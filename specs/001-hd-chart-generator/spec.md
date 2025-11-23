@@ -306,6 +306,43 @@ A visitor is impressed by their chart and wants to explore further. They can opt
 
 - **Error Handling**: API timeouts, server errors, and network issues are handled gracefully with retry logic and user-friendly messages. No silent failures.
 
+## Deployment Infrastructure
+
+The Human Design Chart Generator uses a dual-platform deployment strategy aligned with the project owner's infrastructure:
+
+### Frontend Deployment (Vercel)
+
+- **Platform**: Vercel (Next.js optimized, edge functions, automatic deployments)
+- **Account**: Project owner's Vercel account (new project to be created)
+- **Deployments**: Automatic from main branch (production) and feature branches (preview deployments)
+- **Environment**: Node.js runtime with support for serverless functions and static site generation
+- **Domain**: To be configured pointing to Vercel project
+- **Configuration**: Environment variables for API endpoint, analytics, etc. managed in Vercel dashboard
+
+### Backend Deployment (Railway)
+
+- **Platform**: Railway (container-based, easy scaling, database support)
+- **Account**: Project owner's Railway account (new project to be created)
+- **Deployments**: Automatic from main branch (production) and feature branches (staging deployments)
+- **Runtime**: Node.js, Python, or language of choice (to be determined in planning phase)
+- **Services**: Backend API server + optional PostgreSQL database for future use (not needed for MVP persistence)
+- **Environment**: Environment variables for secrets, HD calculation API credentials, etc. managed in Railway dashboard
+
+### Development Workflow
+
+- Developers work on feature branches locally
+- Pushing to origin creates automatic preview deployments on both Vercel (frontend) and Railway (backend)
+- Pull requests include preview URLs for testing
+- Merging to main triggers automatic production deployments
+- Both platforms provide deployment logs and monitoring dashboards
+
+### Infrastructure Notes
+
+- **New Project Setup**: Both Vercel and Railway projects must be created and configured before development begins
+- **Environment Variables**: Secrets and API credentials are stored in platform dashboards, not in git
+- **Coordination**: Frontend and backend deployment timing should be coordinated for breaking changes (use feature flags or API versioning)
+- **Monitoring**: Both platforms provide built-in monitoring; additional observability tools may be integrated during development
+
 ## Out of Scope (Explicitly Not Included)
 
 The following features and data are explicitly excluded from this specification and may be considered for future iterations:
