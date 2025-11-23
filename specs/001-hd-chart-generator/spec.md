@@ -150,15 +150,17 @@ A visitor doesn't know their exact birth time or it's only approximate. They can
 
 ### User Story 9 - Lead Capture for Future Business (Priority: P3)
 
-A visitor is impressed by their chart and wants to explore further. They can optionally enter their email to express interest in a Business Reading, building a lead list for future sales.
+A visitor is impressed by their chart and wants to explore further. They can optionally enter their email to express interest in a Business Reading, building a lead list for future sales. Basic email validation is performed; comprehensive compliance (GDPR consent, privacy policy) is addressed in Phase 2.
 
-**Why this priority**: This is a business goal, not a core user need. Important for monetization but not for MVP delivery of the tool itself. Can be added in phase 2.
+**Why this priority**: This is a business goal supporting early lead generation and monetization discovery. Included in MVP with basic validation; full compliance implementation deferred to Phase 2.
 
-**Independent Test**: Can be fully tested by verifying that an optional email field is available, submission is validated, and emails are stored securely for future contact.
+**Independent Test**: Can be fully tested by verifying that an optional email field is available, basic email format validation works, and emails are stored for contact follow-up. (Note: Comprehensive GDPR/compliance testing deferred to Phase 2.)
 
 **Acceptance Scenarios**:
 
 1. **Given** a completed chart, **When** the visitor sees an optional "Interesse an Business Reading?" section with email field, **Then** they can enter their email without it being required.
+
+2. **Given** an email is submitted, **When** validation completes, **Then** the system confirms receipt and stores the email for future Business Reading outreach (basic MVP implementation; comprehensive compliance in Phase 2).
 
 ### Edge Cases
 
@@ -239,6 +241,10 @@ A visitor is impressed by their chart and wants to explore further. They can opt
 
 - **FR-030**: Frontend MUST provide "retry" option when HD calculation API is unavailable with friendly message: "Gerade kann dein Chart nicht berechnet werden. Bitte versuche es später noch einmal."
 
+- **FR-031**: Backend MUST accept optional email input from lead capture form with basic email format validation (RFC 5322 standard or similar).
+
+- **FR-032**: Backend MUST store submitted emails in database table for future Business Reading outreach (MVP: basic storage; Phase 2: add double opt-in, GDPR consent tracking, privacy policy).
+
 ### Key Entities
 
 - **User Input**: Represents the visitor's birth information (firstName, birthDate, birthTime, birthLocation, birthTimeApproximate flag). Not persisted in MVP.
@@ -246,6 +252,8 @@ A visitor is impressed by their chart and wants to explore further. They can opt
 - **HD Chart Data**: The complete calculated Human Design profile including Type, Authority, Profile, Centers (9), Channels (variable count), Gates (conscious/unconscious), Incarnation Cross. Calculated externally, not stored.
 
 - **Normalized Chart Response**: Internal system representation ensuring Frontend always receives consistent JSON structure regardless of HD provider source. Includes all display-ready information formatted for presentation.
+
+- **Lead Capture Email**: Optional visitor email submitted after chart display for Business Reading interest. Stored in database for future outreach. MVP: basic email storage; Phase 2: add consent tracking and GDPR compliance.
 
 ## Success Criteria *(mandatory)*
 
@@ -280,13 +288,23 @@ A visitor is impressed by their chart and wants to explore further. They can opt
 
 - **SC-012**: Chart output is printable or shareable (page-friendly rendering) without losing visual quality or important data.
 
+## Clarifications
+
+### Session 2025-11-23
+
+- Q: Should HD calculations be sourced from external API, internal calculation, or hybrid? → A: Hybrid — start with external API for MVP, plan internal calculation as Phase 2 enhancement.
+- Q: How should 49+ profile descriptions be managed? → A: Hybrid approach — start with static curated set for MVP, allow future expansion from research.
+- Q: If geocoding/autocomplete unavailable, what's the fallback? → A: Graceful degradation — attempt autocomplete if available; fall back to free-text-only if service unavailable.
+- Q: Should email lead capture infrastructure be in MVP or deferred to Phase 2? → A: Implement in MVP with basic validation; handle comprehensive GDPR compliance in Phase 2.
+- Q: Where should Bodygraph color scheme be documented? → A: Centralized design system file (e.g., `design/color-system.md`) for single source of truth.
+
 ## Assumptions
 
-- **External HD Calculation Source**: An external Human Design calculation API or internal calculation function is available (either existing or to be built). Specification assumes it returns complete HD data; if using external API, an integration layer maps its response to internal format.
+- **HD Calculation Hybrid Approach**: MVP uses external Human Design calculation API (third-party provider TBD in planning phase). Backend implements normalization layer to map external API response to internal JSON structure. Phase 2 will explore building internal HD calculation logic; external API remains as fallback/comparison source.
 
-- **Location Services**: Birth location to coordinates/timezone conversion assumes availability of a geocoding service (Google Maps API, OpenStreetMap, or similar). If not available in MVP, location can be stored as text-only and passed to HD provider.
+- **Location Services**: Birth location input accepts free text (e.g., "Berlin, Germany") as fallback. If geocoding service (Google Maps API, OpenStreetMap, or similar) is available, autocomplete will be attempted; free-text is always accepted as fallback. External HD API typically accepts location names as text.
 
-- **Chart Styling**: Visual appearance (fonts, color scheme) aligns with existing NOIO branding. Specific colors for defined centers and accent colors are available in the design system.
+- **Chart Styling**: Visual appearance (fonts, color scheme) aligns with existing NOIO branding. Bodygraph colors (defined centers, open centers, accent colors, text) are documented in centralized design system file (`design/color-system.md` or equivalent) created during Phase 1 planning. This file serves as single source of truth for all frontend styling.
 
 - **Browser Support**: Frontend must support modern browsers (Chrome, Firefox, Safari, Edge) with SVG rendering support. IE11 or older browsers not supported.
 
@@ -296,7 +314,7 @@ A visitor is impressed by their chart and wants to explore further. They can opt
 
 - **Gateway/Channel Mapping**: The internal system correctly maps gateway numbers to centers and channel codes; test data confirms this mapping is consistent with Human Design standards.
 
-- **Profile Descriptions**: Short descriptions for each profile combination (4/1, 3/5, etc.) are provided or written as part of specification implementation; 49+ profile combinations exist.
+- **Profile Descriptions**: MVP includes curated static descriptions for all 49+ profile combinations stored in backend configuration (JSON/YAML). Descriptions are researched and written during Phase 1 planning; documented in German with focus on life dynamics and relatable language. Phase 2 may expand descriptions through additional research or user feedback integration.
 
 - **Authority Decision Hints**: Prewritten decision hints for each authority type are accurate, clear, and non-jargon. These are curated during specification phase or implementation.
 
