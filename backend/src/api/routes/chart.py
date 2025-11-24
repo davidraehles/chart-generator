@@ -18,6 +18,7 @@ from src.models.error import (
 from src.services.ephemeris import load_config
 from src.services.ephemeris.swiss_ephemeris import SwissEphemerisSource
 from src.services.calculation.position_calculator import PositionCalculator
+from src.services.calculation.design_time import calculate_design_datetime
 import pytz
 
 
@@ -35,14 +36,14 @@ async def calculate_chart(request: EphemerisChartRequest):
     """
     Calculate Human Design chart from birth data.
 
-    **Phase 3 (US1)**: Returns personality (birth) planetary positions only.
-    Design chart and gate/line mappings will be added in later phases.
+    **Phase 4 (US1+US2)**: Returns both personality (birth) and design planetary positions.
+    Gate/line mappings will be added in Phase 5.
 
     Args:
         request: Birth data (datetime, timezone, location, optional name)
 
     Returns:
-        EphemerisChartResponse with 13 planetary positions
+        EphemerisChartResponse with 26 planetary positions (13 personality + 13 design)
 
     Raises:
         HTTPException 400: Invalid input data (date range, timezone, coordinates)
@@ -97,13 +98,23 @@ async def calculate_chart(request: EphemerisChartRequest):
         # Initialize position calculator
         calculator = PositionCalculator(ephemeris_source)
 
-        # Calculate planetary positions for birth moment
+        # Calculate planetary positions for birth moment (personality)
         personality_positions = calculator.calculate_positions(birth_utc)
+
+        # Calculate design datetime (88° solar arc before birth)
+        design_datetime_utc = calculate_design_datetime(
+            birth_utc, ephemeris_source, target_arc=88.0
+        )
+
+        # Calculate planetary positions for design moment
+        design_positions = calculator.calculate_positions(design_datetime_utc)
 
         # Build response
         response = EphemerisChartResponse(
             name=request.name,
             personality_activations=personality_positions,
+            design_activations=design_positions,
+            design_datetime=design_datetime_utc,
             calculation_source=ephemeris_source.get_source_name(),
             calculated_at=datetime.utcnow(),
         )

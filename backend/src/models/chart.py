@@ -154,7 +154,7 @@ class PlanetaryPosition(BaseModel):
 class EphemerisChartResponse(BaseModel):
     """
     Ephemeris calculation response with planetary positions.
-    Phase 3 (US1): Returns personality (birth) positions only.
+    Phase 4 (US1+US2): Returns both personality (birth) and design positions.
     """
 
     name: Optional[str] = None
@@ -163,6 +163,16 @@ class EphemerisChartResponse(BaseModel):
         min_items=13,
         max_items=13,
         description="13 planetary positions from birth moment",
+    )
+    design_activations: List[PlanetaryPosition] = Field(
+        ...,
+        min_items=13,
+        max_items=13,
+        description="13 planetary positions from design moment (~88 days before birth)",
+    )
+    design_datetime: datetime = Field(
+        ...,
+        description="Calculated design moment (when Sun was 88° earlier)",
     )
     calculation_source: str = Field(
         ..., description="Ephemeris source used"
