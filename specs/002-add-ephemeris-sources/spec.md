@@ -1,6 +1,6 @@
 # Feature Specification: Ephemeris Data Integration for Human Design Calculations
 
-**Feature Branch**: `001-add-ephemeris-sources`
+**Feature Branch**: `002-add-ephemeris-sources`
 **Created**: 2025-11-24
 **Status**: Draft
 **Input**: User description: "Integration of open-source ephemeris sources for accurate planetary position calculations in Human Design app"
