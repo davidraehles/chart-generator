@@ -96,16 +96,18 @@ railway up
 2. Click "Add New..." → "Project"
 3. Import your GitHub repository: `davidraehles/chart-generator`
 4. Configure the project:
-   - **Framework Preset**: Next.js
-   - **Root Directory**: `frontend`
-   - **Build Command**: `npm run build` (auto-detected)
-   - **Output Directory**: `.next` (auto-detected)
-5. Set environment variable:
-   ```
-   NEXT_PUBLIC_API_URL=https://your-backend.railway.app (from step 1)
-   ```
-6. Click "Deploy"
-7. Vercel will provide a URL like: `https://chart-generator.vercel.app`
+   - **Framework Preset**: Next.js (auto-detected)
+   - **Root Directory**: `frontend` ⚠️ **IMPORTANT: Must set this!**
+   - **Build Command**: Leave default (auto-detected)
+   - **Output Directory**: Leave default (auto-detected)
+5. Click "Deploy" (deployment may fail initially - that's ok)
+6. After project is created, go to **Settings** → **Environment Variables**
+7. Add environment variable:
+   - **Key**: `NEXT_PUBLIC_API_URL`
+   - **Value**: `https://your-backend.railway.app` (from step 1, Railway URL)
+   - **Environments**: Check all (Production, Preview, Development)
+8. Go to **Deployments** tab → Click "Redeploy" on the latest deployment
+9. Vercel will provide a URL like: `https://chart-generator.vercel.app`
 
 **Option B: Via Vercel CLI**
 ```bash
@@ -199,17 +201,47 @@ No manual deployment needed!
 
 ## ⚠️ Common Issues
 
+**Issue: 403 Forbidden Error on Vercel**
+- **Cause**: Root directory not set correctly or build failed
+- **Fix**:
+  1. Go to Vercel project Settings → General
+  2. Verify "Root Directory" is set to `frontend`
+  3. Click "Save"
+  4. Redeploy from Deployments tab
+
+**Issue: Vercel deployment fails with "Cannot find module"**
+- **Cause**: Missing dependencies or incorrect build directory
+- **Fix**:
+  1. Check that `frontend/package.json` exists in repository
+  2. Verify Root Directory is set to `frontend` in Vercel settings
+  3. Redeploy
+
 **Issue: Frontend can't connect to backend**
-- Check `NEXT_PUBLIC_API_URL` in Vercel includes `https://`
-- Verify Railway backend is running (check health endpoint)
+- **Cause**: Missing or incorrect API URL environment variable
+- **Fix**:
+  1. Go to Vercel Settings → Environment Variables
+  2. Verify `NEXT_PUBLIC_API_URL` is set with your Railway URL
+  3. Must include `https://` (e.g., `https://chart-generator-production.up.railway.app`)
+  4. Redeploy after setting environment variable
 
-**Issue: CORS errors**
-- Verify `FRONTEND_URL` in Railway matches your Vercel URL exactly
-- Check Railway logs: `railway logs`
+**Issue: CORS errors in browser console**
+- **Cause**: Backend FRONTEND_URL doesn't match Vercel URL
+- **Fix**:
+  1. Go to Railway project → Variables
+  2. Update `FRONTEND_URL` to exact Vercel URL (including `https://`)
+  3. Railway will auto-redeploy
 
-**Issue: Backend not starting**
-- Check Railway logs for errors
-- Verify `requirements.txt` has all dependencies
+**Issue: Backend not starting on Railway**
+- **Fix**: Check Railway logs for errors
+  1. Click on Railway deployment
+  2. View logs tab
+  3. Look for Python errors or missing dependencies
+
+**Issue: "Application error" on Vercel**
+- **Fix**: Check Vercel deployment logs
+  1. Go to Deployments tab
+  2. Click on failed deployment
+  3. View Function Logs for errors
 
 ## 📞 Support
 
