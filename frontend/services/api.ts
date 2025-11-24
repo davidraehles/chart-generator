@@ -4,7 +4,9 @@
 
 import { ChartRequest, ChartResponse, EmailCaptureRequest, EmailCaptureResponse } from "@/types/chart";
 
-const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000";
+// Use relative path to leverage Next.js rewrites in production
+// In dev, rewrites proxy to localhost:5000
+const API_BASE_URL = "/api";
 
 export class APIError extends Error {
   field?: string;
@@ -21,7 +23,7 @@ export class APIError extends Error {
  */
 export async function fetchChart(request: ChartRequest): Promise<ChartResponse> {
   try {
-    const response = await fetch(`${API_BASE_URL}/api/hd-chart`, {
+    const response = await fetch(`${API_BASE_URL}/hd-chart`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -53,7 +55,7 @@ export async function fetchChart(request: ChartRequest): Promise<ChartResponse> 
  */
 export async function submitEmail(email: string): Promise<EmailCaptureResponse> {
   try {
-    const response = await fetch(`${API_BASE_URL}/api/email-capture`, {
+    const response = await fetch(`${API_BASE_URL}/email-capture`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
