@@ -8,9 +8,9 @@ Most accurate and widely used for Human Design calculations.
 import os
 from typing import Optional
 import swisseph as swe
-from backend.src.services.ephemeris.base import EphemerisSource
-from backend.src.models.celestial import CelestialBody
-from backend.src.models.error import ERROR_EPHEMERIS_UNAVAILABLE, ERROR_CALCULATION_FAILED
+from src.services.ephemeris.base import EphemerisSource
+from src.models.celestial import CelestialBody
+from src.models.error import ERROR_EPHEMERIS_UNAVAILABLE, ERROR_CALCULATION_FAILED
 
 
 # Mapping of CelestialBody enum to Swiss Ephemeris planet constants

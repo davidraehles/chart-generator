@@ -4,7 +4,7 @@ Ephemeris service initialization and configuration.
 Provides configuration loading and service factory.
 """
 
-from backend.src.models.ephemeris import EphemerisConfig
+from src.models.ephemeris import EphemerisConfig
 
 
 def load_config() -> EphemerisConfig:

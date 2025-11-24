@@ -10,6 +10,7 @@ from src.models.email import EmailCaptureRequest, EmailCaptureResponse
 from src.services.validation_service import ValidationService, ValidationError
 from src.services.hd_api_client import HDAPIClient, HDAPIError
 from src.services.normalization_service import NormalizationService
+from src.api.routes.chart import router as chart_router
 
 # Load environment variables
 load_dotenv()
@@ -35,6 +36,9 @@ app.add_middleware(
 validation_service = ValidationService()
 hd_client = HDAPIClient()
 normalization_service = NormalizationService()
+
+# Include routers
+app.include_router(chart_router)
 
 
 @app.get("/health")

@@ -6,7 +6,7 @@ Defines the interface that all ephemeris sources must implement.
 
 from abc import ABC, abstractmethod
 from datetime import datetime
-from backend.src.models.celestial import CelestialBody
+from src.models.celestial import CelestialBody
 
 
 class EphemerisSource(ABC):
