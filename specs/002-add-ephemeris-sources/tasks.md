@@ -25,14 +25,14 @@ This is a web application with backend/frontend separation per plan.md:
 
 **Purpose**: Project initialization and ephemeris file preparation
 
-- [ ] T001 Install pyswisseph dependency in backend/requirements.txt (add pyswisseph==2.10.3.2)
-- [ ] T002 Create ephemeris data directory at backend/data/ephemeris/
-- [ ] T003 [P] Download Swiss Ephemeris files (seas_18.se1, semo_18.se1, sepl_18.se1) to backend/data/ephemeris/
-- [ ] T004 [P] Configure ephemeris environment variables in backend/.env.example (EPHEMERIS_SOURCE, EPHEMERIS_PATH)
-- [ ] T005 [P] Create backend/src/services/ephemeris/ directory structure
-- [ ] T006 [P] Create backend/src/services/calculation/ directory structure
-- [ ] T007 [P] Create backend/src/services/mapping/ directory structure
-- [ ] T008 [P] Create backend/src/api/routes/ directory (if not exists)
+- [x] T001 Install pyswisseph dependency in backend/requirements.txt (add pyswisseph==2.10.3.2)
+- [x] T002 Create ephemeris data directory at backend/data/ephemeris/
+- [x] T003 [P] Download Swiss Ephemeris files (seas_18.se1, semo_18.se1, sepl_18.se1) to backend/data/ephemeris/
+- [x] T004 [P] Configure ephemeris environment variables in backend/.env.example (EPHEMERIS_SOURCE, EPHEMERIS_PATH)
+- [x] T005 [P] Create backend/src/services/ephemeris/ directory structure
+- [x] T006 [P] Create backend/src/services/calculation/ directory structure
+- [x] T007 [P] Create backend/src/services/mapping/ directory structure
+- [x] T008 [P] Create backend/src/api/routes/ directory (if not exists)
 
 ---
 
