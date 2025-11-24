@@ -10,6 +10,10 @@ from src.models.celestial import CelestialBody
 from src.models.chart import PlanetaryPosition
 from src.services.ephemeris.base import EphemerisSource
 from src.services.calculation.julian_day import datetime_to_julian_day
+from src.services.calculation.gate_line_mapper import (
+    ecliptic_to_gate_line,
+    format_gate_line,
+)
 
 
 class PositionCalculator:
@@ -56,10 +60,17 @@ class PositionCalculator:
             # Calculate ecliptic longitude using ephemeris source
             longitude = self.ephemeris_source.calculate_position(body, julian_day)
 
-            # Create position object
+            # Map ecliptic longitude to Human Design gate and line
+            gate, line = ecliptic_to_gate_line(longitude)
+            gate_line_str = format_gate_line(gate, line)
+
+            # Create position object with gate/line mapping
             position = PlanetaryPosition(
                 body=body,
                 ecliptic_longitude=longitude,
+                gate=gate,
+                line=line,
+                gate_line=gate_line_str,
                 calculation_timestamp=datetime.utcnow(),
                 julian_day=julian_day,
                 source=source_name,

@@ -126,8 +126,8 @@ class EphemerisChartRequest(BaseModel):
 
 class PlanetaryPosition(BaseModel):
     """
-    Position of a celestial body in ecliptic coordinates.
-    Raw astronomical data before HD mapping.
+    Position of a celestial body in ecliptic coordinates with HD gate/line mapping.
+    Combines raw astronomical data with Human Design system mapping.
     """
 
     body: CelestialBody = Field(..., description="Celestial body")
@@ -136,6 +136,22 @@ class PlanetaryPosition(BaseModel):
         ge=0,
         lt=360,
         description="Position in degrees along the ecliptic (0-360)",
+    )
+    gate: int = Field(
+        ...,
+        ge=1,
+        le=64,
+        description="Human Design gate number (1-64, I'Ching hexagram)",
+    )
+    line: int = Field(
+        ...,
+        ge=1,
+        le=6,
+        description="Line number within the gate (1-6)",
+    )
+    gate_line: str = Field(
+        ...,
+        description="Formatted gate.line notation (e.g., '41.3')",
     )
     calculation_timestamp: datetime = Field(
         ...,
