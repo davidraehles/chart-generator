@@ -42,13 +42,13 @@ This is a web application with backend/frontend separation per plan.md:
 
 **⚠️ CRITICAL**: No user story work can begin until this phase is complete
 
-- [ ] T009 Create base Pydantic models in backend/src/models/ephemeris.py (EphemerisConfig from data-model.md)
-- [ ] T010 [P] Create error models in backend/src/models/error.py (CalculationError from data-model.md)
-- [ ] T011 [P] Create celestial body enum in backend/src/models/celestial.py (CelestialBody enum from data-model.md)
-- [ ] T012 Implement ephemeris configuration loader in backend/src/services/ephemeris/__init__.py (load from environment)
-- [ ] T013 Create abstract ephemeris source base class in backend/src/services/ephemeris/base.py (define calculate_position interface)
-- [ ] T014 Implement Swiss Ephemeris source in backend/src/services/ephemeris/swiss_ephemeris.py (primary source using pyswisseph)
-- [ ] T015 Verify Swiss Ephemeris installation with test script backend/verify_ephemeris.py (from quickstart.md example)
+- [x] T009 Create base Pydantic models in backend/src/models/ephemeris.py (EphemerisConfig from data-model.md)
+- [x] T010 [P] Create error models in backend/src/models/error.py (CalculationError from data-model.md)
+- [x] T011 [P] Create celestial body enum in backend/src/models/celestial.py (CelestialBody enum from data-model.md)
+- [x] T012 Implement ephemeris configuration loader in backend/src/services/ephemeris/__init__.py (load from environment)
+- [x] T013 Create abstract ephemeris source base class in backend/src/services/ephemeris/base.py (define calculate_position interface)
+- [x] T014 Implement Swiss Ephemeris source in backend/src/services/ephemeris/swiss_ephemeris.py (primary source using pyswisseph)
+- [x] T015 Verify Swiss Ephemeris installation with test script backend/verify_ephemeris.py (from quickstart.md example)
 
 **Checkpoint**: Foundation ready - user story implementation can now begin in parallel
 
