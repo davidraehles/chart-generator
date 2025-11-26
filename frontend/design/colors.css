@@ -1,0 +1,623 @@
+/**
+ * Color System - CSS Implementation
+ *
+ * This file defines all color tokens for the Human Design Chart Generator.
+ * These are the single source of truth for all colors across the application.
+ *
+ * NEVER hardcode hex values in component stylesheets.
+ * ALWAYS use these CSS custom properties instead.
+ *
+ * Example:
+ *   Good:    background-color: var(--color-bodygraph-defined);
+ *   Bad:     background-color: #2C3E50;
+ */
+
+:root {
+  /* ========================================
+     PRIMARY BRAND COLORS
+     ======================================== */
+
+  /* Deep Navy Blue - Primary brand color for defined centers */
+  --color-primary: #2C3E50;
+  --color-primary-rgb: 44, 62, 80;
+  --color-primary-dark: #1A2333;
+  --color-primary-light: #3D5A73;
+
+  /* Text Colors - High contrast */
+  --color-text-primary: #1A1A1A;       /* Near black - 20:1 contrast on white */
+  --color-text-secondary: #8B95A5;    /* Steel gray - 7.2:1 contrast on white */
+  --color-text-tertiary: #CBD5E0;     /* Light gray - for disabled states */
+  --color-text-inverse: #FFFFFF;      /* White text on dark backgrounds */
+
+  /* Background Colors */
+  --color-bg-primary: #FFFFFF;        /* Page background */
+  --color-bg-secondary: #F9FAFC;      /* Card/section backgrounds */
+  --color-bg-tertiary: #F5F7FA;       /* Hover states, open centers */
+  --color-bg-divider: #E8EAED;        /* Borders and dividers */
+
+  /* ========================================
+     BODYGRAPH-SPECIFIC COLORS
+     ======================================== */
+
+  /* Defined centers - filled/colored */
+  --bodygraph-defined-fill: var(--color-primary);        /* #2C3E50 */
+  --bodygraph-defined-stroke: none;
+  --bodygraph-defined-text: var(--color-text-inverse);   /* White text on dark center */
+
+  /* Open centers - empty/white with subtle background */
+  --bodygraph-open-fill: #F5F7FA;
+  --bodygraph-open-stroke: #E8EAED;
+  --bodygraph-open-stroke-width: 1;
+  --bodygraph-open-text: var(--color-text-primary);      /* Dark text on light background */
+
+  /* Channel lines connecting centers */
+  --bodygraph-channel-stroke: #8B95A5;                   /* Steel gray */
+  --bodygraph-channel-stroke-width: 1.5;
+  --bodygraph-channel-opacity: 0.8;
+
+  /* Gate points on channels */
+  --bodygraph-gate-fill: #3498DB;                        /* Bright blue */
+  --bodygraph-gate-radius: 3;
+  --bodygraph-gate-opacity: 0.9;
+
+  /* Center labels and text within Bodygraph */
+  --bodygraph-label-font-size: 12px;
+  --bodygraph-label-font-weight: 500;
+  --bodygraph-label-color: var(--color-text-primary);
+  --bodygraph-label-letter-spacing: 0.5px;
+
+  /* ========================================
+     SEMANTIC COLORS
+     ======================================== */
+
+  /* Accent color - used for interactive elements, info icons */
+  --color-accent: #3498DB;
+  --color-accent-dark: #2980B9;
+  --color-accent-light: #5DADE2;
+
+  /* Error states - validation failures, alerts */
+  --color-error: #E74C3C;
+  --color-error-light: #FEF5F5;       /* Very light red background */
+  --color-error-border: #E74C3C;
+  --color-error-text: #E74C3C;
+
+  /* Success states - form validation, confirmations */
+  --color-success: #27AE60;
+  --color-success-light: #F0FDF4;     /* Very light green background */
+  --color-success-border: #27AE60;
+  --color-success-text: #27AE60;
+
+  /* Warning color - deprecated in current design, kept for future */
+  --color-warning: #F39C12;
+  --color-warning-light: #FEF8E7;
+
+  /* ========================================
+     INTERACTIVE ELEMENT COLORS
+     ======================================== */
+
+  /* Button - Primary (uses brand color) */
+  --btn-primary-bg: var(--color-primary);
+  --btn-primary-text: var(--color-text-inverse);
+  --btn-primary-bg-hover: var(--color-primary-dark);
+  --btn-primary-bg-active: var(--color-primary-dark);
+  --btn-primary-bg-disabled: var(--color-text-tertiary);
+  --btn-primary-text-disabled: #FFFFFF;
+
+  /* Button - Secondary (outline style) */
+  --btn-secondary-bg: transparent;
+  --btn-secondary-border: var(--color-text-secondary);
+  --btn-secondary-text: var(--color-text-primary);
+  --btn-secondary-bg-hover: var(--color-bg-secondary);
+  --btn-secondary-border-hover: var(--color-primary);
+  --btn-secondary-text-hover: var(--color-primary);
+
+  /* Links */
+  --link-color: var(--color-primary);
+  --link-color-hover: var(--color-primary-dark);
+  --link-color-visited: #9B59B6;      /* Purple for visited links */
+  --link-color-active: var(--color-primary-dark);
+
+  /* Form inputs */
+  --input-border: var(--color-bg-divider);
+  --input-border-focus: var(--color-primary);
+  --input-border-error: var(--color-error);
+  --input-border-success: var(--color-success);
+  --input-bg: #FFFFFF;
+  --input-bg-disabled: var(--color-bg-secondary);
+  --input-text: var(--color-text-primary);
+  --input-placeholder: var(--color-text-tertiary);
+
+  /* Focus indicators (accessibility requirement) */
+  --focus-outline-color: var(--color-primary);
+  --focus-outline-width: 2px;
+  --focus-outline-offset: 2px;
+
+  /* ========================================
+     OPACITY SCALES (for layering effects)
+     ======================================== */
+
+  /* Used for disabled states, shadows, overlays */
+  --opacity-disabled: 0.5;
+  --opacity-hover: 0.8;
+  --opacity-active: 1;
+  --opacity-subtle: 0.2;
+
+  /* ========================================
+     GRADIENTS (for future use in Phase 2+)
+     ======================================== */
+
+  /* Subtle background gradients (not used in MVP) */
+  --gradient-subtle: linear-gradient(135deg,
+    var(--color-bg-primary) 0%,
+    var(--color-bg-secondary) 100%);
+}
+
+/* ========================================
+   COMPONENT-SPECIFIC STYLES
+   ======================================== */
+
+/* Bodygraph SVG Elements */
+
+.bodygraph-svg {
+  background-color: var(--color-bg-primary);
+}
+
+.center--defined {
+  fill: var(--bodygraph-defined-fill);
+  stroke: none;
+}
+
+.center--defined-text {
+  fill: var(--bodygraph-defined-text);
+}
+
+.center--open {
+  fill: var(--bodygraph-open-fill);
+  stroke: var(--bodygraph-open-stroke);
+  stroke-width: var(--bodygraph-open-stroke-width);
+}
+
+.center--open-text {
+  fill: var(--bodygraph-open-text);
+}
+
+.center-label {
+  font-size: var(--bodygraph-label-font-size);
+  font-weight: var(--bodygraph-label-font-weight);
+  fill: var(--bodygraph-label-color);
+  letter-spacing: var(--bodygraph-label-letter-spacing);
+}
+
+.channel-line {
+  stroke: var(--bodygraph-channel-stroke);
+  stroke-width: var(--bodygraph-channel-stroke-width);
+  opacity: var(--bodygraph-channel-opacity);
+  fill: none;
+}
+
+.channel-line:hover {
+  opacity: 1;
+  stroke-width: calc(var(--bodygraph-channel-stroke-width) + 0.5);
+}
+
+.gate-point {
+  fill: var(--bodygraph-gate-fill);
+  r: var(--bodygraph-gate-radius);
+  opacity: var(--bodygraph-gate-opacity);
+}
+
+.gate-point:hover {
+  r: calc(var(--bodygraph-gate-radius) + 1);
+  opacity: 1;
+  filter: drop-shadow(0 1px 2px rgba(0, 0, 0, 0.1));
+}
+
+/* Text Elements */
+
+body {
+  color: var(--color-text-primary);
+  background-color: var(--color-bg-primary);
+}
+
+p {
+  color: var(--color-text-primary);
+}
+
+h1, h2, h3, h4, h5, h6 {
+  color: var(--color-text-primary);
+}
+
+label {
+  color: var(--color-text-primary);
+}
+
+small {
+  color: var(--color-text-secondary);
+}
+
+/* Links */
+
+a {
+  color: var(--link-color);
+  text-decoration: none;
+}
+
+a:hover {
+  color: var(--link-color-hover);
+}
+
+a:visited {
+  color: var(--link-color-visited);
+}
+
+a:active {
+  color: var(--link-color-active);
+}
+
+a:focus {
+  outline: var(--focus-outline-width) solid var(--focus-outline-color);
+  outline-offset: var(--focus-outline-offset);
+}
+
+/* Buttons */
+
+.btn {
+  font-size: 14px;
+  padding: 8px 16px;
+  border-radius: 4px;
+  border: none;
+  cursor: pointer;
+  transition: all 200ms ease-out;
+  min-height: 44px;
+  min-width: 44px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.btn:focus {
+  outline: var(--focus-outline-width) solid var(--focus-outline-color);
+  outline-offset: var(--focus-outline-offset);
+}
+
+.btn-primary {
+  background-color: var(--btn-primary-bg);
+  color: var(--btn-primary-text);
+}
+
+.btn-primary:hover {
+  background-color: var(--btn-primary-bg-hover);
+}
+
+.btn-primary:active {
+  background-color: var(--btn-primary-bg-active);
+}
+
+.btn-primary:disabled {
+  background-color: var(--btn-primary-bg-disabled);
+  color: var(--btn-primary-text-disabled);
+  cursor: not-allowed;
+  opacity: var(--opacity-disabled);
+}
+
+.btn-secondary {
+  background-color: var(--btn-secondary-bg);
+  border: 1px solid var(--btn-secondary-border);
+  color: var(--btn-secondary-text);
+}
+
+.btn-secondary:hover {
+  background-color: var(--btn-secondary-bg-hover);
+  border-color: var(--btn-secondary-border-hover);
+  color: var(--btn-secondary-text-hover);
+}
+
+.btn-secondary:disabled {
+  opacity: var(--opacity-disabled);
+  cursor: not-allowed;
+}
+
+/* Form Inputs */
+
+input,
+textarea,
+select {
+  border: 1px solid var(--input-border);
+  background-color: var(--input-bg);
+  color: var(--input-text);
+  padding: 8px 12px;
+  border-radius: 4px;
+  font-size: 14px;
+  transition: border-color 200ms ease-out;
+  min-height: 44px;
+}
+
+input:focus,
+textarea:focus,
+select:focus {
+  outline: none;
+  border-color: var(--input-border-focus);
+  box-shadow: 0 0 0 2px rgba(var(--color-primary-rgb), 0.2);
+}
+
+input:disabled,
+textarea:disabled,
+select:disabled {
+  background-color: var(--input-bg-disabled);
+  cursor: not-allowed;
+  opacity: var(--opacity-disabled);
+}
+
+input[type="search"]::placeholder,
+input[type="text"]::placeholder,
+input[type="email"]::placeholder,
+textarea::placeholder {
+  color: var(--input-placeholder);
+}
+
+/* Form validation states */
+
+input:valid {
+  border-color: var(--input-border-success);
+}
+
+input:invalid {
+  border-color: var(--input-border-error);
+}
+
+/* Error Messages */
+
+.error-message,
+.error-text {
+  color: var(--color-error-text);
+  font-size: 12px;
+  font-weight: 500;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-top: 4px;
+}
+
+.error-icon {
+  color: var(--color-error);
+  display: inline-block;
+  flex-shrink: 0;
+}
+
+.error-container,
+.alert-error {
+  background-color: var(--color-error-light);
+  border-left: 3px solid var(--color-error-border);
+  border-radius: 4px;
+  padding: 12px 16px;
+  margin: 12px 0;
+  display: flex;
+  gap: 12px;
+  align-items: flex-start;
+}
+
+.error-container p,
+.alert-error p {
+  color: var(--color-error-text);
+  margin: 0;
+}
+
+/* Success Messages */
+
+.success-message,
+.success-text {
+  color: var(--color-success-text);
+  font-size: 12px;
+  font-weight: 500;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-top: 4px;
+}
+
+.success-icon {
+  color: var(--color-success);
+  display: inline-block;
+  flex-shrink: 0;
+}
+
+.success-container,
+.alert-success {
+  background-color: var(--color-success-light);
+  border-left: 3px solid var(--color-success-border);
+  border-radius: 4px;
+  padding: 12px 16px;
+  margin: 12px 0;
+  display: flex;
+  gap: 12px;
+  align-items: flex-start;
+}
+
+.success-container p,
+.alert-success p {
+  color: var(--color-success-text);
+  margin: 0;
+}
+
+/* Cards & Containers */
+
+.card {
+  background-color: var(--color-bg-secondary);
+  border: 1px solid var(--color-bg-divider);
+  border-radius: 8px;
+  padding: 16px;
+}
+
+.section {
+  background-color: var(--color-bg-primary);
+  border-bottom: 1px solid var(--color-bg-divider);
+  padding: 20px;
+}
+
+.divider {
+  border-bottom: 1px solid var(--color-bg-divider);
+  margin: 16px 0;
+}
+
+/* Icons */
+
+.icon {
+  display: inline-block;
+  color: var(--color-text-secondary);
+}
+
+.icon-primary {
+  color: var(--color-primary);
+}
+
+.icon-accent {
+  color: var(--color-accent);
+}
+
+.icon-error {
+  color: var(--color-error);
+}
+
+.icon-success {
+  color: var(--color-success);
+}
+
+/* Disabled States */
+
+.disabled {
+  color: var(--color-text-tertiary);
+  opacity: var(--opacity-disabled);
+  cursor: not-allowed;
+}
+
+/* Hover Effects */
+
+.interactive:hover {
+  background-color: var(--color-bg-secondary);
+}
+
+/* Selection (text highlight) */
+
+::selection {
+  background-color: rgba(var(--color-primary-rgb), 0.2);
+  color: var(--color-text-primary);
+}
+
+/* ========================================
+   DARK MODE PREPARATION (Phase 2+)
+   Do not use in MVP. Reference only.
+   ======================================== */
+
+/*
+@media (prefers-color-scheme: dark) {
+  :root {
+    --color-bg-primary: #0F1419;
+    --color-bg-secondary: #1A202C;
+    --color-text-primary: #F5F7FA;
+    --color-text-secondary: #CBD5E0;
+    --color-primary: #60A5FA;
+    --color-accent: #60A5FA;
+    --color-error: #FCA5A5;
+    --color-success: #6EE7B7;
+  }
+}
+*/
+
+/* ========================================
+   PRINT STYLES
+   ======================================== */
+
+@media print {
+  /* Override colors for print-friendly output */
+  body {
+    background-color: #FFFFFF;
+    color: #000000;
+  }
+
+  .bodygraph-svg {
+    background-color: #FFFFFF;
+  }
+
+  .center--defined {
+    fill: #333333; /* Dark gray instead of navy */
+  }
+
+  .channel-line {
+    stroke: #666666; /* Medium gray */
+  }
+
+  .gate-point {
+    fill: #666666; /* Medium gray */
+  }
+
+  a {
+    color: #000000;
+  }
+
+  .error-message,
+  .success-message {
+    color: #000000;
+  }
+}
+
+/* ========================================
+   ACCESSIBILITY REQUIREMENTS
+   ======================================== */
+
+/* High Contrast Mode support (Windows High Contrast Mode) */
+@media (prefers-contrast: more) {
+  /* Ensure all elements have sufficient contrast */
+  button,
+  input,
+  select,
+  textarea {
+    border-width: 2px;
+  }
+
+  .btn {
+    border: 2px solid currentColor;
+  }
+
+  a {
+    text-decoration: underline;
+  }
+}
+
+/* Reduced Motion support (respects user preference) */
+@media (prefers-reduced-motion: reduce) {
+  * {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
+/* ========================================
+   RESPONSIVE DESIGN
+   ======================================== */
+
+/* Mobile-first approach - base styles for mobile, scale up as needed */
+
+@media (min-width: 768px) {
+  /* Tablet and up - increase spacing and font sizes slightly */
+
+  .bodygraph-label {
+    font-size: 13px; /* Slightly larger on tablets */
+  }
+
+  .card {
+    padding: 20px; /* More breathing room */
+  }
+}
+
+@media (min-width: 1024px) {
+  /* Desktop - optimize for larger screens */
+
+  .bodygraph-label {
+    font-size: 14px; /* Full size on desktop */
+  }
+
+  .card {
+    padding: 24px;
+  }
+}
