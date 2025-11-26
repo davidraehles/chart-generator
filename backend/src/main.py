@@ -11,6 +11,8 @@ from src.services.validation_service import ValidationService, ValidationError
 from src.services.hd_api_client import HDAPIClient, HDAPIError
 from src.services.normalization_service import NormalizationService
 from src.api.routes.chart import router as chart_router
+from src.handlers.email_handler import EmailHandler, EmailCaptureError
+from src.database import get_db_session
 
 # Load environment variables
 load_dotenv()
@@ -36,6 +38,7 @@ app.add_middleware(
 validation_service = ValidationService()
 hd_client = HDAPIClient()
 normalization_service = NormalizationService()
+email_handler = EmailHandler()
 
 # Include routers
 app.include_router(chart_router)
@@ -114,39 +117,60 @@ async def generate_chart(request: ChartRequest):
 
 
 @app.post("/api/email-capture", response_model=EmailCaptureResponse)
-async def capture_email(request: EmailCaptureRequest):
+async def capture_email(request: EmailCaptureRequest, http_request: Request):
     """
     Capture email for Business Reading interest
 
     Args:
         request: EmailCaptureRequest with email
+        http_request: FastAPI Request object for metadata
 
     Returns:
         EmailCaptureResponse with success status
 
     Raises:
-        HTTPException: 400 for validation errors
+        HTTPException: 400 for validation errors, 409 for duplicates, 500 for server errors
     """
+    db_session = None
     try:
-        # Validate email
-        is_valid, error_msg = validation_service.validate_email(request.email)
-        if not is_valid:
-            raise ValidationError("email", error_msg)
+        # Get database session
+        db_session = get_db_session()
 
-        # TODO: Save to database
-        # For now, just return success
-        import uuid
+        # Extract client metadata
+        ip_address = http_request.client.host if http_request.client else None
+        user_agent = http_request.headers.get("user-agent")
+
+        # Capture email using handler
+        result = email_handler.capture_email(
+            email=request.email,
+            db_session=db_session,
+            ip_address=ip_address,
+            user_agent=user_agent
+        )
+
         return EmailCaptureResponse(
-            success=True,
-            id=uuid.uuid4(),
-            message="Vielen Dank für dein Interesse an einem Business Reading."
+            success=result["success"],
+            id=result["id"],
+            message=result["message"]
         )
 
-    except ValidationError as e:
+    except EmailCaptureError as e:
         raise HTTPException(
-            status_code=400,
-            detail={"field": e.field, "error": e.message}
+            status_code=e.status_code,
+            detail={"field": "email", "error": e.message}
         )
+    except Exception as e:
+        # Log the error (in production, use proper logging)
+        print(f"Unexpected error in email capture: {str(e)}")
+        raise HTTPException(
+            status_code=500,
+            detail={
+                "error": "Ein unerwarteter Fehler ist aufgetreten. Bitte versuche es später noch einmal."
+            }
+        )
+    finally:
+        if db_session:
+            db_session.close()
 
 
 @app.exception_handler(Exception)
