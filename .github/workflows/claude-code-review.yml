@@ -1,0 +1,120 @@
+name: Claude Code Review
+
+on:
+  pull_request:
+    types: [opened, synchronize, reopened]
+    branches:
+      - main
+      - 'claude/**'
+      - 'feature/**'
+
+permissions:
+  contents: read
+  pull-requests: write
+  issues: write
+
+jobs:
+  claude-review:
+    runs-on: ubuntu-latest
+    name: Claude AI Code Review
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Get changed files
+        id: changed-files
+        uses: tj-actions/changed-files@v41
+        with:
+          separator: ","
+
+      - name: Claude Code Review
+        uses: anthropics/claude-code-review-action@v1
+        with:
+          anthropic_api_key: ${{ secrets.ANTHROPIC_API_KEY }}
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          model: claude-sonnet-4-5-20250929
+          changed_files: ${{ steps.changed-files.outputs.all_changed_files }}
+          review_level: thorough
+          focus_areas: |
+            - TypeScript type safety and strict null checks
+            - React 18+ best practices and hooks usage
+            - Next.js 14+ App Router patterns
+            - Mobile-first responsive design (min 375px)
+            - German language content validation
+            - API contract compliance with specs/001-hd-chart-generator/contracts/
+            - Human Design domain accuracy
+            - Error handling with user-friendly German messages
+            - Accessibility standards
+            - Performance optimization
+            - Security vulnerabilities (XSS, injection, OWASP top 10)
+          exclude_patterns: |
+            - "*.md"
+            - "*.json"
+            - "package-lock.json"
+            - "yarn.lock"
+            - ".gitignore"
+            - "LICENSE"
+          custom_instructions: |
+            This is a Human Design Chart Generator project with strict requirements:
+
+            ARCHITECTURE:
+            - Frontend: Next.js 14+ with TypeScript, React 18+, Tailwind CSS
+            - Backend: Node.js/Python on Railway (API normalization layer)
+            - Deployment: Vercel (frontend), Railway (backend)
+
+            DOMAIN REQUIREMENTS:
+            - All user-facing text MUST be in German language
+            - Human Design terminology: Italian type names (Generatore, Manifestante, Proiettore, Manifestatore, Riflettore)
+            - Must comply with specs/001-hd-chart-generator/spec.md requirements
+            - Authority decision hints must be clear, non-jargon German
+
+            QUALITY GATES:
+            - Mobile-first: 375px minimum width
+            - Performance: 3s max chart generation, no layout shifts
+            - No technical error messages to users (German-only friendly errors)
+            - TypeScript strict mode compliance
+            - Visual Bodygraph must render correctly as SVG
+
+            SECURITY:
+            - Validate all user inputs (birth date, time, location, email)
+            - Prevent XSS, SQL injection, command injection
+            - No secrets in code (use environment variables)
+
+            CONSTITUTION COMPLIANCE:
+            - Specification-first design
+            - Minimalist UI (no over-engineering)
+            - API-agnostic backend (normalization layer)
+            - Error-first experience design
+
+            Review code against these requirements and the specification documents in specs/001-hd-chart-generator/.
+
+      - name: Post review summary
+        if: always()
+        uses: actions/github-script@v7
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          script: |
+            const review_url = `${context.payload.pull_request.html_url}#pullrequestreview`;
+            const comment = `## 🤖 Claude Code Review Complete
+
+            Claude has completed the code review for this PR.
+
+            **Review Focus:**
+            - TypeScript & Next.js best practices
+            - Human Design domain accuracy
+            - Mobile-first responsive design
+            - German language validation
+            - Security & performance
+            - Specification compliance
+
+            Check the review comments for detailed feedback.`;
+
+            await github.rest.issues.createComment({
+              issue_number: context.issue.number,
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              body: comment
+            });
