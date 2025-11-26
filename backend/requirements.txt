@@ -9,3 +9,5 @@ python-dotenv==1.0.1
 httpx==0.28.0
 python-multipart==0.0.19
 email-validator==2.1.0
+pyswisseph==2.10.3.2
+pytz==2024.1
