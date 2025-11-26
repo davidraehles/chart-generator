@@ -12,7 +12,7 @@ export default function CentersSection({ centers }: CentersSectionProps) {
   return (
     <div className="p-6 bg-white rounded-lg shadow-md">
       <h3 className="text-xl font-semibold text-primary mb-4">{LABELS.yourCenters}</h3>
-      <div className="grid grid-cols-2 gap-4">
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         <div>
           <h4 className="font-medium text-primary mb-2">{LABELS.defined}</h4>
           <ul className="space-y-1">

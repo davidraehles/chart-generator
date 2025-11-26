@@ -4,10 +4,11 @@ Database models for storing Swiss Ephemeris binary files.
 Stores .se1 files in Postgres for deployment and runtime access.
 """
 
-from datetime import datetime
+from datetime import datetime, UTC
 from sqlalchemy import Column, String, LargeBinary, DateTime, Integer
-from sqlalchemy.ext.declarative import declarative_base
+from sqlalchemy.orm import declarative_base
 
+# Using declarative_base() for SQLAlchemy 1.4/2.0 compatibility
 Base = declarative_base()
 
 
@@ -25,7 +26,7 @@ class EphemerisFile(Base):
     file_data = Column(LargeBinary, nullable=False)
     file_size = Column(Integer, nullable=False)
     sha256_hash = Column(String(64), nullable=False)
-    uploaded_at = Column(DateTime, nullable=False, default=datetime.utcnow)
+    uploaded_at = Column(DateTime, nullable=False, default=lambda: datetime.now(UTC))
     source_url = Column(String(512), nullable=True)
 
     def __repr__(self):

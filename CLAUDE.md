@@ -27,3 +27,4 @@ Python 3.11.0: Follow standard conventions
 
 <!-- MANUAL ADDITIONS START -->
 <!-- MANUAL ADDITIONS END -->
+- Always create a new feature branch after finishing your work, push it and create a PR using Github CLI as this is a trunk based development project.

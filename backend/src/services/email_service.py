@@ -4,7 +4,7 @@ Email service for database operations.
 Handles saving and checking email addresses in the database.
 """
 
-from datetime import datetime
+from datetime import datetime, UTC
 from typing import Optional
 from sqlalchemy.orm import Session
 from sqlalchemy import func
@@ -65,7 +65,7 @@ class EmailService:
             status="pending",
             source=source,
             consent_given=True,  # Implicit consent by submitting
-            consent_date=datetime.utcnow(),
+            consent_date=datetime.now(UTC),
             ip_address=ip_address,
             user_agent=user_agent
         )
@@ -114,7 +114,7 @@ class EmailService:
         ).first()
 
         if record:
-            record.deleted_at = datetime.utcnow()
+            record.deleted_at = datetime.now(UTC)
             db_session.commit()
             return True
 
