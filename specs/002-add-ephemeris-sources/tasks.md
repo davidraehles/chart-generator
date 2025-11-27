@@ -67,14 +67,14 @@ This is a web application with backend/frontend separation per plan.md:
 
 ### Implementation for User Story 1
 
-- [ ] T016 [P] [US1] Create ChartRequest model in backend/src/models/chart.py (from data-model.md)
-- [ ] T017 [P] [US1] Create PlanetaryPosition model in backend/src/models/chart.py (from data-model.md)
-- [ ] T018 [US1] Implement Julian Day conversion in backend/src/services/calculation/julian_day.py (datetime to JD)
-- [ ] T019 [US1] Implement planetary position calculator in backend/src/services/calculation/position_calculator.py (uses Swiss Ephemeris, iterates 13 bodies)
-- [ ] T020 [US1] Create ChartResponse model stub in backend/src/models/chart.py (personality_activations placeholder)
-- [ ] T021 [US1] Implement calculate-chart endpoint in backend/src/api/routes/chart.py (POST /api/calculate-chart)
-- [ ] T022 [US1] Add request validation and error handling in backend/src/api/routes/chart.py (date range, coordinates, timezone)
-- [ ] T023 [US1] Register chart routes in backend/src/main.py FastAPI app
+- [x] T016 [P] [US1] Create ChartRequest model in backend/src/models/chart.py (from data-model.md)
+- [x] T017 [P] [US1] Create PlanetaryPosition model in backend/src/models/chart.py (from data-model.md)
+- [x] T018 [US1] Implement Julian Day conversion in backend/src/services/calculation/julian_day.py (datetime to JD)
+- [x] T019 [US1] Implement planetary position calculator in backend/src/services/calculation/position_calculator.py (uses Swiss Ephemeris, iterates 13 bodies)
+- [x] T020 [US1] Create ChartResponse model stub in backend/src/models/chart.py (personality_activations placeholder)
+- [x] T021 [US1] Implement calculate-chart endpoint in backend/src/api/routes/chart.py (POST /api/calculate-chart)
+- [x] T022 [US1] Add request validation and error handling in backend/src/api/routes/chart.py (date range, coordinates, timezone)
+- [x] T023 [US1] Register chart routes in backend/src/main.py FastAPI app
 - [ ] T024 [US1] Test endpoint manually with curl (use example from quickstart.md)
 
 **Checkpoint**: At this point, User Story 1 should return planetary positions for birth moment
@@ -94,12 +94,12 @@ This is a web application with backend/frontend separation per plan.md:
 
 ### Implementation for User Story 2
 
-- [ ] T025 [US2] Implement 88° solar arc calculation in backend/src/services/calculation/design_chart.py (calculate sun position 88° before birth)
-- [ ] T026 [US2] Create ChartCalculation model in backend/src/models/chart.py (combines personality + design positions)
-- [ ] T027 [US2] Extend position calculator to support design chart in backend/src/services/calculation/position_calculator.py
-- [ ] T028 [US2] Create chart orchestration service in backend/src/services/calculation/chart_calculator.py (calculates both personality + design)
-- [ ] T029 [US2] Update calculate-chart endpoint to return both charts in backend/src/api/routes/chart.py
-- [ ] T030 [US2] Update ChartResponse model in backend/src/models/chart.py (add design_activations, personality_datetime, design_datetime)
+- [x] T025 [US2] Implement 88° solar arc calculation in backend/src/services/calculation/design_chart.py (calculate sun position 88° before birth)
+- [x] T026 [US2] Create ChartCalculation model in backend/src/models/chart.py (combines personality + design positions)
+- [x] T027 [US2] Extend position calculator to support design chart in backend/src/services/calculation/position_calculator.py
+- [x] T028 [US2] Create chart orchestration service in backend/src/services/calculation/chart_calculator.py (calculates both personality + design)
+- [x] T029 [US2] Update calculate-chart endpoint to return both charts in backend/src/api/routes/chart.py
+- [x] T030 [US2] Update ChartResponse model in backend/src/models/chart.py (add design_activations, personality_datetime, design_datetime)
 - [ ] T031 [US2] Verify both charts are returned correctly with test data
 
 **Checkpoint**: At this point, User Stories 1 AND 2 should both work - full planetary positions for birth + design
@@ -119,13 +119,13 @@ This is a web application with backend/frontend separation per plan.md:
 
 ### Implementation for User Story 4
 
-- [ ] T032 [P] [US4] Create HDActivation model in backend/src/models/human_design.py (from data-model.md)
-- [ ] T033 [P] [US4] Create gate order table in backend/src/services/mapping/mapping_tables.py (64 gates starting with Gate 41 at 0°)
-- [ ] T034 [US4] Implement degree-to-gate converter in backend/src/services/mapping/gate_mapper.py (ecliptic → gate number)
-- [ ] T035 [US4] Implement degree-to-line converter in backend/src/services/mapping/gate_mapper.py (position in gate → line 1-6)
-- [ ] T036 [US4] Create mapping service in backend/src/services/mapping/hd_mapper.py (PlanetaryPosition → HDActivation)
-- [ ] T037 [US4] Update chart calculator to apply mapping in backend/src/services/calculation/chart_calculator.py
-- [ ] T038 [US4] Update ChartResponse to include gate/line activations in backend/src/models/chart.py
+- [x] T032 [P] [US4] Create HDActivation model in backend/src/models/human_design.py (from data-model.md)
+- [x] T033 [P] [US4] Create gate order table in backend/src/services/mapping/mapping_tables.py (64 gates starting with Gate 41 at 0°)
+- [x] T034 [US4] Implement degree-to-gate converter in backend/src/services/mapping/gate_mapper.py (ecliptic → gate number)
+- [x] T035 [US4] Implement degree-to-line converter in backend/src/services/mapping/gate_mapper.py (position in gate → line 1-6)
+- [x] T036 [US4] Create mapping service in backend/src/services/mapping/hd_mapper.py (PlanetaryPosition → HDActivation)
+- [x] T037 [US4] Update chart calculator to apply mapping in backend/src/services/calculation/chart_calculator.py
+- [x] T038 [US4] Update ChartResponse to include gate/line activations in backend/src/models/chart.py
 - [ ] T039 [US4] Verify mapping accuracy with test cases from quickstart.md (test known positions → expected gates/lines)
 
 **Checkpoint**: At this point, charts should include gate and line activations, not just raw degrees
@@ -145,12 +145,12 @@ This is a web application with backend/frontend separation per plan.md:
 
 ### Implementation for User Story 3
 
-- [ ] T040 [P] [US3] Create OpenAstro API client in backend/src/services/ephemeris/openastro_api.py (HTTP client using httpx)
-- [ ] T041 [P] [US3] Create NASA JPL client stub in backend/src/services/ephemeris/nasa_jpl.py (placeholder for future implementation)
-- [ ] T042 [US3] Implement ephemeris source factory in backend/src/services/ephemeris/source_factory.py (selects source based on config)
-- [ ] T043 [US3] Update chart calculator to use factory in backend/src/services/calculation/chart_calculator.py
-- [ ] T044 [US3] Add source metadata to ChartResponse in backend/src/models/chart.py (calculation_source field)
-- [ ] T045 [US3] Test source switching by changing EPHEMERIS_SOURCE environment variable
+- [x] T040 [P] [US3] Create OpenAstro API client in backend/src/services/ephemeris/openastro_api.py (HTTP client using httpx)
+- [x] T041 [P] [US3] Create NASA JPL client stub in backend/src/services/ephemeris/nasa_jpl.py (placeholder for future implementation)
+- [x] T042 [US3] Implement ephemeris source factory in backend/src/services/ephemeris/source_factory.py (selects source based on config)
+- [x] T043 [US3] Update chart calculator to use factory in backend/src/api/routes/chart.py
+- [x] T044 [US3] Add source metadata to ChartResponse in backend/src/models/chart.py (calculation_source field)
+- [x] T045 [US3] Test source switching by changing EPHEMERIS_SOURCE environment variable
 
 **Checkpoint**: All user stories should now be independently functional with source flexibility
 
@@ -160,16 +160,17 @@ This is a web application with backend/frontend separation per plan.md:
 
 **Purpose**: Improvements that affect multiple user stories
 
-- [ ] T046 [P] Implement structured error responses for all failure cases in backend/src/api/routes/chart.py (use CalculationError model)
-- [ ] T047 [P] Add German error messages to error responses in backend/src/api/routes/chart.py (per contracts/calculation-error-response.json)
+- [x] T046 [P] Implement structured error responses for all failure cases in backend/src/api/routes/chart.py (use CalculationError model)
+- [x] T047 [P] Add German error messages to error responses in backend/src/api/routes/chart.py (per contracts/calculation-error-response.json)
 - [ ] T048 [P] Implement optional Redis caching in backend/src/services/caching/chart_cache.py (24hr TTL, graceful degradation)
 - [ ] T049 [P] Add caching to chart endpoint in backend/src/api/routes/chart.py (check cache before calculation)
-- [ ] T050 [P] Update frontend API client in frontend/src/services/chartApi.ts (call /api/calculate-chart endpoint)
+- [x] T050 [P] Update frontend API client in frontend/services/api.ts (call /api/calculate-chart endpoint)
 - [ ] T051 [P] Add API request/response logging in backend/src/api/routes/chart.py
-- [ ] T052 [P] Create Dockerfile with bundled ephemeris files in backend/Dockerfile (COPY data/ephemeris/)
+- [x] T052 [P] Create Dockerfile with bundled ephemeris files in backend/Dockerfile (COPY data/ephemeris/)
 - [ ] T053 Run full quickstart.md validation (verify setup, calculations, reference chart comparison)
-- [ ] T054 [P] Document API endpoint in backend/src/api/routes/chart.py docstrings (OpenAPI schema)
+- [x] T054 [P] Document API endpoint in backend/src/api/routes/chart.py docstrings (OpenAPI schema)
 - [ ] T055 Performance testing: Verify <2s calculation time for full chart
+- [x] T056 [P] Set up Playwright E2E testing framework in frontend/ with chart-form.spec.ts and api-integration.spec.ts
 
 ---
 

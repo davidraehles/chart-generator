@@ -1,0 +1,83 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "CalculationError Response",
+  "description": "Structured error response for chart calculation failures",
+  "type": "object",
+  "required": [
+    "code",
+    "message",
+    "message_de"
+  ],
+  "properties": {
+    "code": {
+      "type": "string",
+      "description": "Machine-readable error code for client handling",
+      "enum": [
+        "INVALID_DATE",
+        "DATE_OUT_OF_RANGE",
+        "INVALID_LOCATION",
+        "EPHEMERIS_UNAVAILABLE",
+        "CALCULATION_FAILED"
+      ]
+    },
+    "message": {
+      "type": "string",
+      "description": "English error message for logging and debugging"
+    },
+    "message_de": {
+      "type": "string",
+      "description": "German error message for user display (per constitution)"
+    },
+    "field": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "description": "Which input field caused the error (for validation errors)"
+    },
+    "retry_after": {
+      "type": [
+        "integer",
+        "null"
+      ],
+      "description": "Seconds to wait before retrying (for rate limit/transient errors)"
+    }
+  },
+  "examples": [
+    {
+      "code": "INVALID_DATE",
+      "message": "birth_datetime must be a valid datetime",
+      "message_de": "Ungültige Eingabedaten: birth_datetime must be a valid datetime",
+      "field": "birth_datetime",
+      "retry_after": null
+    },
+    {
+      "code": "DATE_OUT_OF_RANGE",
+      "message": "Birth date must be between year 1 and 3000",
+      "message_de": "Geburtsdatum muss zwischen den Jahren 1 und 3000 liegen",
+      "field": "birth_datetime",
+      "retry_after": null
+    },
+    {
+      "code": "INVALID_LOCATION",
+      "message": "Latitude must be between -90 and 90 degrees",
+      "message_de": "Breitengrad muss zwischen -90 und 90 Grad liegen",
+      "field": "birth_latitude",
+      "retry_after": null
+    },
+    {
+      "code": "EPHEMERIS_UNAVAILABLE",
+      "message": "Ephemeris files are unavailable",
+      "message_de": "Ephemeris-Dateien sind nicht verfügbar",
+      "field": null,
+      "retry_after": 60
+    },
+    {
+      "code": "CALCULATION_FAILED",
+      "message": "Planetary position calculation failed",
+      "message_de": "Fehler bei der Berechnung der Planetenpositionen",
+      "field": null,
+      "retry_after": 5
+    }
+  ]
+}
