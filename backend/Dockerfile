@@ -19,8 +19,12 @@ COPY . .
 # Copy ephemeris data files to the container
 COPY data/ephemeris/ /app/data/ephemeris/
 
-# Expose port 8000
+# Set default port (Railway will override with $PORT)
+ENV PORT=8000
+
+# Expose port (documentation only - actual binding done by CMD)
 EXPOSE 8000
 
 # Run the FastAPI application with uvicorn
-CMD ["uvicorn", "src.main:app", "--host", "0.0.0.0", "--port", "8000"]
+# Use shell form to allow environment variable expansion
+CMD uvicorn src.main:app --host 0.0.0.0 --port ${PORT:-8000}
