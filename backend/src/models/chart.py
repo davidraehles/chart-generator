@@ -115,12 +115,10 @@ class EphemerisChartRequest(BaseModel):
     )
 
     @validator("birth_datetime")
-    def validate_date_range(cls, v):
-        """Ensure birth date is within ephemeris coverage."""
-        min_year = 1
-        max_year = 3000
-        if not (min_year <= v.year <= max_year):
-            raise ValueError(f"Birth date must be between year {min_year} and {max_year}")
+    def validate_datetime_format(cls, v):
+        """Ensure birth_datetime is a valid datetime object."""
+        if not isinstance(v, datetime):
+            raise ValueError("birth_datetime must be a valid datetime")
         return v
 
 
