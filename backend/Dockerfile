@@ -22,8 +22,8 @@ COPY data/ephemeris/ /app/data/ephemeris/
 # Set default port (Railway will override with $PORT)
 ENV PORT=8000
 
-# Expose port
-EXPOSE $PORT
+# Expose port (documentation only - actual binding done by CMD)
+EXPOSE 8000
 
 # Run the FastAPI application with uvicorn
 # Use shell form to allow environment variable expansion

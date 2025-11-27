@@ -2,11 +2,12 @@ import { test, expect } from '@playwright/test';
 
 /**
  * E2E API Integration tests
- * Tests the /api/calculate-chart endpoint on production Railway backend
+ * Tests the /api/calculate-chart endpoint
+ * Set API_URL env var to test against production Railway backend
  */
 
-// Production Railway API URL
-const API_BASE_URL = process.env.API_URL || 'https://chart-generator-production-64fd.up.railway.app';
+// Default to localhost for safety, set API_URL for production testing
+const API_BASE_URL = process.env.API_URL || 'http://localhost:8000';
 
 // Helper to check if backend is available
 async function isBackendAvailable(request: any): Promise<boolean> {
@@ -119,6 +120,7 @@ test.describe('Chart Calculation API Integration', () => {
         timeout: 15000
       });
     } catch (e) {
+      console.log('⚠️ Backend request failed - skipping timezone validation test');
       test.skip();
       return;
     }
@@ -152,6 +154,7 @@ test.describe('Chart Calculation API Integration', () => {
         timeout: 15000
       });
     } catch (e) {
+      console.log('⚠️ Backend request failed - skipping coordinates validation test');
       test.skip();
       return;
     }
@@ -179,6 +182,7 @@ test.describe('Chart Calculation API Integration', () => {
         timeout: 15000
       });
     } catch (e) {
+      console.log('⚠️ Backend request failed - skipping calculation source test');
       test.skip();
       return;
     }
@@ -217,6 +221,7 @@ test.describe('Chart Calculation Performance', () => {
         timeout: 10000
       });
     } catch (e) {
+      console.log('⚠️ Backend request failed - skipping performance test');
       test.skip();
       return;
     }
