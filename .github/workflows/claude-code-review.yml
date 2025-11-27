@@ -1,22 +1,20 @@
-name: Claude Code Review
+name: Code Review
 
 on:
   pull_request:
     types: [opened, synchronize, reopened]
     branches:
       - main
-      - 'claude/**'
       - 'feature/**'
 
 permissions:
   contents: read
   pull-requests: write
-  issues: write
 
 jobs:
-  claude-review:
+  code-review:
     runs-on: ubuntu-latest
-    name: Claude AI Code Review
+    name: Automated Code Review
 
     steps:
       - name: Checkout code
@@ -96,6 +94,32 @@ jobs:
               repo: context.repo.repo,
               body: comment
             });
+          files: |
+            **/*.ts
+            **/*.tsx
+            **/*.js
+            **/*.jsx
+            **/*.py
+          separator: "\n"
+
+      - name: Run ESLint on changed files
+        if: steps.changed-files.outputs.any_changed == 'true'
+        continue-on-error: true
+        run: |
+          if [ -d "frontend" ] && [ -f "frontend/package.json" ]; then
+            cd frontend
+            npm ci --quiet
+            echo "${{ steps.changed-files.outputs.all_changed_files }}" | grep -E '\.(ts|tsx|js|jsx)$' | xargs -r npx eslint --format stylish || true
+          fi
+
+      - name: Run Python linting
+        if: steps.changed-files.outputs.any_changed == 'true'
+        continue-on-error: true
+        run: |
+          if [ -d "backend" ]; then
+            pip install ruff --quiet
+            echo "${{ steps.changed-files.outputs.all_changed_files }}" | grep -E '\.py$' | xargs -r ruff check || true
+          fi
 
       - name: Post review summary
         if: steps.check-key.outputs.api_key_exists == 'true'
@@ -122,6 +146,24 @@ jobs:
             - Specification Compliance Agent
 
             Check the review comments above for detailed feedback.`;
+            const changedFiles = `${{ steps.changed-files.outputs.all_changed_files }}`;
+            const fileCount = changedFiles ? changedFiles.split('\n').filter(f => f.trim()).length : 0;
+            
+            const comment = `## 🔍 Automated Code Review
+
+            **Files analyzed:** ${fileCount} source files
+            
+            **Checks performed:**
+            - ESLint for TypeScript/JavaScript files
+            - Ruff for Python files
+            
+            **Review Focus Areas:**
+            - TypeScript type safety
+            - React/Next.js best practices
+            - Python code quality
+            - Security patterns
+            
+            Check the workflow logs for detailed linting results.`;
 
             await github.rest.issues.createComment({
               issue_number: context.issue.number,

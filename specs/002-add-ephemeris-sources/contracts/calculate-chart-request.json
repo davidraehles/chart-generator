@@ -1,0 +1,62 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "Chart Calculation Request",
+  "description": "Request schema for POST /api/calculate-chart endpoint. Provides birth data for Human Design chart calculation.",
+  "type": "object",
+  "required": [
+    "birth_datetime",
+    "birth_timezone",
+    "birth_latitude",
+    "birth_longitude"
+  ],
+  "properties": {
+    "birth_datetime": {
+      "type": "string",
+      "format": "date-time",
+      "description": "Birth date and time in ISO 8601 format (local timezone)",
+      "example": "1985-05-21T14:30:00"
+    },
+    "birth_timezone": {
+      "type": "string",
+      "description": "IANA timezone identifier for birth location",
+      "example": "Europe/Berlin",
+      "pattern": "^[A-Za-z]+/[A-Za-z_]+$"
+    },
+    "birth_latitude": {
+      "type": "number",
+      "description": "Birth location latitude in decimal degrees",
+      "minimum": -90,
+      "maximum": 90,
+      "example": 52.5200
+    },
+    "birth_longitude": {
+      "type": "number",
+      "description": "Birth location longitude in decimal degrees",
+      "minimum": -180,
+      "maximum": 180,
+      "example": 13.4050
+    },
+    "name": {
+      "type": "string",
+      "description": "Optional name for chart personalization (not used in calculations)",
+      "maxLength": 100,
+      "example": "Max Mustermann"
+    }
+  },
+  "additionalProperties": false,
+  "examples": [
+    {
+      "birth_datetime": "1985-05-21T14:30:00",
+      "birth_timezone": "Europe/Berlin",
+      "birth_latitude": 52.5200,
+      "birth_longitude": 13.4050,
+      "name": "Max Mustermann"
+    },
+    {
+      "birth_datetime": "1990-12-01T08:15:00",
+      "birth_timezone": "America/New_York",
+      "birth_latitude": 40.7128,
+      "birth_longitude": -74.0060
+    }
+  ]
+}

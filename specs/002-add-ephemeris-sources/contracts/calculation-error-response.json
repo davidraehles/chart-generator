@@ -1,0 +1,97 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "Calculation Error Response",
+  "description": "Error response schema for chart calculation failures. Returns structured error with actionable guidance.",
+  "type": "object",
+  "required": ["error"],
+  "properties": {
+    "error": {
+      "type": "object",
+      "required": ["code", "message", "message_de"],
+      "properties": {
+        "code": {
+          "type": "string",
+          "description": "Machine-readable error code for client handling",
+          "enum": [
+            "INVALID_DATE",
+            "DATE_OUT_OF_RANGE",
+            "INVALID_LOCATION",
+            "INVALID_TIMEZONE",
+            "EPHEMERIS_UNAVAILABLE",
+            "CALCULATION_FAILED"
+          ],
+          "example": "DATE_OUT_OF_RANGE"
+        },
+        "message": {
+          "type": "string",
+          "description": "English error message for logging/debugging",
+          "example": "Birth date must be between 3000 BCE and 3000 CE"
+        },
+        "message_de": {
+          "type": "string",
+          "description": "German error message for user display",
+          "example": "Geburtsdatum muss zwischen 3000 v. Chr. und 3000 n. Chr. liegen"
+        },
+        "field": {
+          "type": ["string", "null"],
+          "description": "Which input field caused the error (for validation errors)",
+          "enum": [null, "birth_datetime", "birth_timezone", "birth_latitude", "birth_longitude"],
+          "example": "birth_datetime"
+        },
+        "retry_after": {
+          "type": ["integer", "null"],
+          "description": "Seconds to wait before retrying (for rate limit/transient errors)",
+          "minimum": 0,
+          "example": null
+        }
+      }
+    }
+  },
+  "examples": [
+    {
+      "error": {
+        "code": "DATE_OUT_OF_RANGE",
+        "message": "Birth date must be between 3000 BCE and 3000 CE",
+        "message_de": "Geburtsdatum muss zwischen 3000 v. Chr. und 3000 n. Chr. liegen",
+        "field": "birth_datetime",
+        "retry_after": null
+      }
+    },
+    {
+      "error": {
+        "code": "INVALID_TIMEZONE",
+        "message": "Timezone 'Invalid/Timezone' is not a valid IANA timezone identifier",
+        "message_de": "Zeitzone 'Invalid/Timezone' ist kein gültiger IANA-Zeitzonenbezeichner",
+        "field": "birth_timezone",
+        "retry_after": null
+      }
+    },
+    {
+      "error": {
+        "code": "INVALID_LOCATION",
+        "message": "Latitude must be between -90 and 90 degrees",
+        "message_de": "Breitengrad muss zwischen -90 und 90 Grad liegen",
+        "field": "birth_latitude",
+        "retry_after": null
+      }
+    },
+    {
+      "error": {
+        "code": "EPHEMERIS_UNAVAILABLE",
+        "message": "Ephemeris data files not found at configured path",
+        "message_de": "Ephemeris-Datendateien wurden am konfigurierten Pfad nicht gefunden",
+        "field": null,
+        "retry_after": 60
+      }
+    },
+    {
+      "error": {
+        "code": "CALCULATION_FAILED",
+        "message": "Internal error during planetary position calculation",
+        "message_de": "Interner Fehler bei der Berechnung der Planetenpositionen",
+        "field": null,
+        "retry_after": 5
+      }
+    }
+  ]
+}
