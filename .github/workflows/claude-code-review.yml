@@ -109,7 +109,17 @@ jobs:
           if [ -d "frontend" ] && [ -f "frontend/package.json" ]; then
             cd frontend
             npm ci --quiet
-            echo "${{ steps.changed-files.outputs.all_changed_files }}" | grep -E '\.(ts|tsx|js|jsx)$' | xargs -r npx eslint --format stylish || true
+            # Safely handle file paths to prevent command injection
+            changed_files="${{ steps.changed-files.outputs.all_changed_files }}"
+            if [ -n "$changed_files" ]; then
+              IFS=',' read -ra FILES <<< "$changed_files"
+              for file in "${FILES[@]}"; do
+                # Validate file exists and matches expected pattern
+                if [[ "$file" =~ \.(ts|tsx|js|jsx)$ ]] && [ -f "$file" ]; then
+                  npx eslint --format stylish "$file" || true
+                fi
+              done
+            fi
           fi
 
       - name: Run Python linting
@@ -118,7 +128,17 @@ jobs:
         run: |
           if [ -d "backend" ]; then
             pip install ruff --quiet
-            echo "${{ steps.changed-files.outputs.all_changed_files }}" | grep -E '\.py$' | xargs -r ruff check || true
+            # Safely handle file paths to prevent command injection
+            changed_files="${{ steps.changed-files.outputs.all_changed_files }}"
+            if [ -n "$changed_files" ]; then
+              IFS=',' read -ra FILES <<< "$changed_files"
+              for file in "${FILES[@]}"; do
+                # Validate file exists and matches expected pattern
+                if [[ "$file" =~ \.py$ ]] && [ -f "$file" ]; then
+                  ruff check "$file" || true
+                fi
+              done
+            fi
           fi
 
       - name: Post review summary

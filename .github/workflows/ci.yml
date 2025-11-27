@@ -29,19 +29,17 @@ jobs:
         run: |
           cd backend
           pip install -r requirements.txt
-          pip install ruff mypy
+          pip install ruff mypy types-requests
       
       - name: Run Ruff linter
         run: |
           cd backend
           ruff check src/ --output-format=github
-        continue-on-error: true
       
       - name: Run type check
         run: |
           cd backend
-          mypy src/ --ignore-missing-imports || true
-        continue-on-error: true
+          mypy src/ --ignore-missing-imports
 
   backend-test:
     runs-on: ubuntu-latest
@@ -66,8 +64,7 @@ jobs:
       - name: Run tests
         run: |
           cd backend
-          pytest tests/ -v || true
-        continue-on-error: true
+          pytest tests/ -v
 
   frontend-lint:
     runs-on: ubuntu-latest
@@ -91,14 +88,12 @@ jobs:
       - name: Run ESLint
         run: |
           cd frontend
-          npm run lint || true
-        continue-on-error: true
+          npm run lint
       
-      - name: Type check
+      - name: Type check (strict mode)
         run: |
           cd frontend
-          npx tsc --noEmit || true
-        continue-on-error: true
+          npx tsc --noEmit
 
   frontend-build:
     runs-on: ubuntu-latest

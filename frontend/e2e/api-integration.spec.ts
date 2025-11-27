@@ -103,7 +103,16 @@ test.describe('Chart Calculation API Integration', () => {
       console.log(`✅ Chart calculated successfully using ${data.calculation_source}`);
     } else if (response.status() === 500) {
       const error = await response.json();
-      console.log(`⚠️ Backend error: ${JSON.stringify(error.detail || error)}`);
+      // Validate German error message exists and is user-friendly
+      if (error.detail?.message_de) {
+        expect(error.detail.message_de).toBeTruthy();
+        expect(error.detail.message_de.length).toBeGreaterThan(10);
+        // Should not contain technical English terms
+        expect(error.detail.message_de).not.toMatch(/error|exception|null|undefined|stack/i);
+        console.log(`⚠️ Backend error (German): ${error.detail.message_de}`);
+      } else {
+        console.log(`⚠️ Backend error: ${JSON.stringify(error.detail || error)}`);
+      }
     }
   });
 
@@ -139,6 +148,12 @@ test.describe('Chart Calculation API Integration', () => {
     expect(error.detail).toHaveProperty('message');
     expect(error.detail).toHaveProperty('message_de');
     expect(error.detail.code).toBe('INVALID_TIMEZONE');
+    
+    // Validate German error message quality
+    expect(error.detail.message_de).toBeTruthy();
+    expect(error.detail.message_de.length).toBeGreaterThan(10);
+    // Should not contain technical English terms
+    expect(error.detail.message_de).not.toMatch(/error|exception|invalid|null/i);
   });
 
   test('should return error for invalid coordinates', async ({ request }) => {
