@@ -102,9 +102,9 @@ class TestEmailService:
             user_agent="Mozilla/5.0"
         )
 
-        # Verify in database (convert UUID to string for SQLite compatibility)
+        # Verify in database
         record = db_session.query(LeadEmailDB).filter_by(
-            id=str(result["id"])
+            id=result["id"]
         ).first()
 
         assert record.ip_address == "192.168.1.1"
@@ -161,7 +161,7 @@ class TestEmailService:
         )
 
         record = db_session.query(LeadEmailDB).filter_by(
-            id=str(result["id"])
+            id=result["id"]
         ).first()
         record.deleted_at = datetime.now(UTC)
         db_session.commit()
@@ -249,9 +249,9 @@ class TestEmailHandler:
             user_agent="Test Agent"
         )
 
-        # Verify in database (convert UUID to string for SQLite compatibility)
+        # Verify in database
         record = db_session.query(LeadEmailDB).filter_by(
-            id=str(result["id"])
+            id=result["id"]
         ).first()
 
         assert record.ip_address == "10.0.0.1"
