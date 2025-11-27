@@ -94,13 +94,6 @@ jobs:
               repo: context.repo.repo,
               body: comment
             });
-          files: |
-            **/*.ts
-            **/*.tsx
-            **/*.js
-            **/*.jsx
-            **/*.py
-          separator: "\n"
 
       - name: Run ESLint on changed files
         if: steps.changed-files.outputs.any_changed == 'true'
