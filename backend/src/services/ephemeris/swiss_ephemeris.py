@@ -71,12 +71,9 @@ class SwissEphemerisSource(EphemerisSource):
             Ecliptic longitude in degrees (0-360)
 
         Raises:
-            RuntimeError: If calculation fails or ephemeris files unavailable
+            RuntimeError: If calculation fails
         """
-        if not self.is_available():
-            raise RuntimeError(
-                f"{ERROR_EPHEMERIS_UNAVAILABLE}: Ephemeris files not found at {self.ephemeris_path}"
-            )
+        # Note: is_available() now always returns True since we support built-in data
 
         try:
             # Get Swiss Ephemeris planet constant
@@ -108,11 +105,16 @@ class SwissEphemerisSource(EphemerisSource):
         Check if Swiss Ephemeris files are available.
 
         Returns:
-            True if ephemeris data files exist and can be used
+            True if ephemeris data files exist and can be used, or if using built-in data
         """
+        # Empty path means use built-in ephemeris data from pyswisseph
+        if not self.ephemeris_path or self.ephemeris_path == "":
+            return True
+
         # Check if the ephemeris path exists and contains .se1 files
         if not os.path.exists(self.ephemeris_path):
-            return False
+            # Fall back to built-in data if path doesn't exist
+            return True
 
         # Check for at least one required ephemeris file
         required_files = ["seas_18.se1", "semo_18.se1", "sepl_18.se1"]
@@ -121,4 +123,5 @@ class SwissEphemerisSource(EphemerisSource):
             if os.path.exists(filepath):
                 return True  # At least one file present
 
-        return False
+        # If path exists but no files, use built-in data
+        return True

@@ -12,7 +12,11 @@ import httpx
 from pathlib import Path
 from typing import List, Tuple
 
-# Swiss Ephemeris file URLs from Astrodienst
+# Swiss Ephemeris file URLs from GitHub mirror (Astrodienst FTP is blocked)
+# Primary source: https://github.com/aloistr/swisseph (official Swiss Ephemeris GitHub repository)
+GITHUB_BASE_URL = "https://raw.githubusercontent.com/aloistr/swisseph/master/ephe/"
+
+# Fallback source if primary fails
 ASTRODIENST_BASE_URL = "https://www.astro.com/ftp/swisseph/ephe/"
 
 # Required ephemeris files for comprehensive coverage (1800-2400 CE)
@@ -87,7 +91,6 @@ def download_ephemeris_files(
     failed_files = []
 
     for filename in files_to_download:
-        url = f"{ASTRODIENST_BASE_URL}{filename}"
         dest = output_path / filename
 
         # Skip if already exists
@@ -97,8 +100,17 @@ def download_ephemeris_files(
             downloaded_files.append(dest)
             continue
 
-        success, message = download_file(url, dest)
+        # Try GitHub mirror first (primary source)
+        github_url = f"{GITHUB_BASE_URL}{filename}"
+        success, message = download_file(github_url, dest)
         print(f"  {message}")
+
+        # If GitHub fails, try Astrodienst as fallback
+        if not success:
+            print(f"  Trying fallback source...")
+            astrodienst_url = f"{ASTRODIENST_BASE_URL}{filename}"
+            success, message = download_file(astrodienst_url, dest)
+            print(f"  {message}")
 
         if success:
             downloaded_files.append(dest)
