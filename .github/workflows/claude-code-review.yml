@@ -59,28 +59,30 @@ jobs:
         with:
           github-token: ${{ secrets.GITHUB_TOKEN }}
           script: |
-            const changedFiles = `${{ steps.changed-files.outputs.all_changed_files }}`;
-            const fileCount = changedFiles ? changedFiles.split('\n').filter(f => f.trim()).length : 0;
+            const changedFilesRaw = `${{ steps.changed-files.outputs.all_changed_files }}`;
+            const fileCount = changedFilesRaw ? changedFilesRaw.split('\n').filter(f => f.trim()).length : 0;
             
-            const comment = `## 🔍 Automated Code Review
-
-            **Files analyzed:** ${fileCount} source files
-            
-            **Checks performed:**
-            - ESLint for TypeScript/JavaScript files
-            - Ruff for Python files
-            
-            **Review Focus Areas:**
-            - TypeScript type safety
-            - React/Next.js best practices
-            - Python code quality
-            - Security patterns
-            
-            Check the workflow logs for detailed linting results.`;
+            const reviewComment = [
+              '## 🔍 Automated Code Review',
+              '',
+              `**Files analyzed:** ${fileCount} source files`,
+              '',
+              '**Checks performed:**',
+              '- ESLint for TypeScript/JavaScript files',
+              '- Ruff for Python files',
+              '',
+              '**Review Focus Areas:**',
+              '- TypeScript type safety',
+              '- React/Next.js best practices',
+              '- Python code quality',
+              '- Security patterns',
+              '',
+              'Check the workflow logs for detailed linting results.'
+            ].join('\n');
 
             await github.rest.issues.createComment({
               issue_number: context.issue.number,
               owner: context.repo.owner,
               repo: context.repo.repo,
-              body: comment
+              body: reviewComment
             });
