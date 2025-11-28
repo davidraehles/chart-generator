@@ -205,14 +205,12 @@ async def generate_chart(request: ChartRequest, http_request: Request):
 
 
 @app.post("/api/email-capture", response_model=EmailCaptureResponse)
-@limiter.limit("5/minute")
-async def capture_email(request: EmailCaptureRequest, http_request: Request):
+async def capture_email(request: EmailCaptureRequest):
     """
     Capture email for Business Reading interest
 
     Args:
         request: EmailCaptureRequest with email
-        http_request: FastAPI Request object for metadata
 
     Returns:
         EmailCaptureResponse with success status
@@ -225,16 +223,12 @@ async def capture_email(request: EmailCaptureRequest, http_request: Request):
         # Get database session
         db_session = get_db_session()
 
-        # Extract client metadata
-        ip_address = http_request.client.host if http_request.client else None
-        user_agent = http_request.headers.get("user-agent")
-
         # Capture email using handler
         result = email_handler.capture_email(
             email=request.email,
             db_session=db_session,
-            ip_address=ip_address,
-            user_agent=user_agent,
+            ip_address=None,
+            user_agent=None,
         )
 
         return EmailCaptureResponse(
