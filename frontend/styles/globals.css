@@ -14,3 +14,49 @@ body {
     Ubuntu, Cantarell, "Open Sans", "Helvetica Neue", sans-serif;
   color: var(--primary);
 }
+
+@media print {
+  @page {
+    margin: 2cm;
+  }
+
+  body {
+    print-color-adjust: exact;
+    -webkit-print-color-adjust: exact;
+  }
+
+  /* Hide interactive elements */
+  button, 
+  input, 
+  select, 
+  textarea,
+  .no-print {
+    display: none !important;
+  }
+
+  /* Ensure charts and graphics print well */
+  svg {
+    max-width: 100%;
+    break-inside: avoid;
+  }
+
+  /* Layout adjustments for print */
+  .grid {
+    display: block;
+  }
+  
+  .grid > * {
+    margin-bottom: 2rem;
+    break-inside: avoid;
+  }
+
+  /* Typography for print */
+  h1, h2, h3 {
+    color: black;
+    break-after: avoid;
+  }
+  
+  p {
+    color: #333;
+  }
+}

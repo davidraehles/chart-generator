@@ -54,6 +54,10 @@ export default function ChartDisplay({ data, onReset }: ChartDisplayProps) {
       <ImpulseSection impulse={data.shortImpulse} />
 
       <EmailCaptureSection />
+
+      <div className="text-center text-xs text-gray-400 mt-8 pb-4">
+        <p>Berechnet mit {data.calculationSource || "Swiss Ephemeris"}</p>
+      </div>
     </div>
   );
 }
