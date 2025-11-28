@@ -52,9 +52,10 @@ class SwissEphemerisSource(EphemerisSource):
         self.ephemeris_path = ephemeris_path
 
         # Set ephemeris file path for pyswisseph
-        if os.path.exists(ephemeris_path):
+        # Use try-except instead of checking existence to avoid TOCTOU race condition
+        try:
             swe.set_ephe_path(ephemeris_path)
-        else:
+        except (OSError, FileNotFoundError):
             # Allow initialization even if files don't exist yet (for testing)
             # is_available() will return False
             pass
@@ -110,15 +111,16 @@ class SwissEphemerisSource(EphemerisSource):
         Returns:
             True if ephemeris data files exist and can be used
         """
-        # Check if the ephemeris path exists and contains .se1 files
-        if not os.path.exists(self.ephemeris_path):
-            return False
-
         # Check for at least one required ephemeris file
+        # Use try-except to avoid TOCTOU race condition
         required_files = ["seas_18.se1", "semo_18.se1", "sepl_18.se1"]
         for filename in required_files:
             filepath = os.path.join(self.ephemeris_path, filename)
-            if os.path.exists(filepath):
-                return True  # At least one file present
+            try:
+                # Attempt to open the file to verify it exists and is readable
+                with open(filepath, 'rb'):
+                    return True  # At least one file present and readable
+            except (OSError, FileNotFoundError, PermissionError):
+                continue
 
         return False

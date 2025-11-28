@@ -15,6 +15,7 @@ from sqlalchemy.orm import sessionmaker
 sys.path.insert(0, str(Path(__file__).parent.parent))
 
 from src.models.ephemeris_storage import Base, EphemerisFile
+from src.utils.file_security import validate_safe_filename, validate_safe_path
 
 
 def load_ephemeris_files(
@@ -55,7 +56,14 @@ def load_ephemeris_files(
     skipped = 0
 
     for ephemeris_file in files:
-        dest_path = output_path / ephemeris_file.filename
+        # Validate filename for path traversal attacks
+        try:
+            safe_filename = validate_safe_filename(ephemeris_file.filename, allowed_extensions=['.se1'])
+            # Validate the full path is within output directory
+            dest_path = validate_safe_path(output_dir, safe_filename)
+        except (ValueError, Exception) as e:
+            print(f"✗ Skipping {ephemeris_file.filename}: Security validation failed - {e}")
+            continue
 
         # Skip if exists and not forcing
         if dest_path.exists() and not force:

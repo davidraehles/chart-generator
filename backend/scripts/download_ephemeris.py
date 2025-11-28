@@ -9,11 +9,15 @@ for deployment and runtime access.
 import os
 import sys
 import httpx
+import hashlib
 from pathlib import Path
 from typing import List, Tuple
 
 # Swiss Ephemeris file URLs from Astrodienst
 ASTRODIENST_BASE_URL = "https://www.astro.com/ftp/swisseph/ephe/"
+
+# Maximum allowed file size (100 MB) to prevent memory exhaustion attacks
+MAX_FILE_SIZE_BYTES = 100 * 1024 * 1024
 
 # Required ephemeris files for comprehensive coverage (1800-2400 CE)
 REQUIRED_FILES = [
@@ -31,7 +35,7 @@ OPTIONAL_FILES = [
 
 def download_file(url: str, dest_path: Path) -> Tuple[bool, str]:
     """
-    Download a single ephemeris file.
+    Download a single ephemeris file with streaming and size limits.
 
     Args:
         url: URL to download from
@@ -43,15 +47,41 @@ def download_file(url: str, dest_path: Path) -> Tuple[bool, str]:
     try:
         print(f"Downloading {dest_path.name}...")
         with httpx.Client(timeout=60.0) as client:
-            response = client.get(url)
-            response.raise_for_status()
+            # Stream the response to avoid loading large files into memory
+            with client.stream('GET', url) as response:
+                response.raise_for_status()
 
-            # Write to destination
-            dest_path.parent.mkdir(parents=True, exist_ok=True)
-            dest_path.write_bytes(response.content)
+                # Check Content-Length header to prevent oversized downloads
+                content_length = response.headers.get('content-length')
+                if content_length:
+                    file_size = int(content_length)
+                    if file_size > MAX_FILE_SIZE_BYTES:
+                        size_mb = file_size / (1024 * 1024)
+                        max_mb = MAX_FILE_SIZE_BYTES / (1024 * 1024)
+                        return False, f"✗ File too large: {size_mb:.2f} MB (max {max_mb:.0f} MB)"
 
-            size_mb = len(response.content) / (1024 * 1024)
-            return True, f"✓ Downloaded {dest_path.name} ({size_mb:.2f} MB)"
+                # Stream download with size limit enforcement
+                dest_path.parent.mkdir(parents=True, exist_ok=True)
+                bytes_downloaded = 0
+                sha256_hash = hashlib.sha256()
+
+                with open(dest_path, 'wb') as f:
+                    for chunk in response.iter_bytes(chunk_size=8192):
+                        bytes_downloaded += len(chunk)
+
+                        # Enforce size limit during download (defense in depth)
+                        if bytes_downloaded > MAX_FILE_SIZE_BYTES:
+                            f.close()
+                            dest_path.unlink(missing_ok=True)  # Clean up partial file
+                            size_mb = bytes_downloaded / (1024 * 1024)
+                            max_mb = MAX_FILE_SIZE_BYTES / (1024 * 1024)
+                            return False, f"✗ Download exceeded size limit: {size_mb:.2f} MB (max {max_mb:.0f} MB)"
+
+                        f.write(chunk)
+                        sha256_hash.update(chunk)
+
+                size_mb = bytes_downloaded / (1024 * 1024)
+                return True, f"✓ Downloaded {dest_path.name} ({size_mb:.2f} MB, SHA256: {sha256_hash.hexdigest()[:16]}...)"
 
     except httpx.HTTPStatusError as e:
         return False, f"✗ HTTP {e.response.status_code}: {url}"

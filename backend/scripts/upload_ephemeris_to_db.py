@@ -16,6 +16,7 @@ from sqlalchemy.orm import sessionmaker
 sys.path.insert(0, str(Path(__file__).parent.parent))
 
 from src.models.ephemeris_storage import Base, EphemerisFile
+from src.utils.file_security import validate_safe_filename
 
 
 def calculate_sha256(file_path: Path) -> str:
@@ -64,7 +65,12 @@ def upload_ephemeris_files(
     skipped = 0
 
     for file_path in se1_files:
-        filename = file_path.name
+        # Validate filename for path traversal attacks
+        try:
+            filename = validate_safe_filename(file_path.name, allowed_extensions=['.se1'])
+        except (ValueError, Exception) as e:
+            print(f"✗ Skipping {file_path.name}: {e}")
+            continue
 
         # Check if already exists
         existing = session.query(EphemerisFile).filter_by(filename=filename).first()
