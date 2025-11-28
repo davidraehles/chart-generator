@@ -6,6 +6,7 @@ Most accurate and widely used for Human Design calculations.
 """
 
 import os
+from pathlib import Path
 from typing import Optional
 import swisseph as swe
 from src.services.ephemeris.base import EphemerisSource
@@ -31,6 +32,36 @@ BODY_TO_SWE_PLANET = {
 }
 
 
+def validate_ephemeris_path(path: str) -> str:
+    """
+    Validate ephemeris path to prevent security issues.
+
+    Args:
+        path: Ephemeris directory path
+
+    Returns:
+        Validated path string
+
+    Raises:
+        ValueError: If path contains suspicious patterns or is invalid
+    """
+    # Check for null bytes
+    if "\x00" in path:
+        raise ValueError("Invalid ephemeris path: contains null bytes")
+
+    # Convert to Path for validation
+    path_obj = Path(path)
+
+    # Check for suspicious patterns that could indicate path traversal
+    path_str = str(path_obj)
+    suspicious_patterns = ["../", "..\\"]
+    for pattern in suspicious_patterns:
+        if pattern in path_str:
+            raise ValueError(f"Invalid ephemeris path: contains suspicious pattern '{pattern}'")
+
+    return path
+
+
 class SwissEphemerisSource(EphemerisSource):
     """
     Swiss Ephemeris calculation source.
@@ -47,13 +78,15 @@ class SwissEphemerisSource(EphemerisSource):
             ephemeris_path: Path to directory containing .se1 ephemeris files
 
         Raises:
-            ValueError: If ephemeris path doesn't exist
+            ValueError: If ephemeris path is invalid or contains security issues
         """
-        self.ephemeris_path = ephemeris_path
+        # Validate path for security
+        validated_path = validate_ephemeris_path(ephemeris_path)
+        self.ephemeris_path = validated_path
 
         # Set ephemeris file path for pyswisseph
-        if os.path.exists(ephemeris_path):
-            swe.set_ephe_path(ephemeris_path)
+        if os.path.exists(validated_path):
+            swe.set_ephe_path(validated_path)
         else:
             # Allow initialization even if files don't exist yet (for testing)
             # is_available() will return False
@@ -108,17 +141,18 @@ class SwissEphemerisSource(EphemerisSource):
         Check if Swiss Ephemeris files are available.
 
         Returns:
-            True if ephemeris data files exist and can be used
+            True if ALL required ephemeris data files exist and can be used
         """
-        # Check if the ephemeris path exists and contains .se1 files
+        # Check if the ephemeris path exists
         if not os.path.exists(self.ephemeris_path):
             return False
 
-        # Check for at least one required ephemeris file
+        # Check for ALL required ephemeris files
+        # All three files are necessary for comprehensive calculations
         required_files = ["seas_18.se1", "semo_18.se1", "sepl_18.se1"]
         for filename in required_files:
             filepath = os.path.join(self.ephemeris_path, filename)
-            if os.path.exists(filepath):
-                return True  # At least one file present
+            if not os.path.exists(filepath):
+                return False  # Missing required file
 
-        return False
+        return True  # All required files present
