@@ -20,14 +20,20 @@ interface ChartDisplayProps {
 
 export default function ChartDisplay({ data, onReset }: ChartDisplayProps) {
   return (
-    <div className="space-y-8">
-      <div className="flex justify-between items-center">
-        <h2 className="text-2xl font-bold text-primary">
-          {data.firstName}s Chart
-        </h2>
+    <div className="space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-500">
+      <div className="flex flex-col md:flex-row justify-between items-center gap-4 bg-white p-6 rounded-lg shadow-sm border border-border">
+        <div>
+           <h2 className="text-2xl font-bold text-primary">
+            {data.firstName}s Chart
+          </h2>
+          <p className="text-secondary text-sm mt-1">
+             Discover the details of your design below
+          </p>
+        </div>
+
         <button
           onClick={onReset}
-          className="px-4 py-2 text-sm bg-secondary text-white rounded-md hover:bg-opacity-90"
+          className="btn-secondary whitespace-nowrap"
         >
           {LABELS.newChart}
         </button>
@@ -49,7 +55,12 @@ export default function ChartDisplay({ data, onReset }: ChartDisplayProps) {
 
       <IncarnationCrossSection incarnationCross={data.incarnationCross} />
 
-      <Bodygraph centers={data.centers} channels={data.channels} />
+      <div className="material-card bg-white overflow-hidden">
+        <h3 className="text-xl font-bold text-primary mb-6">Bodygraph</h3>
+        <div className="flex justify-center p-4">
+           <Bodygraph centers={data.centers} channels={data.channels} />
+        </div>
+      </div>
 
       <ImpulseSection impulse={data.shortImpulse} />
 

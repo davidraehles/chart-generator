@@ -115,9 +115,9 @@ export default function ChartForm({ onSuccess, onError }: ChartFormProps) {
   };
 
   return (
-    <form onSubmit={handleSubmit} className="space-y-6 bg-white p-8 rounded-lg shadow-md">
+    <form onSubmit={handleSubmit} className="space-y-6 material-card bg-white">
       <div>
-        <label htmlFor="firstName" className="block text-sm font-medium text-primary mb-2">
+        <label htmlFor="firstName" className="material-label">
           {LABELS.firstName}
         </label>
         <input
@@ -127,20 +127,22 @@ export default function ChartForm({ onSuccess, onError }: ChartFormProps) {
           value={formData.firstName}
           onChange={handleChange}
           placeholder={PLACEHOLDERS.firstName}
-          className={`w-full px-4 py-2 border rounded-md focus:outline-none focus:ring-2 ${
+          className={`material-input ${
             errors.firstName
-              ? "border-error focus:ring-error"
-              : "border-secondary focus:ring-accent"
+              ? "border-error focus:border-error focus:ring-error"
+              : ""
           }`}
           required
         />
         {errors.firstName && (
-          <p className="mt-1 text-sm text-error">{errors.firstName}</p>
+          <p className="mt-1 text-sm text-error flex items-center">
+            <span className="mr-1">⚠</span> {errors.firstName}
+          </p>
         )}
       </div>
 
       <div>
-        <label htmlFor="birthDate" className="block text-sm font-medium text-primary mb-2">
+        <label htmlFor="birthDate" className="material-label">
           {LABELS.birthDate}
         </label>
         <input
@@ -150,21 +152,23 @@ export default function ChartForm({ onSuccess, onError }: ChartFormProps) {
           value={formData.birthDate}
           onChange={handleChange}
           placeholder={PLACEHOLDERS.birthDate}
-          className={`w-full px-4 py-2 border rounded-md focus:outline-none focus:ring-2 ${
+          className={`material-input ${
             errors.birthDate
-              ? "border-error focus:ring-error"
-              : "border-secondary focus:ring-accent"
+              ? "border-error focus:border-error focus:ring-error"
+              : ""
           }`}
           required
         />
         {errors.birthDate && (
-          <p className="mt-1 text-sm text-error">{errors.birthDate}</p>
+          <p className="mt-1 text-sm text-error flex items-center">
+             <span className="mr-1">⚠</span> {errors.birthDate}
+          </p>
         )}
         <p className="mt-1 text-xs text-secondary">Format: TT.MM.JJJJ</p>
       </div>
 
       <div>
-        <label htmlFor="birthTime" className="block text-sm font-medium text-primary mb-2">
+        <label htmlFor="birthTime" className="material-label">
           {LABELS.birthTime}
         </label>
         <input
@@ -175,34 +179,35 @@ export default function ChartForm({ onSuccess, onError }: ChartFormProps) {
           onChange={handleChange}
           placeholder={PLACEHOLDERS.birthTime}
           disabled={formData.birthTimeApproximate}
-          className={`w-full px-4 py-2 border rounded-md focus:outline-none focus:ring-2 ${
+          className={`material-input ${
             errors.birthTime
-              ? "border-error focus:ring-error"
-              : "border-secondary focus:ring-accent"
-          } ${formData.birthTimeApproximate ? "bg-gray-100" : ""}`}
+              ? "border-error focus:border-error focus:ring-error"
+              : ""
+          } ${formData.birthTimeApproximate ? "bg-gray-50 text-gray-400" : ""}`}
           required={!formData.birthTimeApproximate}
         />
         {errors.birthTime && (
-          <p className="mt-1 text-sm text-error">{errors.birthTime}</p>
+          <p className="mt-1 text-sm text-error flex items-center">
+             <span className="mr-1">⚠</span> {errors.birthTime}
+          </p>
         )}
-        <p className="mt-1 text-xs text-secondary">Format: HH:MM</p>
-
-        <div className="mt-2">
-          <label className="flex items-center space-x-2">
+        <div className="flex justify-between items-center mt-1">
+          <p className="text-xs text-secondary">Format: HH:MM</p>
+          <label className="flex items-center space-x-2 cursor-pointer group">
             <input
               type="checkbox"
               name="birthTimeApproximate"
               checked={formData.birthTimeApproximate}
               onChange={handleChange}
-              className="w-4 h-4 text-accent border-secondary rounded focus:ring-accent"
+              className="w-4 h-4 text-accent border-secondary rounded focus:ring-accent accent-accent"
             />
-            <span className="text-sm text-secondary">{LABELS.birthTimeApproximate}</span>
+            <span className="text-sm text-secondary group-hover:text-primary transition-colors">{LABELS.birthTimeApproximate}</span>
           </label>
         </div>
       </div>
 
       <div>
-        <label htmlFor="birthPlace" className="block text-sm font-medium text-primary mb-2">
+        <label htmlFor="birthPlace" className="material-label">
           {LABELS.birthPlace}
         </label>
         <input
@@ -212,22 +217,24 @@ export default function ChartForm({ onSuccess, onError }: ChartFormProps) {
           value={formData.birthPlace}
           onChange={handleChange}
           placeholder={PLACEHOLDERS.birthPlace}
-          className={`w-full px-4 py-2 border rounded-md focus:outline-none focus:ring-2 ${
+          className={`material-input ${
             errors.birthPlace
-              ? "border-error focus:ring-error"
-              : "border-secondary focus:ring-accent"
+              ? "border-error focus:border-error focus:ring-error"
+              : ""
           }`}
           required
         />
         {errors.birthPlace && (
-          <p className="mt-1 text-sm text-error">{errors.birthPlace}</p>
+          <p className="mt-1 text-sm text-error flex items-center">
+             <span className="mr-1">⚠</span> {errors.birthPlace}
+          </p>
         )}
       </div>
 
       <button
         type="submit"
         disabled={loading}
-        className="w-full bg-primary text-white py-3 px-6 rounded-md font-medium hover:bg-opacity-90 focus:outline-none focus:ring-2 focus:ring-accent disabled:opacity-50 disabled:cursor-not-allowed"
+        className="w-full btn-primary h-12 text-lg uppercase tracking-wide"
       >
         {loading ? "Generiere..." : LABELS.generateChart}
       </button>

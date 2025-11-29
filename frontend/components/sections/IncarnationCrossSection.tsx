@@ -9,13 +9,13 @@ export default function IncarnationCrossSection({
   incarnationCross,
 }: IncarnationCrossSectionProps) {
   return (
-    <div className="p-6 bg-white rounded-lg shadow-md">
-      <h3 className="text-xl font-semibold text-primary mb-3">
+    <div className="material-card bg-white">
+      <h3 className="text-xl font-bold text-primary mb-3">
         {LABELS.yourIncarnationCross}
       </h3>
-      <div className="space-y-2">
-        <p className="text-xl font-bold text-accent">{incarnationCross.name}</p>
-        <p className="text-secondary">
+      <div className="space-y-3">
+        <p className="text-2xl font-bold text-accent">{incarnationCross.name}</p>
+        <p className="text-secondary font-medium">
           ({incarnationCross.gates.join("/")})
         </p>
       </div>
