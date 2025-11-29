@@ -7,11 +7,11 @@ interface AuthoritySectionProps {
 
 export default function AuthoritySection({ authority }: AuthoritySectionProps) {
   return (
-    <div className="p-6 bg-white rounded-lg shadow-md">
-      <h3 className="text-xl font-semibold text-primary mb-3">{LABELS.yourAuthority}</h3>
-      <div className="space-y-2">
-        <p className="text-2xl font-bold text-accent">{authority.label}</p>
-        <p className="text-secondary leading-relaxed">{authority.decisionHint}</p>
+    <div className="material-card bg-white">
+      <h3 className="text-xl font-bold text-primary mb-3">{LABELS.yourAuthority}</h3>
+      <div className="space-y-3">
+        <p className="text-3xl font-bold text-accent">{authority.label}</p>
+        <p className="text-text leading-relaxed">{authority.decisionHint}</p>
       </div>
     </div>
   );
