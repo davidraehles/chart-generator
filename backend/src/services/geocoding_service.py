@@ -7,14 +7,16 @@ Resolves place names to coordinates and timezones.
 from geopy.geocoders import Nominatim
 from timezonefinder import TimezoneFinder
 from typing import Tuple, Optional
+import os
 
 
 class GeocodingService:
     """Service for geocoding and timezone lookup."""
 
     def __init__(self):
-        # User agent is required by Nominatim usage policy
-        self.geolocator = Nominatim(user_agent="hd-chart-generator")
+        # User agent is required by Nominatim usage policy (moved to environment variable)
+        user_agent = os.getenv("NOMINATIM_USER_AGENT", "hd-chart-generator")
+        self.geolocator = Nominatim(user_agent=user_agent)
         self.tf = TimezoneFinder()
 
         # Fallback/Cache for common test locations to avoid rate limits

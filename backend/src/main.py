@@ -5,6 +5,10 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
 import os
 from dotenv import load_dotenv
+import html
+from slowapi import Limiter
+from slowapi.util import get_remote_address
+from slowapi.errors import RateLimitExceeded
 
 from src.models.chart import ChartRequest, ChartResponse
 from src.models.email import EmailCaptureRequest, EmailCaptureResponse
@@ -25,6 +29,9 @@ from src.services.calculation.design_time import calculate_design_datetime
 # Load environment variables
 load_dotenv()
 
+# Initialize rate limiter
+limiter = Limiter(key_func=get_remote_address)
+
 # Initialize FastAPI app
 app = FastAPI(
     title="Human Design Chart Generator API",
@@ -32,14 +39,17 @@ app = FastAPI(
     version="1.0.0",
 )
 
-# Configure CORS
+# Add rate limiter to app state
+app.state.limiter = limiter
+
+# Configure CORS with hardened settings
 frontend_url = os.getenv("FRONTEND_URL", "http://localhost:3000")
 app.add_middleware(
     CORSMiddleware,
     allow_origins=[frontend_url, "http://localhost:3000"],
     allow_credentials=True,
-    allow_methods=["*"],
-    allow_headers=["*"],
+    allow_methods=["GET", "POST", "OPTIONS"],
+    allow_headers=["Content-Type", "Authorization"],
 )
 
 # Initialize services
@@ -61,12 +71,14 @@ async def health_check():
 
 
 @app.post("/api/hd-chart", response_model=ChartResponse)
-async def generate_chart(request: ChartRequest):
+@limiter.limit("10/minute")
+async def generate_chart(request: ChartRequest, http_request: Request):
     """
     Generate Human Design chart from birth data
 
     Args:
         request: ChartRequest with birth information
+        http_request: FastAPI Request object for rate limiting
 
     Returns:
         ChartResponse with complete HD chart data
@@ -75,8 +87,11 @@ async def generate_chart(request: ChartRequest):
         HTTPException: 400 for validation errors, 500 for API errors
     """
     try:
+        # Sanitize input to prevent XSS
+        sanitized_name = html.escape(request.firstName.strip())
+
         # Validate input
-        is_valid, error_msg = validation_service.validate_name(request.firstName)
+        is_valid, error_msg = validation_service.validate_name(sanitized_name)
         if not is_valid:
             raise ValidationError("firstName", error_msg)
 
@@ -122,32 +137,50 @@ async def generate_chart(request: ChartRequest):
                 detail={"error": "Fehler bei der Zeitzonenverarbeitung."},
             )
 
-        # 4. Calculate positions
+        # 4. Calculate positions with timeout protection
         try:
-            ephemeris_source = get_ephemeris_source()
-            pos_calculator = PositionCalculator(ephemeris_source)
+            import signal
 
-            personality_positions = pos_calculator.calculate_positions(birth_dt_utc)
+            def timeout_handler(signum, frame):
+                raise TimeoutError("Calculation exceeded maximum time limit (30 seconds)")
 
-            design_dt_utc = calculate_design_datetime(
-                birth_dt_utc, ephemeris_source, target_arc=88.0
+            # Set timeout for ephemeris calculations (30 seconds)
+            signal.signal(signal.SIGALRM, timeout_handler)
+            signal.alarm(30)
+
+            try:
+                ephemeris_source = get_ephemeris_source()
+                pos_calculator = PositionCalculator(ephemeris_source)
+
+                personality_positions = pos_calculator.calculate_positions(birth_dt_utc)
+
+                design_dt_utc = calculate_design_datetime(
+                    birth_dt_utc, ephemeris_source, target_arc=88.0
+                )
+                design_positions = pos_calculator.calculate_positions(design_dt_utc)
+
+                # 5. Calculate Bodygraph
+                chart_response = bodygraph_calculator.calculate_chart(
+                    personality_positions,
+                    design_positions,
+                    sanitized_name,
+                    calculation_source=ephemeris_source.get_source_name(),
+                )
+
+                return chart_response
+            finally:
+                signal.alarm(0)  # Cancel the alarm
+
+        except TimeoutError as e:
+            print(f"Calculation timeout: {e}")
+            raise HTTPException(
+                status_code=504,
+                detail={
+                    "error": "Die Berechnung hat zu lange gedauert. Bitte versuchen Sie es später noch einmal."
+                },
             )
-            design_positions = pos_calculator.calculate_positions(design_dt_utc)
-
-            # 5. Calculate Bodygraph
-            chart_response = bodygraph_calculator.calculate_chart(
-                personality_positions,
-                design_positions,
-                request.firstName,
-                calculation_source=ephemeris_source.get_source_name(),
-            )
-
-            return chart_response
-
         except Exception as e:
             print(f"Calculation error: {e}")
-            # Fallback to mock if calculation fails (optional, but good for stability during transition)
-            # For now, we raise error to ensure we know if it fails
             raise HTTPException(
                 status_code=500,
                 detail={
@@ -172,6 +205,7 @@ async def generate_chart(request: ChartRequest):
 
 
 @app.post("/api/email-capture", response_model=EmailCaptureResponse)
+@limiter.limit("5/minute")
 async def capture_email(request: EmailCaptureRequest, http_request: Request):
     """
     Capture email for Business Reading interest

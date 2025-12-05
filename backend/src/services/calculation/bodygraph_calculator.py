@@ -104,8 +104,11 @@ class BodygraphCalculator:
         unconscious_gates = {p.gate for p in design_positions}
 
         # Add Earth gates (Sun + 180)
-        p_sun = next(p for p in personality_positions if p.body == CelestialBody.SUN)
-        d_sun = next(p for p in design_positions if p.body == CelestialBody.SUN)
+        p_sun = next((p for p in personality_positions if p.body == CelestialBody.SUN), None)
+        d_sun = next((p for p in design_positions if p.body == CelestialBody.SUN), None)
+
+        if p_sun is None or d_sun is None:
+            raise ValueError("Sun position required for bodygraph calculation")
 
         p_earth_long = (p_sun.ecliptic_longitude + 180.0) % 360.0
         d_earth_long = (d_sun.ecliptic_longitude + 180.0) % 360.0
