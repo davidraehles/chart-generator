@@ -1,22 +1,20 @@
-name: Claude Code Review
+name: Code Review
 
 on:
   pull_request:
     types: [opened, synchronize, reopened]
     branches:
       - main
-      - 'claude/**'
       - 'feature/**'
 
 permissions:
   contents: read
   pull-requests: write
-  issues: write
 
 jobs:
-  claude-review:
+  code-review:
     runs-on: ubuntu-latest
-    name: Claude AI Code Review
+    name: Automated Code Review
 
     steps:
       - name: Checkout code
@@ -30,91 +28,148 @@ jobs:
         with:
           separator: ","
 
-      - name: Claude Code Review
-        uses: anthropics/claude-code-review-action@v1
+      - name: Setup Python
+        uses: actions/setup-python@v5
         with:
-          anthropic_api_key: ${{ secrets.ANTHROPIC_API_KEY }}
-          github_token: ${{ secrets.GITHUB_TOKEN }}
-          model: claude-sonnet-4-5-20250929
-          changed_files: ${{ steps.changed-files.outputs.all_changed_files }}
-          review_level: thorough
-          focus_areas: |
-            - TypeScript type safety and strict null checks
-            - React 18+ best practices and hooks usage
-            - Next.js 14+ App Router patterns
-            - Mobile-first responsive design (min 375px)
-            - German language content validation
-            - API contract compliance with specs/001-hd-chart-generator/contracts/
-            - Human Design domain accuracy
-            - Error handling with user-friendly German messages
-            - Accessibility standards
-            - Performance optimization
-            - Security vulnerabilities (XSS, injection, OWASP top 10)
-          exclude_patterns: |
-            - "*.md"
-            - "*.json"
-            - "package-lock.json"
-            - "yarn.lock"
-            - ".gitignore"
-            - "LICENSE"
-          custom_instructions: |
-            This is a Human Design Chart Generator project with strict requirements:
+          python-version: '3.11'
 
-            ARCHITECTURE:
-            - Frontend: Next.js 14+ with TypeScript, React 18+, Tailwind CSS
-            - Backend: Node.js/Python on Railway (API normalization layer)
-            - Deployment: Vercel (frontend), Railway (backend)
+      - name: Install dependencies
+        run: |
+          pip install anthropic requests
 
-            DOMAIN REQUIREMENTS:
-            - All user-facing text MUST be in German language
-            - Human Design terminology: Italian type names (Generatore, Manifestante, Proiettore, Manifestatore, Riflettore)
-            - Must comply with specs/001-hd-chart-generator/spec.md requirements
-            - Authority decision hints must be clear, non-jargon German
+      - name: Check API Key
+        id: check-key
+        run: |
+          if [ -z "${{ secrets.ANTHROPIC_API_KEY }}" ]; then
+            echo "api_key_exists=false" >> $GITHUB_OUTPUT
+          else
+            echo "api_key_exists=true" >> $GITHUB_OUTPUT
+          fi
 
-            QUALITY GATES:
-            - Mobile-first: 375px minimum width
-            - Performance: 3s max chart generation, no layout shifts
-            - No technical error messages to users (German-only friendly errors)
-            - TypeScript strict mode compliance
-            - Visual Bodygraph must render correctly as SVG
+      - name: Claude Code Review
+        if: steps.check-key.outputs.api_key_exists == 'true'
+        env:
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          PR_NUMBER: ${{ github.event.pull_request.number }}
+          REPO_OWNER: ${{ github.repository_owner }}
+          REPO_NAME: ${{ github.event.repository.name }}
+          CHANGED_FILES: ${{ steps.changed-files.outputs.all_changed_files }}
+        run: |
+          python .github/scripts/claude_review.py
 
-            SECURITY:
-            - Validate all user inputs (birth date, time, location, email)
-            - Prevent XSS, SQL injection, command injection
-            - No secrets in code (use environment variables)
-
-            CONSTITUTION COMPLIANCE:
-            - Specification-first design
-            - Minimalist UI (no over-engineering)
-            - API-agnostic backend (normalization layer)
-            - Error-first experience design
-
-            Review code against these requirements and the specification documents in specs/001-hd-chart-generator/.
-
-      - name: Post review summary
-        if: always()
+      - name: API Key Missing Notice
+        if: steps.check-key.outputs.api_key_exists == 'false'
         uses: actions/github-script@v7
         with:
           github-token: ${{ secrets.GITHUB_TOKEN }}
           script: |
-            const review_url = `${context.payload.pull_request.html_url}#pullrequestreview`;
-            const comment = `## 🤖 Claude Code Review Complete
+            const comment = `## ⚠️ Claude Code Review - Setup Required
 
-            Claude has completed the code review for this PR.
+            The Claude code review workflow is configured but cannot run because the \`ANTHROPIC_API_KEY\` secret is not set.
 
-            **Review Focus:**
-            - TypeScript & Next.js best practices
-            - Human Design domain accuracy
-            - Mobile-first responsive design
-            - German language validation
-            - Security & performance
-            - Specification compliance
+            **To enable automated Claude code reviews:**
 
-            Check the review comments for detailed feedback.`;
+            1. Get an API key from [Anthropic Console](https://console.anthropic.com/)
+            2. Go to **Settings** → **Secrets and variables** → **Actions**
+            3. Click **New repository secret**
+            4. Name: \`ANTHROPIC_API_KEY\`
+            5. Value: Your Anthropic API key
+            6. Click **Add secret**
+
+            Once the secret is added, future pull requests will automatically receive Claude code reviews.
+
+            **Manual Review Available:**
+            You can still use the custom Claude agents manually:
+            - \`/agent hd-domain-expert\` - Human Design domain validation
+            - \`/agent api-integration-specialist\` - API integration review
+            - \`/agent chart-visualization-specialist\` - Bodygraph SVG review
+            - \`/agent spec-compliance-agent\` - Specification compliance check
+
+            See \`.github/scripts/README.md\` for full setup instructions.`;
 
             await github.rest.issues.createComment({
               issue_number: context.issue.number,
               owner: context.repo.owner,
               repo: context.repo.repo,
               body: comment
+            });
+
+      - name: Run ESLint on changed files
+        if: steps.changed-files.outputs.any_changed == 'true'
+        continue-on-error: true
+        run: |
+          if [ -d "frontend" ] && [ -f "frontend/package.json" ]; then
+            cd frontend
+            npm ci --quiet
+            # Safely handle file paths to prevent command injection
+            changed_files="${{ steps.changed-files.outputs.all_changed_files }}"
+            if [ -n "$changed_files" ]; then
+              IFS=',' read -ra FILES <<< "$changed_files"
+              for file in "${FILES[@]}"; do
+                # Validate file exists and matches expected pattern
+                if [[ "$file" =~ \.(ts|tsx|js|jsx)$ ]] && [ -f "$file" ]; then
+                  npx eslint --format stylish "$file" || true
+                fi
+              done
+            fi
+          fi
+
+      - name: Run Python linting
+        if: steps.changed-files.outputs.any_changed == 'true'
+        continue-on-error: true
+        run: |
+          if [ -d "backend" ]; then
+            pip install ruff --quiet
+            # Safely handle file paths to prevent command injection
+            changed_files="${{ steps.changed-files.outputs.all_changed_files }}"
+            if [ -n "$changed_files" ]; then
+              IFS=',' read -ra FILES <<< "$changed_files"
+              for file in "${FILES[@]}"; do
+                # Validate file exists and matches expected pattern
+                if [[ "$file" =~ \.py$ ]] && [ -f "$file" ]; then
+                  ruff check "$file" || true
+                fi
+              done
+            fi
+          fi
+
+      - name: Post review summary
+        if: steps.check-key.outputs.api_key_exists == 'true'
+        uses: actions/github-script@v7
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          script: |
+            const changedFilesRaw = `${{ steps.changed-files.outputs.all_changed_files }}`;
+            const fileCount = changedFilesRaw ? changedFilesRaw.split(',').filter(f => f.trim()).length : 0;
+            
+            const reviewComment = [
+              '## ✅ Claude Code Review Complete',
+              '',
+              'Claude has analyzed the changes in this PR.',
+              '',
+              `**Files analyzed:** ${fileCount} source files`,
+              '',
+              '**Review Focus:**',
+              '- TypeScript & Next.js best practices',
+              '- Human Design domain accuracy',
+              '- Mobile-first responsive design (375px+)',
+              '- German language validation',
+              '- Security & performance',
+              '- Specification compliance (specs/001-hd-chart-generator/)',
+              '',
+              '**Custom Agents Available:**',
+              '- HD Domain Expert',
+              '- API Integration Specialist',
+              '- Chart Visualization Specialist',
+              '- Specification Compliance Agent',
+              '',
+              'Check the review comments above for detailed feedback.'
+            ].join('\n');
+
+            await github.rest.issues.createComment({
+              issue_number: context.issue.number,
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              body: reviewComment
             });
