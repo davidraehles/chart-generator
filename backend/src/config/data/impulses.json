@@ -1,37 +1,25 @@
 {
-  "manifestor_emotional": "Du bist ein Manifestor mit emotionaler Autorität - warte auf emotionale Klarheit, bevor du wichtige Entscheidungen triffst und andere informierst.",
-  "manifestor_sacral": "Du bist ein Manifestor mit sakraler Autorität - höre auf die spontanen Ja/Nein-Impulse deines Körpers und informiere andere über deine Initiativen.",
-  "manifestor_splenic": "Du bist ein Manifestor mit milzlicher Autorität - vertraue auf deine spontanen Intuitionsblitze im Moment und informiere andere über deine Pläne.",
-  "manifestor_ego": "Du bist ein Manifestor mit Ego-Autorität - folge dem, was dein Herz wirklich will, und kommuniziere deine Absichten klar nach außen.",
-  "manifestor_self_projected": "Du bist ein Manifestor mit selbst-projizierter Autorität - sprich über deine Ideen und höre auf deine eigene Stimme, bevor du handelst.",
-  "manifestor_lunar": "Du bist ein Manifestor mit lunarer Autorität - nimm dir Zeit für wichtige Entscheidungen und beobachte deine Gefühle über einen Mondzyklus hinweg.",
-  "manifestor_outer": "Du bist ein Manifestor mit äußerer Autorität - suche den Rat vertrauter Menschen, bevor du große Veränderungen initiierst.",
-  "generator_emotional": "Du bist ein Generator mit emotionaler Autorität - warte auf emotionale Klarheit und antworte dann aus deinem Sakralzentrum auf das Leben.",
-  "generator_sacral": "Du bist ein Generator mit sakraler Autorität - vertraue auf die unmittelbaren Ja/Nein-Antworten deines Sakralzentrums und reagiere auf das, was das Leben dir bringt.",
-  "generator_splenic": "Du bist ein Generator mit milzlicher Autorität - folge deinen spontanen körperlichen Impulsen im Hier und Jetzt, während du auf das Leben antwortest.",
-  "generator_ego": "Du bist ein Generator mit Ego-Autorität - höre auf dein Herz und folge dem, was dir wirklich wichtig ist, während du sakral antwortest.",
-  "generator_self_projected": "Du bist ein Generator mit selbst-projizierter Autorität - sprich über deine Möglichkeiten und höre auf deine eigene Wahrheit, bevor du dich festlegst.",
-  "generator_lunar": "Du bist ein Generator mit lunarer Autorität - gib dir Zeit über einen Mondzyklus, um wichtige Entscheidungen reifen zu lassen.",
-  "generator_outer": "Du bist ein Generator mit äußerer Autorität - besprich wichtige Entscheidungen mit vertrauten Menschen, während du sakral auf Möglichkeiten antwortest.",
-  "generator_manifestor_emotional": "Du bist ein manifestierender Generator mit emotionaler Autorität - warte auf emotionale Klarheit, bevor du deine vielfältigen Initiativen startest.",
-  "generator_manifestor_sacral": "Du bist ein manifestierender Generator mit sakraler Autorität - folge deinen spontanen sakralen Impulsen und springe mutig zwischen verschiedenen Projekten.",
-  "generator_manifestor_splenic": "Du bist ein manifestierender Generator mit milzlicher Autorität - vertraue auf deine spontanen Intuitionsblitze und bewege dich flexibel durchs Leben.",
-  "generator_manifestor_ego": "Du bist ein manifestierender Generator mit Ego-Autorität - folge deinem Herzen und erlaube dir, viele verschiedene Dinge gleichzeitig zu verfolgen.",
-  "generator_manifestor_self_projected": "Du bist ein manifestierender Generator mit selbst-projizierter Autorität - sprich über deine vielen Ideen und höre auf deine innere Stimme.",
-  "generator_manifestor_lunar": "Du bist ein manifestierender Generator mit lunarer Autorität - gib deinen vielfältigen Impulsen Zeit über einen Mondzyklus zu reifen.",
-  "generator_manifestor_outer": "Du bist ein manifestierender Generator mit äußerer Autorität - besprich deine vielen Projekte mit vertrauten Menschen, bevor du dich festlegst.",
-  "projector_emotional": "Du bist ein Projektor mit emotionaler Autorität - warte auf Einladungen und emotionale Klarheit, bevor du deine Weisheit teilst.",
-  "projector_sacral": "Du bist ein Projektor mit sakraler Autorität - antworte sakral auf Einladungen und erkenne, wann es Zeit ist, deine Expertise einzubringen.",
-  "projector_splenic": "Du bist ein Projektor mit milzlicher Autorität - vertraue auf deine spontane Intuition bei Einladungen und folge deinem Wohlbefinden im Moment.",
-  "projector_ego": "Du bist ein Projektor mit Ego-Autorität - warte auf Einladungen, die dein Herz wirklich berühren, und teile dann deine einzigartige Perspektive.",
-  "projector_self_projected": "Du bist ein Projektor mit selbst-projizierter Autorität - sprich über Einladungen und höre auf deine eigene Wahrheit, bevor du dich engagierst.",
-  "projector_lunar": "Du bist ein Projektor mit lunarer Autorität - nimm dir Zeit über einen Mondzyklus, um wichtige Einladungen zu prüfen, bevor du zusagst.",
-  "projector_outer": "Du bist ein Projektor mit äußerer Autorität - besprich bedeutende Einladungen mit vertrauten Menschen, bevor du deine Energie investierst.",
-  "reflector_emotional": "Du bist ein Reflektor mit emotionaler Autorität - spiegle deine Umgebung und warte auf emotionale Klarheit über einen Mondzyklus hinweg.",
-  "reflector_sacral": "Du bist ein Reflektor mit sakraler Autorität - nimm die Energie deiner Umgebung wahr und antworte sakral auf die richtigen Möglichkeiten.",
-  "reflector_splenic": "Du bist ein Reflektor mit milzlicher Autorität - vertraue auf deine feinen spontanen Wahrnehmungen und spiegle die Gesundheit deiner Umgebung.",
-  "reflector_ego": "Du bist ein Reflektor mit Ego-Autorität - spiegle deine Umgebung und folge dem, was dein Herz über einen längeren Zeitraum anzieht.",
-  "reflector_self_projected": "Du bist ein Reflektor mit selbst-projizierter Autorität - sprich über deine Wahrnehmungen und höre auf deine eigene Stimme im Dialog.",
-  "reflector_lunar": "Du bist ein Reflektor mit lunarer Autorität - gib dir den vollen Mondzyklus, um wichtige Entscheidungen zu spiegeln und zu reflektieren.",
-  "reflector_outer": "Du bist ein Reflektor mit äußerer Autorität - teile deine Wahrnehmungen mit vertrauten Menschen und lass Entscheidungen über Zeit reifen."
+  "1": {
+    "emotional": "Wenn du deiner emotionalen Klarheit vertraust, kann deine Energie Wunder bewegen.",
+    "sacral": "Deine sakrale Antwort zeigt dir den Weg zu echter Erfüllung."
+  },
+  "2": {
+    "emotional": "Mit emotionaler Klarheit wird deine manifestierende Kraft unaufhaltsam.",
+    "sacral": "Dein Sakral und deine Geduld sind deine größten Geschenke."
+  },
+  "3": {
+    "emotional": "Warte auf Klarheit, bevor du Einladungen annimmst.",
+    "spleen": "Deine spontane Wahrnehmung führt dich zu den richtigen Entscheidungen.",
+    "ego_projected": "Folge deinem Willen, wenn du eingeladen wirst.",
+    "self_projected": "Wenn du auf Einladungen wartest, öffnen sich die richtigen Türen.",
+    "mental": "Besprich deine Entscheidungen mit anderen, um Klarheit zu finden."
+  },
+  "4": {
+    "emotional": "Mit emotionaler Klarheit manifestierst du kraftvoll und nachhaltig.",
+    "spleen": "Deine Intuition leitet dich im Moment des Initiierens.",
+    "ego_manifested": "Deine Willenskraft bringt Visionen in die Realität."
+  },
+  "5": {
+    "lunar": "Im Rhythmus des Mondes findest du deine einzigartige Perspektive."
+  }
 }

@@ -32,8 +32,14 @@ export default function Home() {
         )}
 
         {error && (
-          <div className="mt-4 p-4 bg-red-50 border border-error rounded-lg">
+          <div className="mt-4 p-4 bg-red-50 border border-error rounded-lg flex justify-between items-center">
             <p className="text-error">{error}</p>
+            <button
+              onClick={() => setError(null)}
+              className="ml-4 px-3 py-1 text-sm text-error border border-error rounded hover:bg-red-100 transition-colors"
+            >
+              OK
+            </button>
           </div>
         )}
       </div>

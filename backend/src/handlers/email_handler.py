@@ -1,18 +1,14 @@
-"""
-Email capture handler.
+"""Email capture handler for business reading interest"""
 
-Coordinates validation, duplicate checking, and email storage.
-"""
-
-from typing import Tuple, Optional
 from sqlalchemy.orm import Session
-
-from src.services.email_service import EmailService
-from src.services.validation_service import ValidationService
+from sqlalchemy import Column, Integer, String, DateTime, func
+from src.database import Base
+from datetime import datetime
+from email_validator import validate_email, EmailNotValidError
 
 
 class EmailCaptureError(Exception):
-    """Custom exception for email capture errors."""
+    """Custom exception for email capture errors"""
 
     def __init__(self, message: str, status_code: int = 400):
         self.message = message
@@ -20,67 +16,82 @@ class EmailCaptureError(Exception):
         super().__init__(self.message)
 
 
+class EmailCapture(Base):
+    """Database model for captured emails"""
+
+    __tablename__ = "email_captures"
+
+    id = Column(Integer, primary_key=True, index=True)
+    email = Column(String(255), unique=True, nullable=False, index=True)
+    created_at = Column(DateTime, default=func.now(), nullable=False)
+    ip_address = Column(String(45), nullable=True)
+    user_agent = Column(String(500), nullable=True)
+
+
 class EmailHandler:
-    """Handler for email capture operations."""
+    """Handler for email capture operations"""
 
     def __init__(self):
-        self.email_service = EmailService()
-        self.validation_service = ValidationService()
+        pass
 
     def capture_email(
         self,
         email: str,
         db_session: Session,
-        ip_address: Optional[str] = None,
-        user_agent: Optional[str] = None
+        ip_address: str = None,
+        user_agent: str = None,
     ) -> dict:
         """
-        Capture and store email address.
-
-        Validates email format, checks for duplicates, and saves to database.
+        Capture email for Business Reading interest.
 
         Args:
             email: Email address to capture
-            db_session: SQLAlchemy database session
-            ip_address: Client IP address (optional)
-            user_agent: Client user agent (optional)
+            db_session: Database session
+            ip_address: Client IP address
+            user_agent: Client user agent
 
         Returns:
-            dict: Result with id, email, message, and success status
+            dict with success, id, and message
 
         Raises:
-            EmailCaptureError: For validation or duplicate errors
+            EmailCaptureError: If validation fails or email exists
         """
-        # Validate email format
-        is_valid, error_msg = self.validation_service.validate_email(email)
-        if not is_valid:
-            raise EmailCaptureError(error_msg, status_code=400)
-
-        # Check for duplicates
-        if self.email_service.check_duplicate(email, db_session):
-            raise EmailCaptureError(
-                "Diese E-Mail-Adresse wurde bereits registriert.",
-                status_code=409
-            )
-
-        # Save to database
+        # Validate email
         try:
-            result = self.email_service.save_email(
-                email=email,
-                db_session=db_session,
-                source="business_reading_interest",
-                ip_address=ip_address,
-                user_agent=user_agent
+            validated = validate_email(email, check_deliverability=False)
+            email = validated.normalized
+        except EmailNotValidError as e:
+            raise EmailCaptureError(
+                "Ungültige E-Mail-Adresse. Bitte überprüfen Sie Ihre Eingabe.",
+                status_code=400,
             )
+
+        # Check if email already exists
+        existing = (
+            db_session.query(EmailCapture).filter(EmailCapture.email == email).first()
+        )
+        if existing:
+            raise EmailCaptureError(
+                "Diese E-Mail-Adresse wurde bereits registriert.", status_code=409
+            )
+
+        # Create new email capture
+        try:
+            email_capture = EmailCapture(
+                email=email, ip_address=ip_address, user_agent=user_agent
+            )
+            db_session.add(email_capture)
+            db_session.commit()
+            db_session.refresh(email_capture)
 
             return {
                 "success": True,
-                "id": result["id"],
-                "message": "Vielen Dank für dein Interesse an einem Business Reading."
+                "id": email_capture.id,
+                "message": "E-Mail erfolgreich gespeichert.",
             }
-
         except Exception as e:
+            db_session.rollback()
             raise EmailCaptureError(
-                f"Fehler beim Speichern der E-Mail: {str(e)}",
-                status_code=500
+                "Fehler beim Speichern der E-Mail. Bitte versuchen Sie es später noch einmal.",
+                status_code=500,
             )

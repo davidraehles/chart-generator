@@ -1,1 +1,1 @@
-"""Handlers package for business logic."""
+"""Handlers package initialization"""

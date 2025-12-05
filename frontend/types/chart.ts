@@ -56,6 +56,7 @@ export interface ChartResponse {
   };
   incarnationCross: IncarnationCross;
   shortImpulse: string;
+  calculationSource?: string;
 }
 
 export interface EmailCaptureRequest {

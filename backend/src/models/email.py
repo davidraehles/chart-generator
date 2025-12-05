@@ -12,7 +12,7 @@ class EmailCaptureRequest(BaseModel):
 class EmailCaptureResponse(BaseModel):
     """Email capture response"""
     success: bool
-    id: UUID
+    id: int
     message: str
 
 

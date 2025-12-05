@@ -1,162 +1,100 @@
-"""
-Swiss Ephemeris implementation.
+"""Swiss Ephemeris implementation for planetary calculations"""
 
-Primary ephemeris source using the pyswisseph library.
-Most accurate and widely used for Human Design calculations.
-"""
-
-import os
-from pathlib import Path
-from typing import Optional
 import swisseph as swe
-from src.services.ephemeris.base import EphemerisSource
+from datetime import datetime
 from src.models.celestial import CelestialBody
-from src.models.error import ERROR_EPHEMERIS_UNAVAILABLE, ERROR_CALCULATION_FAILED
 
 
-# Mapping of CelestialBody enum to Swiss Ephemeris planet constants
-BODY_TO_SWE_PLANET = {
-    CelestialBody.SUN: swe.SUN,
-    CelestialBody.MOON: swe.MOON,
-    CelestialBody.MERCURY: swe.MERCURY,
-    CelestialBody.VENUS: swe.VENUS,
-    CelestialBody.MARS: swe.MARS,
-    CelestialBody.JUPITER: swe.JUPITER,
-    CelestialBody.SATURN: swe.SATURN,
-    CelestialBody.URANUS: swe.URANUS,
-    CelestialBody.NEPTUNE: swe.NEPTUNE,
-    CelestialBody.PLUTO: swe.PLUTO,
-    CelestialBody.NORTH_NODE: swe.MEAN_NODE,
-    CelestialBody.SOUTH_NODE: swe.MEAN_NODE,  # Calculated as North Node + 180°
-    CelestialBody.CHIRON: swe.CHIRON,
-}
+class SwissEphemerisSource:
+    """Swiss Ephemeris data source for planetary positions"""
 
+    # Mapping of CelestialBody to Swiss Ephemeris constants
+    BODY_MAP = {
+        CelestialBody.SUN: swe.SUN,
+        CelestialBody.MOON: swe.MOON,
+        CelestialBody.MERCURY: swe.MERCURY,
+        CelestialBody.VENUS: swe.VENUS,
+        CelestialBody.MARS: swe.MARS,
+        CelestialBody.JUPITER: swe.JUPITER,
+        CelestialBody.SATURN: swe.SATURN,
+        CelestialBody.URANUS: swe.URANUS,
+        CelestialBody.NEPTUNE: swe.NEPTUNE,
+        CelestialBody.PLUTO: swe.PLUTO,
+        CelestialBody.NORTH_NODE: swe.TRUE_NODE,
+        # Earth is calculated as Sun + 180°
+        # South Node is North Node + 180°
+    }
 
-def validate_ephemeris_path(path: str) -> str:
-    """
-    Validate ephemeris path to prevent security issues.
+    def __init__(self):
+        """Initialize Swiss Ephemeris source"""
+        # Set ephemeris path (optional, uses built-in data by default)
+        # swe.set_ephe_path('/path/to/ephemeris/data')
+        pass
 
-    Args:
-        path: Ephemeris directory path
+    def get_source_name(self) -> str:
+        """Get the name of this ephemeris source"""
+        return "SwissEphemeris"
 
-    Returns:
-        Validated path string
-
-    Raises:
-        ValueError: If path contains suspicious patterns or is invalid
-    """
-    # Check for null bytes
-    if "\x00" in path:
-        raise ValueError("Invalid ephemeris path: contains null bytes")
-
-    # Convert to Path for validation
-    path_obj = Path(path)
-
-    # Check for suspicious patterns that could indicate path traversal
-    path_str = str(path_obj)
-    suspicious_patterns = ["../", "..\\"]
-    for pattern in suspicious_patterns:
-        if pattern in path_str:
-            raise ValueError(f"Invalid ephemeris path: contains suspicious pattern '{pattern}'")
-
-    return path
-
-
-class SwissEphemerisSource(EphemerisSource):
-    """
-    Swiss Ephemeris calculation source.
-
-    Uses pyswisseph library with bundled ephemeris data files.
-    Provides NASA JPL-quality accuracy for astronomical calculations.
-    """
-
-    def __init__(self, ephemeris_path: str = "/app/data/ephemeris"):
+    def datetime_to_julian_day(self, dt: datetime) -> float:
         """
-        Initialize Swiss Ephemeris source.
+        Convert datetime to Julian Day number.
 
         Args:
-            ephemeris_path: Path to directory containing .se1 ephemeris files
+            dt: datetime object (should be in UTC)
 
-        Raises:
-            ValueError: If ephemeris path is invalid or contains security issues
+        Returns:
+            Julian Day number
         """
-        # Validate path for security
-        validated_path = validate_ephemeris_path(ephemeris_path)
-        self.ephemeris_path = validated_path
+        return swe.julday(
+            dt.year,
+            dt.month,
+            dt.day,
+            dt.hour + dt.minute / 60.0 + dt.second / 3600.0
+        )
 
-        # Set ephemeris file path for pyswisseph
-        if os.path.exists(validated_path):
-            swe.set_ephe_path(validated_path)
-        else:
-            # Allow initialization even if files don't exist yet (for testing)
-            # is_available() will return False
-            pass
-
-    def calculate_position(self, body: CelestialBody, julian_day: float) -> float:
+    def get_ecliptic_longitude(self, body: CelestialBody, jd: float) -> float:
         """
-        Calculate ecliptic longitude using Swiss Ephemeris.
+        Get ecliptic longitude for a celestial body.
 
         Args:
-            body: Celestial body to calculate
-            julian_day: Julian Day Number
+            body: Celestial body
+            jd: Julian Day number
 
         Returns:
             Ecliptic longitude in degrees (0-360)
-
-        Raises:
-            RuntimeError: If calculation fails
         """
-        # Note: is_available() now always returns True since we support built-in data
+        if body == CelestialBody.EARTH:
+            # Earth is Sun + 180°
+            sun_lon = self._calculate_position(CelestialBody.SUN, jd)
+            return (sun_lon + 180.0) % 360.0
+        elif body == CelestialBody.SOUTH_NODE:
+            # South Node is North Node + 180°
+            north_node_lon = self._calculate_position(CelestialBody.NORTH_NODE, jd)
+            return (north_node_lon + 180.0) % 360.0
+        else:
+            return self._calculate_position(body, jd)
 
-        try:
-            # Get Swiss Ephemeris planet constant
-            swe_planet = BODY_TO_SWE_PLANET[body]
-
-            # Calculate position using Universal Time
-            result = swe.calc_ut(julian_day, swe_planet)
-
-            # Extract ecliptic longitude (first element of position tuple)
-            longitude = result[0][0]
-
-            # Handle South Node (opposite of North Node)
-            if body == CelestialBody.SOUTH_NODE:
-                longitude = (longitude + 180.0) % 360.0
-
-            return longitude
-
-        except Exception as e:
-            raise RuntimeError(
-                f"{ERROR_CALCULATION_FAILED}: Swiss Ephemeris calculation failed for {body.value}: {str(e)}"
-            )
-
-    def get_source_name(self) -> str:
-        """Return source identifier."""
-        return "SwissEphemeris"
-
-    def is_available(self) -> bool:
+    def _calculate_position(self, body: CelestialBody, jd: float) -> float:
         """
-        Check if Swiss Ephemeris files are available.
+        Calculate position using Swiss Ephemeris.
+
+        Args:
+            body: Celestial body
+            jd: Julian Day number
 
         Returns:
-            True if ALL required ephemeris data files exist and can be used,
-            or if using built-in data from pyswisseph
+            Ecliptic longitude in degrees
         """
-        # Empty path means use built-in ephemeris data from pyswisseph
-        if not self.ephemeris_path or self.ephemeris_path == "":
-            return True
+        if body not in self.BODY_MAP:
+            raise ValueError(f"Unknown celestial body: {body}")
 
-        # Check if the ephemeris path exists
-        if not os.path.exists(self.ephemeris_path):
-            # Fall back to built-in data if path doesn't exist
-            return True
+        swe_body = self.BODY_MAP[body]
 
-        # Check for ALL required ephemeris files
-        # All three files are necessary for comprehensive calculations
-        required_files = ["seas_18.se1", "semo_18.se1", "sepl_18.se1"]
-        for filename in required_files:
-            filepath = os.path.join(self.ephemeris_path, filename)
-            if not os.path.exists(filepath):
-                # Fall back to built-in data if files are missing
-                return True
+        # Calculate position
+        # flags: SEFLG_SWIEPH (use Swiss Ephemeris), SEFLG_SPEED (calculate speed)
+        result = swe.calc_ut(jd, swe_body, swe.FLG_SWIEPH | swe.FLG_SPEED)
 
-        return True  # All required files present
+        # result[0] is a tuple: (longitude, latitude, distance, speed_lon, speed_lat, speed_dist)
+        longitude = result[0][0]
+
+        return longitude

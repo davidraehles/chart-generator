@@ -1,0 +1,50 @@
+{
+    "1": {
+        "name": "Sphinx",
+        "right_angle": "Rechtwinkliges Kreuz der Sphinx",
+        "juxtaposition": "Juxtaposition Kreuz der Selbstausrichtung",
+        "left_angle": "Linkswinkliges Kreuz des Trotzes"
+    },
+    "2": {
+        "name": "Sphinx",
+        "right_angle": "Rechtwinkliges Kreuz der Sphinx",
+        "juxtaposition": "Juxtaposition Kreuz des Fahrers",
+        "left_angle": "Linkswinkliges Kreuz des Trotzes"
+    },
+    "7": {
+        "name": "Sphinx",
+        "right_angle": "Rechtwinkliges Kreuz der Sphinx",
+        "juxtaposition": "Juxtaposition Kreuz der Interaktion",
+        "left_angle": "Linkswinkliges Kreuz der Masken"
+    },
+    "13": {
+        "name": "Sphinx",
+        "right_angle": "Rechtwinkliges Kreuz der Sphinx",
+        "juxtaposition": "Juxtaposition Kreuz des Zuhörens",
+        "left_angle": "Linkswinkliges Kreuz der Masken"
+    },
+    "10": {
+        "name": "Vessel of Love",
+        "right_angle": "Rechtwinkliges Kreuz des Gefäßes der Liebe",
+        "juxtaposition": "Juxtaposition Kreuz des Verhaltens",
+        "left_angle": "Linkswinkliges Kreuz der Prävention"
+    },
+    "15": {
+        "name": "Vessel of Love",
+        "right_angle": "Rechtwinkliges Kreuz des Gefäßes der Liebe",
+        "juxtaposition": "Juxtaposition Kreuz der Extreme",
+        "left_angle": "Linkswinkliges Kreuz der Prävention"
+    },
+    "25": {
+        "name": "Vessel of Love",
+        "right_angle": "Rechtwinkliges Kreuz des Gefäßes der Liebe",
+        "juxtaposition": "Juxtaposition Kreuz der Unschuld",
+        "left_angle": "Linkswinkliges Kreuz der Heilung"
+    },
+    "46": {
+        "name": "Vessel of Love",
+        "right_angle": "Rechtwinkliges Kreuz des Gefäßes der Liebe",
+        "juxtaposition": "Juxtaposition Kreuz des Glücks",
+        "left_angle": "Linkswinkliges Kreuz der Heilung"
+    }
+}
