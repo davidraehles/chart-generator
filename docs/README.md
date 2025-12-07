@@ -159,26 +159,6 @@ The application is ready for deployment with:
 - ⏳ Database integration (optional for MVP)
 - ⏳ Production HD API integration
 
-## Documentation
-
-Comprehensive documentation is available in the `docs/` folder:
-
-- **[Development Guidelines](docs/DEVELOPMENT_GUIDELINES.md)** - Trunk-based development workflow and code standards
-- **[Architecture](docs/ARCHITECTURE.md)** - System architecture, data models, and integration points
-- **[Deployment Guide](docs/DEPLOYMENT_GUIDE.md)** - Step-by-step deployment instructions for Vercel and Railway
-- **[Deployment Checklist](docs/DEPLOYMENT_CHECKLIST.md)** - Pre and post-deployment verification steps
-- **[Monitoring & Logging](docs/MONITORING_AND_LOGGING.md)** - Production monitoring, alerts, and troubleshooting
-- **[Testing Guide](docs/TESTING_GUIDE.md)** - Testing strategy and test execution
-- **[Integration Summary](docs/INTEGRATION_SUMMARY.md)** - Backend and frontend integration overview
-- **[Execution Reference](docs/EXECUTION_REFERENCE.md)** - Quick reference for execution and deployment
-
-### Design Documentation
-- **[Design Deliverables](docs/design/DESIGN_DELIVERABLES.md)** - UI/UX design artifacts and specifications
-- **[Brand Research](docs/design/BRAND_RESEARCH.md)** - Brand strategy and research findings
-- **[Color Research](docs/design/COLOR_RESEARCH.md)** - Color palette and design system specifications
-- **[Responsive Testing](docs/design/RESPONSIVE_TEST.md)** - Mobile and responsive design test results
-- **[E2E Test Samples](docs/design/E2E_TEST_SAMPLES.md)** - End-to-end testing samples and documentation
-
 ## License
 
 MIT License - see LICENSE file for details
