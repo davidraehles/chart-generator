@@ -4,7 +4,7 @@ Bodygraph calculation service.
 Determines chart properties (Type, Authority, Centers, etc.) from planetary positions.
 """
 
-from typing import List, Dict, Set, Tuple, Optional
+from typing import List, Dict, Set, Tuple
 from src.models.chart import (
     ChartResponse,
     TypeInfo,

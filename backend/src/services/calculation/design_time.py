@@ -1,7 +1,6 @@
 """Design time calculation for Human Design charts"""
 
 from datetime import datetime, timedelta
-import math
 
 
 def calculate_design_datetime(

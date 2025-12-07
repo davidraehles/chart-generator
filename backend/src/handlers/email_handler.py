@@ -3,7 +3,6 @@
 from sqlalchemy.orm import Session
 from sqlalchemy import Column, Integer, String, DateTime, func
 from src.database import Base
-from datetime import datetime
 from email_validator import validate_email, EmailNotValidError
 
 
@@ -60,7 +59,7 @@ class EmailHandler:
         try:
             validated = validate_email(email, check_deliverability=False)
             email = validated.normalized
-        except EmailNotValidError as e:
+        except EmailNotValidError:
             raise EmailCaptureError(
                 "Ungültige E-Mail-Adresse. Bitte überprüfen Sie Ihre Eingabe.",
                 status_code=400,
@@ -89,7 +88,7 @@ class EmailHandler:
                 "id": email_capture.id,
                 "message": "E-Mail erfolgreich gespeichert.",
             }
-        except Exception as e:
+        except Exception:
             db_session.rollback()
             raise EmailCaptureError(
                 "Fehler beim Speichern der E-Mail. Bitte versuchen Sie es später noch einmal.",

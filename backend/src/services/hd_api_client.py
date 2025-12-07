@@ -1,8 +1,7 @@
 """Human Design API client"""
 import httpx
 import os
-from typing import Dict, Any, Optional
-from datetime import datetime
+from typing import Dict, Any
 
 
 class HDAPIError(Exception):

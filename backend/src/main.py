@@ -1,6 +1,6 @@
 """FastAPI main application"""
 
-from fastapi import FastAPI, HTTPException, Request, Depends
+from fastapi import FastAPI, HTTPException, Request
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
 import os
@@ -8,7 +8,6 @@ from dotenv import load_dotenv
 import html
 from slowapi import Limiter
 from slowapi.util import get_remote_address
-from slowapi.errors import RateLimitExceeded
 
 from src.models.chart import ChartRequest, ChartResponse
 from src.models.email import EmailCaptureRequest, EmailCaptureResponse
