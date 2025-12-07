@@ -97,7 +97,14 @@ class BodygraphCalculator:
         first_name: str,
         calculation_source: str = "SwissEphemeris",
     ) -> ChartResponse:
-        """Calculate complete chart data."""
+        """
+        Calculate complete chart data.
+
+        Raises:
+            ValueError: If required planetary positions are missing
+        """
+        # Validate that we have all required planetary positions
+        self._validate_planetary_positions(personality_positions, design_positions)
 
         # 1. Extract Active Gates
         conscious_gates = {p.gate for p in personality_positions}
@@ -214,6 +221,55 @@ class BodygraphCalculator:
             shortImpulse=short_impulse,
             calculationSource=calculation_source,
         )
+
+    def _validate_planetary_positions(
+        self,
+        personality_positions: List[PlanetaryPosition],
+        design_positions: List[PlanetaryPosition],
+    ) -> None:
+        """
+        Validate that all required planetary positions are present.
+
+        Required bodies for Human Design calculation:
+        - SUN (for Earth + 180° calculation)
+        - MOON
+        - MERCURY, VENUS, MARS, JUPITER, SATURN, URANUS, NEPTUNE, PLUTO
+        - NORTH_NODE (for South Node + 180° calculation)
+
+        Raises:
+            ValueError: If any required celestial body is missing from either position set
+        """
+        required_bodies = {
+            CelestialBody.SUN,
+            CelestialBody.MOON,
+            CelestialBody.MERCURY,
+            CelestialBody.VENUS,
+            CelestialBody.MARS,
+            CelestialBody.JUPITER,
+            CelestialBody.SATURN,
+            CelestialBody.URANUS,
+            CelestialBody.NEPTUNE,
+            CelestialBody.PLUTO,
+            CelestialBody.NORTH_NODE,
+        }
+
+        personality_bodies = {p.body for p in personality_positions}
+        design_bodies = {p.body for p in design_positions}
+
+        missing_personality = required_bodies - personality_bodies
+        missing_design = required_bodies - design_bodies
+
+        if missing_personality or missing_design:
+            error_parts = []
+            if missing_personality:
+                bodies_str = ", ".join(b.value for b in sorted(missing_personality, key=lambda x: x.value))
+                error_parts.append(f"Personality: {bodies_str}")
+            if missing_design:
+                bodies_str = ", ".join(b.value for b in sorted(missing_design, key=lambda x: x.value))
+                error_parts.append(f"Design: {bodies_str}")
+            raise ValueError(
+                f"Missing required celestial bodies for bodygraph calculation: {'; '.join(error_parts)}"
+            )
 
     def _determine_type(
         self,

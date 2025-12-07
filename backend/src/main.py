@@ -6,6 +6,7 @@ from fastapi.responses import JSONResponse
 import os
 from dotenv import load_dotenv
 import html
+import asyncio
 from slowapi import Limiter
 from slowapi.util import get_remote_address
 
@@ -135,18 +136,14 @@ async def generate_chart(chart_request: ChartRequest):
                 detail={"error": "Fehler bei der Zeitzonenverarbeitung."},
             )
 
-        # 4. Calculate positions with timeout protection
+        # 4. Calculate positions with timeout protection (60s for cold starts)
         try:
-            import signal
+            # Use asyncio.timeout for async-safe timeout handling
+            # Works reliably in async contexts and on all platforms (Windows, Linux, macOS)
+            timeout_seconds = 60  # Allows time for cold starts on Railway
 
-            def timeout_handler(signum, frame):
-                raise TimeoutError("Calculation exceeded maximum time limit (30 seconds)")
-
-            # Set timeout for ephemeris calculations (30 seconds)
-            signal.signal(signal.SIGALRM, timeout_handler)
-            signal.alarm(30)
-
-            try:
+            async def calculate_with_timeout():
+                """Calculate chart with timeout protection"""
                 ephemeris_source = get_ephemeris_source()
                 pos_calculator = PositionCalculator(ephemeris_source)
 
@@ -164,10 +161,16 @@ async def generate_chart(chart_request: ChartRequest):
                     sanitized_name,
                     calculation_source=ephemeris_source.get_source_name(),
                 )
-
                 return chart_response
-            finally:
-                signal.alarm(0)  # Cancel the alarm
+
+            try:
+                chart_response = await asyncio.wait_for(
+                    asyncio.to_thread(calculate_with_timeout),
+                    timeout=timeout_seconds
+                )
+                return chart_response
+            except asyncio.TimeoutError:
+                raise TimeoutError(f"Calculation exceeded maximum time limit ({timeout_seconds} seconds)")
 
         except TimeoutError as e:
             print(f"Calculation timeout: {e}")
