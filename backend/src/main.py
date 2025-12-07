@@ -177,6 +177,20 @@ async def generate_chart(chart_request: ChartRequest):
                     "error": "Die Berechnung hat zu lange gedauert. Bitte versuchen Sie es später noch einmal."
                 },
             )
+        except RuntimeError as e:
+            # Handle swisseph subprocess or calculation errors
+            error_msg = str(e).lower()
+            if "timeout" in error_msg or "timed out" in error_msg:
+                status = 504
+                detail_msg = "Die Berechnung hat zu lange gedauert. Bitte versuchen Sie es später noch einmal."
+            else:
+                status = 503
+                detail_msg = "Ephemeris-Berechnungsdienst nicht verfügbar. Bitte versuchen Sie es später noch einmal."
+            print(f"Calculation runtime error: {e}")
+            raise HTTPException(
+                status_code=status,
+                detail={"error": detail_msg},
+            )
         except Exception as e:
             print(f"Calculation error: {e}")
             raise HTTPException(

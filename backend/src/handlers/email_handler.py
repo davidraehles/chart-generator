@@ -1,10 +1,9 @@
 """Email capture handler for business reading interest"""
 
-from typing import Optional
+from typing import Optional, Type
 from sqlalchemy.orm import Session
-from sqlalchemy import Column, Integer, String, DateTime, func
-from src.database import Base
 from email_validator import validate_email, EmailNotValidError
+from src.models.lead_email_db import LeadEmailDB
 
 
 class EmailCaptureError(Exception):
@@ -16,23 +15,17 @@ class EmailCaptureError(Exception):
         super().__init__(self.message)
 
 
-class EmailCapture(Base):
-    """Database model for captured emails"""
-
-    __tablename__ = "email_captures"
-
-    id = Column(Integer, primary_key=True, index=True)
-    email = Column(String(255), unique=True, nullable=False, index=True)
-    created_at = Column(DateTime, default=func.now(), nullable=False)
-    ip_address = Column(String(45), nullable=True)
-    user_agent = Column(String(500), nullable=True)
-
-
 class EmailHandler:
     """Handler for email capture operations"""
 
-    def __init__(self):
-        pass
+    def __init__(self, model_cls: Optional[Type] = None):
+        """
+        Initialize email handler with optional model dependency injection.
+
+        Args:
+            model_cls: SQLAlchemy model class for email storage. Defaults to LeadEmailDB.
+        """
+        self.Model = model_cls or LeadEmailDB
 
     def capture_email(
         self,
@@ -68,7 +61,7 @@ class EmailHandler:
 
         # Check if email already exists
         existing = (
-            db_session.query(EmailCapture).filter(EmailCapture.email == email).first()
+            db_session.query(self.Model).filter(self.Model.email == email).first()
         )
         if existing:
             raise EmailCaptureError(
@@ -77,8 +70,8 @@ class EmailHandler:
 
         # Create new email capture
         try:
-            email_capture = EmailCapture(
-                email=email, ip_address=ip_address, user_agent=user_agent
+            email_capture = self.Model(
+                email=email, ip_address=ip_address, user_agent=user_agent, consent_given=True
             )
             db_session.add(email_capture)
             db_session.commit()
@@ -86,7 +79,7 @@ class EmailHandler:
 
             return {
                 "success": True,
-                "id": email_capture.id,
+                "id": str(email_capture.id),
                 "message": "E-Mail erfolgreich gespeichert.",
             }
         except Exception:
