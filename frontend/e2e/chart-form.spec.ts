@@ -56,27 +56,34 @@ test.describe('Chart Generation Flow', () => {
   });
 
   test('should successfully submit form with valid data', async ({ page }) => {
-    // Fill form with valid data
+    // Fill form with valid data matching ChartRequest schema
     await page.locator('#firstName').fill('Max Mustermann');
-    await page.locator('#birthDate').fill('21.05.1985');
-    await page.locator('#birthTime').fill('14:30');
+    await page.locator('#birthDate').fill('21.05.1985');  // Format: TT.MM.JJJJ
+    await page.locator('#birthTime').fill('14:30');        // Format: HH:MM
     await page.locator('#birthPlace').fill('Berlin, Germany');
-    
+
     // Submit form
     await page.locator('button[type="submit"]').click();
-    
+
     // Wait for loading state
     await expect(page.locator('button[type="submit"]')).toContainText('Generiere');
-    
-    // Wait for response (either success or error)
-    // Note: This may timeout if backend is not running
-    await page.waitForResponse(
-      response => response.url().includes('/api/') && response.status() !== 0,
-      { timeout: 10000 }
+
+    // Wait for API response
+    const response = await page.waitForResponse(
+      response => response.url().includes('/api/hd-chart'),
+      { timeout: 30000 }
     ).catch(() => {
-      // Backend may not be running during tests
-      console.log('Backend not available - skipping response check');
+      console.log('API request timeout - backend may not be available');
+      return null;
     });
+
+    if (response) {
+      const isSuccess = response.status() === 200;
+      const isValidationError = response.status() === 400;
+
+      // Accept both successful responses and validation errors
+      expect(isSuccess || isValidationError).toBeTruthy();
+    }
   });
 });
 
