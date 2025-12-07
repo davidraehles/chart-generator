@@ -9,6 +9,7 @@ import html
 import asyncio
 from slowapi import Limiter
 from slowapi.util import get_remote_address
+from slowapi.errors import RateLimitExceeded
 
 from src.models.chart import ChartRequest, ChartResponse
 from src.models.email import EmailCaptureRequest, EmailCaptureResponse
@@ -71,7 +72,8 @@ async def health_check():
 
 
 @app.post("/api/hd-chart", response_model=ChartResponse)
-async def generate_chart(chart_request: ChartRequest):
+@limiter.limit("10/minute")  # 10 requests per minute for expensive calculation
+async def generate_chart(request: Request, chart_request: ChartRequest):
     """
     Generate Human Design chart from birth data
 
@@ -132,8 +134,8 @@ async def generate_chart(chart_request: ChartRequest):
         except Exception as e:
             print(f"Timezone error: {e}")
             raise HTTPException(
-                status_code=500,
-                detail={"error": "Fehler bei der Zeitzonenverarbeitung."},
+                status_code=400,
+                detail={"field": "birthPlace", "error": "Fehler bei der Zeitzonenverarbeitung. Bitte prüfen Sie den Ort."},
             )
 
         # 4. Calculate positions with timeout protection (60s for cold starts)
@@ -177,6 +179,7 @@ async def generate_chart(chart_request: ChartRequest):
             raise HTTPException(
                 status_code=504,
                 detail={
+                    "field": "calculation",
                     "error": "Die Berechnung hat zu lange gedauert. Bitte versuchen Sie es später noch einmal."
                 },
             )
@@ -192,13 +195,17 @@ async def generate_chart(chart_request: ChartRequest):
             print(f"Calculation runtime error: {e}")
             raise HTTPException(
                 status_code=status,
-                detail={"error": detail_msg},
+                detail={
+                    "field": "calculation",
+                    "error": detail_msg
+                },
             )
         except Exception as e:
             print(f"Calculation error: {e}")
             raise HTTPException(
                 status_code=500,
                 detail={
+                    "field": "calculation",
                     "error": "Fehler bei der Chart-Berechnung. Bitte versuchen Sie es später noch einmal."
                 },
             )
@@ -220,7 +227,8 @@ async def generate_chart(chart_request: ChartRequest):
 
 
 @app.post("/api/email-capture", response_model=EmailCaptureResponse)
-async def capture_email(email_request: EmailCaptureRequest):
+@limiter.limit("5/minute")  # 5 requests per minute for email capture
+async def capture_email(request: Request, email_request: EmailCaptureRequest):
     """
     Capture email for Business Reading interest
 
@@ -260,6 +268,7 @@ async def capture_email(email_request: EmailCaptureRequest):
         raise HTTPException(
             status_code=500,
             detail={
+                "field": "email",
                 "error": "Ein unerwarteter Fehler ist aufgetreten. Bitte versuche es später noch einmal."
             },
         )
@@ -268,12 +277,25 @@ async def capture_email(email_request: EmailCaptureRequest):
             db_session.close()
 
 
+@app.exception_handler(RateLimitExceeded)
+async def rate_limit_exceeded_handler(request: Request, exc: RateLimitExceeded):
+    """Handle rate limit exceeded errors"""
+    return JSONResponse(
+        status_code=429,
+        content={
+            "field": "request",
+            "error": "Zu viele Anfragen. Bitte warten Sie eine Minute und versuchen Sie es erneut."
+        },
+    )
+
+
 @app.exception_handler(Exception)
 async def global_exception_handler(request: Request, exc: Exception):
     """Global exception handler for unexpected errors"""
     return JSONResponse(
         status_code=500,
         content={
+            "field": "server",
             "error": "Ein unerwarteter Fehler ist aufgetreten. Bitte versuche es später noch einmal."
         },
     )
