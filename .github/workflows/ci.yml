@@ -141,11 +141,23 @@ jobs:
           cd frontend
           npm run build
 
-      - name: Upload build artifacts
+      - name: Package build
+        run: |
+          cd frontend
+          if [ -d .next ]; then
+            tar -czf frontend-build.tgz .next
+            ls -lh frontend-build.tgz
+          else
+            echo ".next directory not found; build may have failed"
+            ls -la
+            exit 1
+          fi
+
+      - name: Upload build artifact
         uses: actions/upload-artifact@v4
         with:
           name: frontend-build
-          path: frontend/.next
+          path: frontend/frontend-build.tgz
           retention-days: 1
 
   e2e-tests:
@@ -157,11 +169,17 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - name: Download build artifacts
+      - name: Download build artifact
         uses: actions/download-artifact@v4
         with:
           name: frontend-build
-          path: frontend/.next
+          path: .
+
+      - name: Extract build
+        run: |
+          mkdir -p frontend
+          tar -xzf frontend-build.tgz -C frontend
+          ls -la frontend/.next
 
       - name: Set up Node.js
         uses: actions/setup-node@v4
