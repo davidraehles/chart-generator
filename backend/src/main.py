@@ -7,6 +7,7 @@ import os
 from dotenv import load_dotenv
 import html
 import asyncio
+import re
 from slowapi import Limiter
 from slowapi.util import get_remote_address
 from slowapi.errors import RateLimitExceeded
@@ -43,14 +44,26 @@ app = FastAPI(
 # Add rate limiter to app state
 app.state.limiter = limiter
 
+# Add HTTPS enforcement middleware in production
+environment = os.getenv("ENVIRONMENT", "development")
+if environment == "production":
+    from fastapi.middleware.httpsredirect import HTTPSRedirectMiddleware
+    app.add_middleware(HTTPSRedirectMiddleware)
+
 # Configure CORS with hardened settings
 frontend_url = os.getenv("FRONTEND_URL", "http://localhost:3000")
+cors_origins = [frontend_url]
+# Allow localhost only in development
+if environment != "production":
+    cors_origins.append("http://localhost:3000")
+
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=[frontend_url, "http://localhost:3000"],
+    allow_origins=cors_origins,
     allow_credentials=True,
     allow_methods=["GET", "POST", "OPTIONS"],
     allow_headers=["Content-Type", "Authorization"],
+    max_age=3600,  # 1 hour cache for preflight
 )
 
 # Initialize services
@@ -87,8 +100,25 @@ async def generate_chart(request: Request, chart_request: ChartRequest):
         HTTPException: 400 for validation errors, 500 for API errors
     """
     try:
-        # Sanitize input to prevent XSS
-        sanitized_name = html.escape(chart_request.firstName.strip())
+        # Sanitize input to prevent XSS with strict validation
+        name = chart_request.firstName.strip()
+
+        # Only allow German characters, spaces, hyphens, and apostrophes
+        if not re.match(r'^[a-zA-ZäöüßÄÖÜ\s\-\.\']+$', name):
+            raise ValidationError(
+                "firstName",
+                "Name darf nur Buchstaben, Leerzeichen, Bindestriche und Apostrophe enthalten."
+            )
+
+        # Additional length check
+        if len(name) < 2 or len(name) > 100:
+            raise ValidationError(
+                "firstName",
+                "Name muss zwischen 2 und 100 Zeichen lang sein."
+            )
+
+        # HTML escape for safe output rendering
+        sanitized_name = html.escape(name)
 
         # Validate input
         is_valid, error_msg = validation_service.validate_name(sanitized_name)
