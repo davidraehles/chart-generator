@@ -14,26 +14,42 @@ import { test, expect } from '@playwright/test';
 // Default to localhost for safety, set API_URL for production testing
 const API_BASE_URL = process.env.API_URL || 'http://localhost:8000';
 
-// Helper to check if backend is available
-async function isBackendAvailable(request: any, timeout: number = 5000): Promise<boolean> {
-  try {
-    const response = await request.get(`${API_BASE_URL}/health`, { timeout });
-    return response.status() === 200;
-  } catch {
-    return false;
+// Helper to check if backend is available with retries for cold starts
+async function isBackendAvailable(
+  request: any,
+  timeout: number = 5000,
+  maxAttempts: number = 24,
+  intervalMs: number = 5000
+): Promise<boolean> {
+  for (let attempt = 1; attempt <= maxAttempts; attempt++) {
+    try {
+      const response = await request.get(`${API_BASE_URL}/health`, { timeout });
+      if (response.status() === 200) {
+        console.log(`✅ Backend available after ${attempt} attempt(s)`);
+        return true;
+      }
+    } catch (e) {
+      // Ignore error and retry
+    }
+    // Wait before retrying (simple backoff)
+    if (attempt < maxAttempts) {
+      await new Promise((res) => setTimeout(res, intervalMs));
+    }
   }
+  return false;
 }
 
 // Run once per test suite to check backend availability
 test.beforeAll(async ({ playwright }) => {
   const request = await playwright.request.newContext();
-  const available = await isBackendAvailable(request, 30000); // Give 30s for cold start
+  // Allow up to ~2 minutes for cold starts (24 attempts * 5 seconds)
+  const available = await isBackendAvailable(request, 5000, 24, 5000);
 
   if (process.env.CI === 'true' && !available) {
     // In CI, fail fast if backend is unavailable
     throw new Error(
-      `Backend at ${API_BASE_URL} is not available in CI environment. ` +
-      `Deployment may not have completed or backend is unreachable.`
+      `Backend at ${API_BASE_URL} is not available in CI environment after 2 minutes. ` +
+      `Make sure the backend is started and healthy before running E2E tests.`
     );
   } else if (!available) {
     // In local development, log warning but allow skipping
