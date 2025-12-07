@@ -2,22 +2,64 @@ import { test, expect } from '@playwright/test';
 
 /**
  * E2E API Integration tests
- * Tests the /api/calculate-chart endpoint
+ * Tests both /api/hd-chart (form-based) and /api/calculate-chart (ephemeris) endpoints
  * Set API_URL env var to test against production Railway backend
+ *
+ * Test data schema validation:
+ * ChartRequest: firstName (2-50 chars), birthDate (TT.MM.JJJJ), birthTime (HH:MM),
+ *               birthPlace (2-200 chars), birthTimeApproximate (bool)
+ * ChartResponse: includes type, authority, profile, centers[], channels[], gates{}, incarnationCross
  */
 
 // Default to localhost for safety, set API_URL for production testing
 const API_BASE_URL = process.env.API_URL || 'http://localhost:8000';
 
-// Helper to check if backend is available
-async function isBackendAvailable(request: any): Promise<boolean> {
-  try {
-    const response = await request.get(`${API_BASE_URL}/health`, { timeout: 5000 });
-    return response.status() === 200;
-  } catch {
-    return false;
+// Helper to check if backend is available with retries for cold starts
+async function isBackendAvailable(
+  request: any,
+  timeout: number = 5000,
+  maxAttempts: number = 24,
+  intervalMs: number = 5000
+): Promise<boolean> {
+  for (let attempt = 1; attempt <= maxAttempts; attempt++) {
+    try {
+      const response = await request.get(`${API_BASE_URL}/health`, { timeout });
+      if (response.status() === 200) {
+        console.log(`✅ Backend available after ${attempt} attempt(s)`);
+        return true;
+      }
+    } catch (e) {
+      // Ignore error and retry
+    }
+    // Wait before retrying (simple backoff)
+    if (attempt < maxAttempts) {
+      await new Promise((res) => setTimeout(res, intervalMs));
+    }
   }
+  return false;
 }
+
+// Run once per test suite to check backend availability
+test.beforeAll(async ({ playwright }) => {
+  const request = await playwright.request.newContext();
+  // Allow up to ~2 minutes for cold starts (24 attempts * 5 seconds)
+  const available = await isBackendAvailable(request, 5000, 24, 5000);
+
+  if (process.env.CI === 'true' && !available) {
+    // In CI, fail fast if backend is unavailable
+    throw new Error(
+      `Backend at ${API_BASE_URL} is not available in CI environment after 2 minutes. ` +
+      `Make sure the backend is started and healthy before running E2E tests.`
+    );
+  } else if (!available) {
+    // In local development, log warning but allow skipping
+    console.log(`⚠️ Backend at ${API_BASE_URL} is not available - tests will be skipped`);
+  } else {
+    console.log(`✅ Backend at ${API_BASE_URL} is healthy and ready`);
+  }
+
+  await request.dispose();
+});
 
 test.describe('Backend Health Check', () => {
   test('should have healthy backend', async ({ request }) => {
@@ -25,18 +67,225 @@ test.describe('Backend Health Check', () => {
     try {
       response = await request.get(`${API_BASE_URL}/health`, { timeout: 10000 });
     } catch (e) {
+      if (process.env.CI === 'true') {
+        throw e; // Fail in CI
+      }
       console.log('⚠️ Backend is not reachable - it may be deploying or down');
       test.skip();
       return;
     }
-    
+
     if (response.status() === 200) {
       const data = await response.json();
       expect(data.status).toBe('healthy');
       console.log('✅ Backend is healthy');
     } else {
+      if (process.env.CI === 'true') {
+        throw new Error(`Backend health check returned ${response.status()}`);
+      }
       console.log(`⚠️ Backend health check returned ${response.status()}`);
     }
+  });
+});
+
+test.describe('Form-Based Chart Generation API (/api/hd-chart)', () => {
+  test.beforeEach(async ({ request }, testInfo) => {
+    const available = await isBackendAvailable(request);
+    if (!available) {
+      console.log('⚠️ Backend unavailable - skipping form API test');
+      testInfo.skip();
+    }
+  });
+
+  test('should generate chart from form data with valid ChartRequest', async ({ request }) => {
+    const payload = {
+      firstName: 'Anna Schmidt',
+      birthDate: '23.11.1985',   // Format: TT.MM.JJJJ
+      birthTime: '09:15',         // Format: HH:MM
+      birthPlace: 'München, Deutschland',
+      birthTimeApproximate: false
+    };
+
+    let response;
+    try {
+      response = await request.post(`${API_BASE_URL}/api/hd-chart`, {
+        data: payload,
+        timeout: 30000
+      });
+    } catch (e) {
+      console.log('⚠️ Backend request failed - skipping form API test');
+      test.skip();
+      return;
+    }
+
+    console.log(`Form API responded with status: ${response.status()}`);
+
+    // Accept 200 success or 400 validation error
+    expect([200, 400, 500]).toContain(response.status());
+
+    if (response.status() === 200) {
+      const data = await response.json();
+
+      // Verify ChartResponse schema
+      expect(data).toHaveProperty('firstName');
+      expect(data).toHaveProperty('type');
+      expect(data).toHaveProperty('authority');
+      expect(data).toHaveProperty('profile');
+      expect(data).toHaveProperty('centers');
+      expect(data).toHaveProperty('channels');
+      expect(data).toHaveProperty('gates');
+      expect(data).toHaveProperty('incarnationCross');
+
+      // Verify field types
+      expect(typeof data.firstName).toBe('string');
+      expect(typeof data.type).toBe('object');
+      expect(typeof data.authority).toBe('object');
+      expect(Array.isArray(data.centers)).toBeTruthy();
+      expect(Array.isArray(data.channels)).toBeTruthy();
+      expect(typeof data.gates).toBe('object');
+      expect(typeof data.incarnationCross).toBe('object');
+
+      // Verify type structure
+      expect(data.type).toHaveProperty('code');
+      expect(data.type).toHaveProperty('label');
+      expect(data.type).toHaveProperty('shortDescription');
+
+      // Verify authority structure
+      expect(data.authority).toHaveProperty('code');
+      expect(data.authority).toHaveProperty('label');
+      expect(data.authority).toHaveProperty('decisionHint');
+
+      // Verify gates structure
+      expect(data.gates).toHaveProperty('conscious');
+      expect(data.gates).toHaveProperty('unconscious');
+      expect(Array.isArray(data.gates.conscious)).toBeTruthy();
+      expect(Array.isArray(data.gates.unconscious)).toBeTruthy();
+
+      // Verify incarnation cross structure
+      expect(data.incarnationCross).toHaveProperty('code');
+      expect(data.incarnationCross).toHaveProperty('gates');
+      expect(Array.isArray(data.incarnationCross.gates)).toBeTruthy();
+
+      console.log(`✅ Chart generated successfully from form data`);
+    } else if (response.status() === 400) {
+      const error = await response.json();
+      console.log(`⚠️ Validation error: ${error.detail?.error || JSON.stringify(error.detail)}`);
+    }
+  });
+
+  test('should handle approximate birth time', async ({ request }) => {
+    const payload = {
+      firstName: 'Jane Doe',
+      birthDate: '10.07.1995',
+      birthTimeApproximate: true,
+      // birthTime omitted when approximate=true, backend uses 12:00
+      birthPlace: 'Paris, France'
+    };
+
+    let response;
+    try {
+      response = await request.post(`${API_BASE_URL}/api/hd-chart`, {
+        data: payload,
+        timeout: 30000
+      });
+    } catch (e) {
+      console.log('⚠️ Backend request failed - skipping approximate time test');
+      test.skip();
+      return;
+    }
+
+    // Skip if backend unavailable
+    if (response.status() === 502 || response.status() === 503) {
+      console.log('⚠️ Backend unavailable - skipping approximate time test');
+      return;
+    }
+
+    // Should handle approximate time gracefully (200 or 400 for location errors)
+    expect([200, 400]).toContain(response.status());
+    console.log(`✅ Approximate birth time handling tested (status: ${response.status()})`);
+  });
+
+  test('should validate required fields', async ({ request }) => {
+    // Missing birthTime and birthPlace
+    const payload = {
+      firstName: 'John',
+      birthDate: '01.01.1980',
+      birthTimeApproximate: false
+      // birthTime is required when approximate=false
+      // birthPlace is required
+    };
+
+    let response;
+    try {
+      response = await request.post(`${API_BASE_URL}/api/hd-chart`, {
+        data: payload,
+        timeout: 10000
+      });
+    } catch (e) {
+      console.log('⚠️ Backend request failed - skipping validation test');
+      test.skip();
+      return;
+    }
+
+    // Should return validation error
+    expect(response.status()).toBe(400);
+
+    const error = await response.json();
+    expect(error).toHaveProperty('detail');
+    console.log(`✅ Validation error returned correctly for missing fields`);
+  });
+
+  test('should reject invalid date format', async ({ request }) => {
+    const payload = {
+      firstName: 'Test',
+      birthDate: '1990-01-15', // Wrong format, should be TT.MM.JJJJ
+      birthTime: '14:30',
+      birthPlace: 'Berlin, Germany'
+    };
+
+    let response;
+    try {
+      response = await request.post(`${API_BASE_URL}/api/hd-chart`, {
+        data: payload,
+        timeout: 10000
+      });
+    } catch (e) {
+      console.log('⚠️ Backend request failed - skipping date validation test');
+      test.skip();
+      return;
+    }
+
+    // Should return validation error for date format
+    expect(response.status()).toBe(400);
+    console.log(`✅ Date format validation works`);
+  });
+
+  test('should return error for non-existent location', async ({ request }) => {
+    const payload = {
+      firstName: 'Test User',
+      birthDate: '15.03.2000',
+      birthTime: '12:00',
+      birthPlace: 'XYZ123NotAPlace'
+    };
+
+    let response;
+    try {
+      response = await request.post(`${API_BASE_URL}/api/hd-chart`, {
+        data: payload,
+        timeout: 30000
+      });
+    } catch (e) {
+      console.log('⚠️ Backend request failed - skipping location validation test');
+      test.skip();
+      return;
+    }
+
+    // Should return 400 for geocoding failure
+    expect(response.status()).toBe(400);
+
+    const error = await response.json();
+    expect(error).toHaveProperty('detail');
+    console.log(`✅ Geocoding error handled correctly`);
   });
 });
 

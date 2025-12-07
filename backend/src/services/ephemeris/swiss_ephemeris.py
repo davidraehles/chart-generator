@@ -1,6 +1,8 @@
 """Swiss Ephemeris implementation for planetary calculations"""
 
 import swisseph as swe
+import multiprocessing
+import traceback
 from datetime import datetime
 from src.models.celestial import CelestialBody
 
@@ -34,6 +36,21 @@ class SwissEphemerisSource:
     def get_source_name(self) -> str:
         """Get the name of this ephemeris source"""
         return "SwissEphemeris"
+
+    def is_available(self) -> bool:
+        """
+        Check if Swiss Ephemeris is available and usable.
+
+        Returns:
+            True if swisseph can perform calculations, False otherwise
+        """
+        try:
+            # Simple test: calculate Sun position at J2000 epoch
+            jd = swe.julday(2000, 1, 1, 12.0)
+            swe.calc_ut(jd, swe.SUN)
+            return True
+        except Exception:
+            return False
 
     def datetime_to_julian_day(self, dt: datetime) -> float:
         """
@@ -78,6 +95,9 @@ class SwissEphemerisSource:
         """
         Calculate position using Swiss Ephemeris.
 
+        Tries direct calculation first; if signal/threading errors occur (common in worker threads),
+        falls back to subprocess calculation.
+
         Args:
             body: Celestial body
             jd: Julian Day number
@@ -90,11 +110,56 @@ class SwissEphemerisSource:
 
         swe_body = self.BODY_MAP[body]
 
-        # Calculate position
-        # flags: SEFLG_SWIEPH (use Swiss Ephemeris), SEFLG_SPEED (calculate speed)
-        result = swe.calc_ut(jd, swe_body, swe.FLG_SWIEPH | swe.FLG_SPEED)
+        try:
+            # Try direct calculation first
+            result = swe.calc_ut(jd, swe_body, swe.FLG_SWIEPH | swe.FLG_SPEED)
+            longitude = result[0][0]
+            return longitude
+        except Exception as exc:
+            # Check if this is a signal-in-thread error
+            exc_str = str(exc).lower()
+            if "signal only works" in exc_str or "signal only works in main thread" in exc_str:
+                # Fall back to subprocess calculation
+                return self._calc_in_subprocess(swe_body, jd)
+            # Re-raise other exceptions
+            raise
 
-        # result[0] is a tuple: (longitude, latitude, distance, speed_lon, speed_lat, speed_dist)
-        longitude = result[0][0]
+    def _calc_in_subprocess(self, swe_body: int, jd: float) -> float:
+        """
+        Run swisseph calculation in a separate process to avoid signal/threading errors.
 
-        return longitude
+        Args:
+            swe_body: Swiss Ephemeris body constant
+            jd: Julian Day number
+
+        Returns:
+            Ecliptic longitude in degrees
+
+        Raises:
+            RuntimeError: If calculation fails or times out
+        """
+        def worker(q, swe_body_arg, jd_arg):
+            """Worker function to run in subprocess"""
+            try:
+                import swisseph as swe_local
+                res = swe_local.calc_ut(jd_arg, swe_body_arg, swe_local.FLG_SWIEPH | swe_local.FLG_SPEED)
+                q.put(("ok", res[0][0]))
+            except Exception as e:
+                q.put(("err", f"{type(e).__name__}: {e}\n{traceback.format_exc()}"))
+
+        ctx = multiprocessing.get_context("spawn")
+        q = ctx.Queue()
+        p = ctx.Process(target=worker, args=(q, swe_body, jd))
+        p.start()
+        p.join(timeout=15)  # 15 second timeout per calculation
+
+        if not q.empty():
+            status, payload = q.get()
+            if status == "ok":
+                return payload
+            else:
+                raise RuntimeError(f"swisseph subprocess error: {payload}")
+        else:
+            # Timeout
+            p.terminate()
+            raise RuntimeError("swisseph calculation timed out in subprocess")

@@ -114,7 +114,7 @@ class EmailService:
         ).first()
 
         if record:
-            record.deleted_at = datetime.now(UTC)
+            record.deleted_at = datetime.now()  # type: ignore
             db_session.commit()
             return True
 

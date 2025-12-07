@@ -1,5 +1,5 @@
-from pydantic import BaseModel, Field, validator
-from typing import List, Optional
+from pydantic import BaseModel, Field, validator, root_validator
+from typing import List, Optional, Annotated
 from datetime import datetime
 from src.models.celestial import CelestialBody
 
@@ -20,6 +20,15 @@ class ChartRequest(BaseModel):
                 "birthTime is required unless birthTimeApproximate is True"
             )
         return v
+
+    @root_validator(skip_on_failure=True)
+    def require_birth_time_if_not_approximate(cls, values):
+        """Ensure birthTime is provided when birthTimeApproximate is False"""
+        approx = values.get("birthTimeApproximate", False)
+        time = values.get("birthTime")
+        if not approx and not time:
+            raise ValueError("birthTime is required when birthTimeApproximate is False")
+        return values
 
 
 class TypeInfo(BaseModel):
@@ -103,29 +112,29 @@ class EphemerisChartRequest(BaseModel):
     birth_datetime: datetime = Field(
         ...,
         description="Birth date and time in local timezone",
-        example="1985-05-21T14:30:00",
+        examples=["1985-05-21T14:30:00"],
     )
     birth_timezone: str = Field(
         ...,
         description="IANA timezone identifier (e.g., 'Europe/Berlin')",
-        example="Europe/Berlin",
+        examples=["Europe/Berlin"],
     )
     birth_latitude: float = Field(
         ...,
         ge=-90,
         le=90,
         description="Birth location latitude in decimal degrees",
-        example=52.5200,
+        examples=[52.5200],
     )
     birth_longitude: float = Field(
         ...,
         ge=-180,
         le=180,
         description="Birth location longitude in decimal degrees",
-        example=13.4050,
+        examples=[13.4050],
     )
     name: Optional[str] = Field(
-        None,
+        default=None,
         max_length=100,
         description="Optional name for personalization",
     )
@@ -188,18 +197,22 @@ class EphemerisChartResponse(BaseModel):
     """
 
     name: Optional[str] = None
-    personality_activations: List[PlanetaryPosition] = Field(
-        ...,
-        min_items=13,
-        max_items=13,
-        description="13 planetary positions from birth moment",
-    )
-    design_activations: List[PlanetaryPosition] = Field(
-        ...,
-        min_items=13,
-        max_items=13,
-        description="13 planetary positions from design moment (~88 days before birth)",
-    )
+    personality_activations: Annotated[
+        List[PlanetaryPosition],
+        Field(
+            min_items=13,
+            max_items=13,
+            description="13 planetary positions from birth moment",
+        ),
+    ]
+    design_activations: Annotated[
+        List[PlanetaryPosition],
+        Field(
+            min_items=13,
+            max_items=13,
+            description="13 planetary positions from design moment (~88 days before birth)",
+        ),
+    ]
     design_datetime: datetime = Field(
         ...,
         description="Calculated design moment (when Sun was 88° earlier)",

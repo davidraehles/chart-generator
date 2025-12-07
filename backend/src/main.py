@@ -6,6 +6,8 @@ from fastapi.responses import JSONResponse
 import os
 from dotenv import load_dotenv
 import html
+import asyncio
+import re
 from slowapi import Limiter
 from slowapi.util import get_remote_address
 from slowapi.errors import RateLimitExceeded
@@ -42,14 +44,26 @@ app = FastAPI(
 # Add rate limiter to app state
 app.state.limiter = limiter
 
+# Add HTTPS enforcement middleware in production
+environment = os.getenv("ENVIRONMENT", "development")
+if environment == "production":
+    from fastapi.middleware.httpsredirect import HTTPSRedirectMiddleware
+    app.add_middleware(HTTPSRedirectMiddleware)
+
 # Configure CORS with hardened settings
 frontend_url = os.getenv("FRONTEND_URL", "http://localhost:3000")
+cors_origins = [frontend_url]
+# Allow localhost only in development
+if environment != "production":
+    cors_origins.append("http://localhost:3000")
+
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=[frontend_url, "http://localhost:3000"],
+    allow_origins=cors_origins,
     allow_credentials=True,
     allow_methods=["GET", "POST", "OPTIONS"],
     allow_headers=["Content-Type", "Authorization"],
+    max_age=3600,  # 1 hour cache for preflight
 )
 
 # Initialize services
@@ -71,14 +85,13 @@ async def health_check():
 
 
 @app.post("/api/hd-chart", response_model=ChartResponse)
-@limiter.limit("10/minute")
-async def generate_chart(request: ChartRequest, http_request: Request):
+@limiter.limit("10/minute")  # 10 requests per minute for expensive calculation
+async def generate_chart(request: Request, chart_request: ChartRequest):
     """
     Generate Human Design chart from birth data
 
     Args:
-        request: ChartRequest with birth information
-        http_request: FastAPI Request object for rate limiting
+        chart_request: ChartRequest with birth information
 
     Returns:
         ChartResponse with complete HD chart data
@@ -87,28 +100,46 @@ async def generate_chart(request: ChartRequest, http_request: Request):
         HTTPException: 400 for validation errors, 500 for API errors
     """
     try:
-        # Sanitize input to prevent XSS
-        sanitized_name = html.escape(request.firstName.strip())
+        # Sanitize input to prevent XSS with strict validation
+        name = chart_request.firstName.strip()
+
+        # Only allow German characters, spaces, hyphens, and apostrophes
+        if not re.match(r'^[a-zA-ZäöüßÄÖÜ\s\-\.\']+$', name):
+            raise ValidationError(
+                "firstName",
+                "Name darf nur Buchstaben, Leerzeichen, Bindestriche und Apostrophe enthalten."
+            )
+
+        # Additional length check
+        if len(name) < 2 or len(name) > 100:
+            raise ValidationError(
+                "firstName",
+                "Name muss zwischen 2 und 100 Zeichen lang sein."
+            )
+
+        # HTML escape for safe output rendering
+        sanitized_name = html.escape(name)
 
         # Validate input
         is_valid, error_msg = validation_service.validate_name(sanitized_name)
         if not is_valid:
             raise ValidationError("firstName", error_msg)
 
-        is_valid, error_msg = validation_service.validate_birth_date(request.birthDate)
+        is_valid, error_msg = validation_service.validate_birth_date(chart_request.birthDate)
         if not is_valid:
             raise ValidationError("birthDate", error_msg)
 
         # Handle approximate time
-        if request.birthTimeApproximate and not request.birthTime:
-            request.birthTime = "12:00"
+        if chart_request.birthTimeApproximate and not chart_request.birthTime:
+            chart_request.birthTime = "12:00"
 
-        is_valid, error_msg = validation_service.validate_birth_time(request.birthTime)
+        birth_time: str = chart_request.birthTime or "12:00"
+        is_valid, error_msg = validation_service.validate_birth_time(birth_time)
         if not is_valid:
             raise ValidationError("birthTime", error_msg)
 
         # 1. Geocode birth place
-        lat, lng, tz_str = geocoding_service.get_location_data(request.birthPlace)
+        lat, lng, tz_str = geocoding_service.get_location_data(chart_request.birthPlace)
         if not lat or not lng or not tz_str:
             raise HTTPException(
                 status_code=400,
@@ -120,7 +151,7 @@ async def generate_chart(request: ChartRequest, http_request: Request):
 
         # 2. Parse datetime
         try:
-            birth_dt_str = f"{request.birthDate} {request.birthTime}"
+            birth_dt_str = f"{chart_request.birthDate} {birth_time}"
             birth_dt = datetime.strptime(birth_dt_str, "%d.%m.%Y %H:%M")
         except ValueError:
             raise ValidationError("birthDate", "Ungültiges Datumsformat")
@@ -133,22 +164,18 @@ async def generate_chart(request: ChartRequest, http_request: Request):
         except Exception as e:
             print(f"Timezone error: {e}")
             raise HTTPException(
-                status_code=500,
-                detail={"error": "Fehler bei der Zeitzonenverarbeitung."},
+                status_code=400,
+                detail={"field": "birthPlace", "error": "Fehler bei der Zeitzonenverarbeitung. Bitte prüfen Sie den Ort."},
             )
 
-        # 4. Calculate positions with timeout protection
+        # 4. Calculate positions with timeout protection (60s for cold starts)
         try:
-            import signal
+            # Use asyncio.timeout for async-safe timeout handling
+            # Works reliably in async contexts and on all platforms (Windows, Linux, macOS)
+            timeout_seconds = 60  # Allows time for cold starts on Railway
 
-            def timeout_handler(signum, frame):
-                raise TimeoutError("Calculation exceeded maximum time limit (30 seconds)")
-
-            # Set timeout for ephemeris calculations (30 seconds)
-            signal.signal(signal.SIGALRM, timeout_handler)
-            signal.alarm(30)
-
-            try:
+            async def calculate_with_timeout():
+                """Calculate chart with timeout protection"""
                 ephemeris_source = get_ephemeris_source()
                 pos_calculator = PositionCalculator(ephemeris_source)
 
@@ -166,17 +193,41 @@ async def generate_chart(request: ChartRequest, http_request: Request):
                     sanitized_name,
                     calculation_source=ephemeris_source.get_source_name(),
                 )
-
                 return chart_response
-            finally:
-                signal.alarm(0)  # Cancel the alarm
+
+            try:
+                chart_response = await asyncio.wait_for(
+                    calculate_with_timeout(),
+                    timeout=timeout_seconds
+                )
+                return chart_response
+            except asyncio.TimeoutError:
+                raise TimeoutError(f"Calculation exceeded maximum time limit ({timeout_seconds} seconds)")
 
         except TimeoutError as e:
             print(f"Calculation timeout: {e}")
             raise HTTPException(
                 status_code=504,
                 detail={
+                    "field": "calculation",
                     "error": "Die Berechnung hat zu lange gedauert. Bitte versuchen Sie es später noch einmal."
+                },
+            )
+        except RuntimeError as e:
+            # Handle swisseph subprocess or calculation errors
+            error_msg = str(e).lower()
+            if "timeout" in error_msg or "timed out" in error_msg:
+                status = 504
+                detail_msg = "Die Berechnung hat zu lange gedauert. Bitte versuchen Sie es später noch einmal."
+            else:
+                status = 503
+                detail_msg = "Ephemeris-Berechnungsdienst nicht verfügbar. Bitte versuchen Sie es später noch einmal."
+            print(f"Calculation runtime error: {e}")
+            raise HTTPException(
+                status_code=status,
+                detail={
+                    "field": "calculation",
+                    "error": detail_msg
                 },
             )
         except Exception as e:
@@ -184,6 +235,7 @@ async def generate_chart(request: ChartRequest, http_request: Request):
             raise HTTPException(
                 status_code=500,
                 detail={
+                    "field": "calculation",
                     "error": "Fehler bei der Chart-Berechnung. Bitte versuchen Sie es später noch einmal."
                 },
             )
@@ -205,14 +257,13 @@ async def generate_chart(request: ChartRequest, http_request: Request):
 
 
 @app.post("/api/email-capture", response_model=EmailCaptureResponse)
-@limiter.limit("5/minute")
-async def capture_email(request: EmailCaptureRequest, http_request: Request):
+@limiter.limit("5/minute")  # 5 requests per minute for email capture
+async def capture_email(request: Request, email_request: EmailCaptureRequest):
     """
     Capture email for Business Reading interest
 
     Args:
-        request: EmailCaptureRequest with email
-        http_request: FastAPI Request object for metadata
+        email_request: EmailCaptureRequest with email
 
     Returns:
         EmailCaptureResponse with success status
@@ -225,16 +276,12 @@ async def capture_email(request: EmailCaptureRequest, http_request: Request):
         # Get database session
         db_session = get_db_session()
 
-        # Extract client metadata
-        ip_address = http_request.client.host if http_request.client else None
-        user_agent = http_request.headers.get("user-agent")
-
         # Capture email using handler
         result = email_handler.capture_email(
-            email=request.email,
+            email=email_request.email,
             db_session=db_session,
-            ip_address=ip_address,
-            user_agent=user_agent,
+            ip_address=None,
+            user_agent=None,
         )
 
         return EmailCaptureResponse(
@@ -251,6 +298,7 @@ async def capture_email(request: EmailCaptureRequest, http_request: Request):
         raise HTTPException(
             status_code=500,
             detail={
+                "field": "email",
                 "error": "Ein unerwarteter Fehler ist aufgetreten. Bitte versuche es später noch einmal."
             },
         )
@@ -259,12 +307,25 @@ async def capture_email(request: EmailCaptureRequest, http_request: Request):
             db_session.close()
 
 
+@app.exception_handler(RateLimitExceeded)
+async def rate_limit_exceeded_handler(request: Request, exc: RateLimitExceeded):
+    """Handle rate limit exceeded errors"""
+    return JSONResponse(
+        status_code=429,
+        content={
+            "field": "request",
+            "error": "Zu viele Anfragen. Bitte warten Sie eine Minute und versuchen Sie es erneut."
+        },
+    )
+
+
 @app.exception_handler(Exception)
 async def global_exception_handler(request: Request, exc: Exception):
     """Global exception handler for unexpected errors"""
     return JSONResponse(
         status_code=500,
         content={
+            "field": "server",
             "error": "Ein unerwarteter Fehler ist aufgetreten. Bitte versuche es später noch einmal."
         },
     )

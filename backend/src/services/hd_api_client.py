@@ -1,8 +1,7 @@
 """Human Design API client"""
 import httpx
 import os
-from typing import Dict, Any, Optional
-from datetime import datetime
+from typing import Dict, Any
 
 
 class HDAPIError(Exception):
@@ -90,8 +89,9 @@ class HDAPIClient:
                 {"name": "Solarplexus", "code": "solar", "defined": auth_idx == 0},
             ],
             "channels": [
-                {"code": f"{10 + (day % 10)}-{20 + (month % 10)}"},
-                {"code": f"{30 + (hour % 10)}-{40 + (minute % 10)}"},
+                # Use valid Human Design channel codes
+                {"code": "64-47"} if day % 2 == 0 else {"code": "61-24"},
+                {"code": "63-4"} if month % 2 == 0 else {"code": "17-62"},
             ],
             "gates": {
                 "conscious": [f"{i}.{(i % 6) + 1}" for i in range(1, 13)],

@@ -27,7 +27,6 @@ BODY_TO_OPENASTRO = {
     CelestialBody.PLUTO: 9,
     CelestialBody.NORTH_NODE: 10,
     CelestialBody.SOUTH_NODE: 10,  # Calculated as North Node + 180°
-    CelestialBody.CHIRON: 11,
 }
 
 
