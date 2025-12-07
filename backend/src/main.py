@@ -1,6 +1,6 @@
 """FastAPI main application"""
 
-from fastapi import FastAPI, HTTPException, Request
+from fastapi import FastAPI, HTTPException, Request, Depends
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
 import os
@@ -71,14 +71,12 @@ async def health_check():
 
 
 @app.post("/api/hd-chart", response_model=ChartResponse)
-@limiter.limit("10/minute")
-async def generate_chart(request: ChartRequest, http_request: Request):
+async def generate_chart(chart_request: ChartRequest):
     """
     Generate Human Design chart from birth data
 
     Args:
-        request: ChartRequest with birth information
-        http_request: FastAPI Request object for rate limiting
+        chart_request: ChartRequest with birth information
 
     Returns:
         ChartResponse with complete HD chart data
@@ -88,27 +86,27 @@ async def generate_chart(request: ChartRequest, http_request: Request):
     """
     try:
         # Sanitize input to prevent XSS
-        sanitized_name = html.escape(request.firstName.strip())
+        sanitized_name = html.escape(chart_request.firstName.strip())
 
         # Validate input
         is_valid, error_msg = validation_service.validate_name(sanitized_name)
         if not is_valid:
             raise ValidationError("firstName", error_msg)
 
-        is_valid, error_msg = validation_service.validate_birth_date(request.birthDate)
+        is_valid, error_msg = validation_service.validate_birth_date(chart_request.birthDate)
         if not is_valid:
             raise ValidationError("birthDate", error_msg)
 
         # Handle approximate time
-        if request.birthTimeApproximate and not request.birthTime:
-            request.birthTime = "12:00"
+        if chart_request.birthTimeApproximate and not chart_request.birthTime:
+            chart_request.birthTime = "12:00"
 
-        is_valid, error_msg = validation_service.validate_birth_time(request.birthTime)
+        is_valid, error_msg = validation_service.validate_birth_time(chart_request.birthTime)
         if not is_valid:
             raise ValidationError("birthTime", error_msg)
 
         # 1. Geocode birth place
-        lat, lng, tz_str = geocoding_service.get_location_data(request.birthPlace)
+        lat, lng, tz_str = geocoding_service.get_location_data(chart_request.birthPlace)
         if not lat or not lng or not tz_str:
             raise HTTPException(
                 status_code=400,
@@ -120,7 +118,7 @@ async def generate_chart(request: ChartRequest, http_request: Request):
 
         # 2. Parse datetime
         try:
-            birth_dt_str = f"{request.birthDate} {request.birthTime}"
+            birth_dt_str = f"{chart_request.birthDate} {chart_request.birthTime}"
             birth_dt = datetime.strptime(birth_dt_str, "%d.%m.%Y %H:%M")
         except ValueError:
             raise ValidationError("birthDate", "Ungültiges Datumsformat")
@@ -205,12 +203,12 @@ async def generate_chart(request: ChartRequest, http_request: Request):
 
 
 @app.post("/api/email-capture", response_model=EmailCaptureResponse)
-async def capture_email(request: EmailCaptureRequest):
+async def capture_email(email_request: EmailCaptureRequest):
     """
     Capture email for Business Reading interest
 
     Args:
-        request: EmailCaptureRequest with email
+        email_request: EmailCaptureRequest with email
 
     Returns:
         EmailCaptureResponse with success status
@@ -225,7 +223,7 @@ async def capture_email(request: EmailCaptureRequest):
 
         # Capture email using handler
         result = email_handler.capture_email(
-            email=request.email,
+            email=email_request.email,
             db_session=db_session,
             ip_address=None,
             user_agent=None,
