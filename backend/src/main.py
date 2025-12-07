@@ -100,7 +100,8 @@ async def generate_chart(chart_request: ChartRequest):
         if chart_request.birthTimeApproximate and not chart_request.birthTime:
             chart_request.birthTime = "12:00"
 
-        is_valid, error_msg = validation_service.validate_birth_time(chart_request.birthTime)
+        birth_time: str = chart_request.birthTime or "12:00"
+        is_valid, error_msg = validation_service.validate_birth_time(birth_time)
         if not is_valid:
             raise ValidationError("birthTime", error_msg)
 
@@ -117,7 +118,7 @@ async def generate_chart(chart_request: ChartRequest):
 
         # 2. Parse datetime
         try:
-            birth_dt_str = f"{chart_request.birthDate} {chart_request.birthTime}"
+            birth_dt_str = f"{chart_request.birthDate} {birth_time}"
             birth_dt = datetime.strptime(birth_dt_str, "%d.%m.%Y %H:%M")
         except ValueError:
             raise ValidationError("birthDate", "Ungültiges Datumsformat")

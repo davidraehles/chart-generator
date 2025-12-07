@@ -1,5 +1,6 @@
 """Email capture handler for business reading interest"""
 
+from typing import Optional
 from sqlalchemy.orm import Session
 from sqlalchemy import Column, Integer, String, DateTime, func
 from src.database import Base
@@ -37,8 +38,8 @@ class EmailHandler:
         self,
         email: str,
         db_session: Session,
-        ip_address: str = None,
-        user_agent: str = None,
+        ip_address: Optional[str] = None,
+        user_agent: Optional[str] = None,
     ) -> dict:
         """
         Capture email for Business Reading interest.

@@ -9,10 +9,10 @@ from sqlalchemy import Column, String, LargeBinary, DateTime, Integer
 from sqlalchemy.orm import declarative_base
 
 # Using declarative_base() for SQLAlchemy 1.4/2.0 compatibility
-Base = declarative_base()
+Base = declarative_base()  # type: ignore
 
 
-class EphemerisFile(Base):
+class EphemerisFile(Base):  # type: ignore
     """
     Swiss Ephemeris binary file storage.
 

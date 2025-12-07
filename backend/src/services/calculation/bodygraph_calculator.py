@@ -165,7 +165,7 @@ class BodygraphCalculator:
             )
 
         # 4. Determine Type & Authority
-        type_info = self._determine_type(defined_centers_set, active_channels_map)
+        type_info = self._determine_type(defined_centers_set, active_channels_map)  # type: ignore
         authority_info = self._determine_authority(defined_centers_set, type_info.code)
 
         # 5. Determine Profile
