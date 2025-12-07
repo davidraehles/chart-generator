@@ -172,8 +172,82 @@ test.describe('Responsive Design', () => {
   test('should render properly on desktop viewport', async ({ page }) => {
     await page.setViewportSize({ width: 1920, height: 1080 });
     await page.goto('/');
-    
+
     await expect(page.locator('form')).toBeVisible();
     await expect(page.locator('.max-w-4xl')).toBeVisible();
+  });
+});
+
+test.describe('Mobile Responsiveness - 375px Minimum Width', () => {
+  test.use({ viewport: { width: 375, height: 667 } });
+
+  test('should render form correctly on 375px mobile viewport', async ({ page }) => {
+    await page.goto('/');
+
+    // Verify main heading is visible
+    await expect(page.locator('h1')).toBeVisible();
+
+    // Verify form exists and is visible
+    const form = page.locator('form');
+    await expect(form).toBeVisible();
+
+    // Verify all form input fields are visible and not cut off
+    const inputs = await form.locator('input, textarea, select').all();
+    expect(inputs.length).toBeGreaterThan(0);
+
+    for (const input of inputs) {
+      await expect(input).toBeInViewport();
+    }
+
+    // Verify submit button is accessible
+    const submitButton = page.locator('button[type="submit"]');
+    await expect(submitButton).toBeVisible();
+    await expect(submitButton).toBeInViewport();
+  });
+
+  test('should handle form submission on mobile', async ({ page }) => {
+    await page.goto('/');
+
+    // Fill form with valid data
+    await page.locator('#firstName').fill('Max');
+    await page.locator('#birthDate').fill('21.05.1985');
+    await page.locator('#birthTime').fill('14:30');
+    await page.locator('#birthPlace').fill('Berlin');
+
+    // Submit should be clickable on mobile
+    const submitButton = page.locator('button[type="submit"]');
+    await expect(submitButton).toBeEnabled();
+    await expect(submitButton).toBeInViewport();
+
+    // Should be able to click without scrolling
+    await submitButton.click();
+  });
+
+  test('should not have horizontal scroll on 375px viewport', async ({ page }) => {
+    await page.goto('/');
+
+    // Get viewport width
+    const viewportSize = page.viewportSize();
+    expect(viewportSize?.width).toBe(375);
+
+    // Check that the main content doesn't exceed viewport
+    const form = page.locator('form');
+    const formBox = await form.boundingBox();
+    expect(formBox?.width).toBeLessThanOrEqual(375);
+
+    // Verify form is properly constrained
+    await expect(form).toBeInViewport();
+  });
+
+  test('should display all form labels on mobile', async ({ page }) => {
+    await page.goto('/');
+
+    // Verify all form labels are visible
+    const labels = await page.locator('label').all();
+    expect(labels.length).toBeGreaterThan(0);
+
+    for (const label of labels) {
+      await expect(label).toBeVisible();
+    }
   });
 });

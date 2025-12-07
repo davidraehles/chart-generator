@@ -15,14 +15,35 @@ import { test, expect } from '@playwright/test';
 const API_BASE_URL = process.env.API_URL || 'http://localhost:8000';
 
 // Helper to check if backend is available
-async function isBackendAvailable(request: any): Promise<boolean> {
+async function isBackendAvailable(request: any, timeout: number = 5000): Promise<boolean> {
   try {
-    const response = await request.get(`${API_BASE_URL}/health`, { timeout: 5000 });
+    const response = await request.get(`${API_BASE_URL}/health`, { timeout });
     return response.status() === 200;
   } catch {
     return false;
   }
 }
+
+// Run once per test suite to check backend availability
+test.beforeAll(async ({ playwright }) => {
+  const request = await playwright.request.newContext();
+  const available = await isBackendAvailable(request, 30000); // Give 30s for cold start
+
+  if (process.env.CI === 'true' && !available) {
+    // In CI, fail fast if backend is unavailable
+    throw new Error(
+      `Backend at ${API_BASE_URL} is not available in CI environment. ` +
+      `Deployment may not have completed or backend is unreachable.`
+    );
+  } else if (!available) {
+    // In local development, log warning but allow skipping
+    console.log(`⚠️ Backend at ${API_BASE_URL} is not available - tests will be skipped`);
+  } else {
+    console.log(`✅ Backend at ${API_BASE_URL} is healthy and ready`);
+  }
+
+  await request.dispose();
+});
 
 test.describe('Backend Health Check', () => {
   test('should have healthy backend', async ({ request }) => {
@@ -30,16 +51,22 @@ test.describe('Backend Health Check', () => {
     try {
       response = await request.get(`${API_BASE_URL}/health`, { timeout: 10000 });
     } catch (e) {
+      if (process.env.CI === 'true') {
+        throw e; // Fail in CI
+      }
       console.log('⚠️ Backend is not reachable - it may be deploying or down');
       test.skip();
       return;
     }
-    
+
     if (response.status() === 200) {
       const data = await response.json();
       expect(data.status).toBe('healthy');
       console.log('✅ Backend is healthy');
     } else {
+      if (process.env.CI === 'true') {
+        throw new Error(`Backend health check returned ${response.status()}`);
+      }
       console.log(`⚠️ Backend health check returned ${response.status()}`);
     }
   });
