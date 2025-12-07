@@ -1,4 +1,4 @@
-from pydantic import BaseModel, Field, validator
+from pydantic import BaseModel, Field, validator, root_validator
 from typing import List, Optional, Annotated
 from datetime import datetime
 from src.models.celestial import CelestialBody
@@ -20,6 +20,15 @@ class ChartRequest(BaseModel):
                 "birthTime is required unless birthTimeApproximate is True"
             )
         return v
+
+    @root_validator(skip_on_failure=True)
+    def require_birth_time_if_not_approximate(cls, values):
+        """Ensure birthTime is provided when birthTimeApproximate is False"""
+        approx = values.get("birthTimeApproximate", False)
+        time = values.get("birthTime")
+        if not approx and not time:
+            raise ValueError("birthTime is required when birthTimeApproximate is False")
+        return values
 
 
 class TypeInfo(BaseModel):
