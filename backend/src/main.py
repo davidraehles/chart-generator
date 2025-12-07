@@ -197,7 +197,7 @@ async def generate_chart(request: Request, chart_request: ChartRequest):
 
             try:
                 chart_response = await asyncio.wait_for(
-                    asyncio.to_thread(calculate_with_timeout),
+                    calculate_with_timeout(),
                     timeout=timeout_seconds
                 )
                 return chart_response

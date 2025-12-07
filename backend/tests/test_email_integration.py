@@ -67,7 +67,7 @@ def email_service():
 @pytest.fixture
 def email_handler():
     """Create email handler instance."""
-    return EmailHandler()
+    return EmailHandler(model_cls=LeadEmailDB)
 
 
 class TestEmailService:
