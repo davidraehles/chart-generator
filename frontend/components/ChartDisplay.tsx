@@ -1,63 +1,389 @@
 "use client";
 
-import { ChartResponse } from "@/types/chart";
+import { ChartRequest, ChartResponse, Center } from "@/types/chart";
 import { LABELS } from "@/utils/constants";
-import TypeSection from "./sections/TypeSection";
-import AuthoritySection from "./sections/AuthoritySection";
-import ProfileSection from "./sections/ProfileSection";
-import CentersSection from "./sections/CentersSection";
-import ChannelsSection from "./sections/ChannelsSection";
-import GatesSection from "./sections/GatesSection";
-import IncarnationCrossSection from "./sections/IncarnationCrossSection";
-import ImpulseSection from "./sections/ImpulseSection";
-import Bodygraph from "./Bodygraph";
-import EmailCaptureSection from "./EmailCaptureSection";
+import {
+  getTypeMetadata,
+  getProfileMetadata,
+  getAuthorityLabel,
+  getAuthorityBusinessText,
+  getCenterTexts,
+} from "@/utils/hdTypeMapping";
+import { generateAndDownloadPdf } from "@/utils/generatePdf";
 
-interface ChartDisplayProps {
-  data: ChartResponse;
-  onReset: () => void;
+// ── Konfigurierbare CTA-URLs ──────────────────────────────────────────────────
+const CTA_AUTORITAET_URL = "https://stupperich.de"; // TODO: Autoritäts-Check URL
+const CTA_READING_URL    = "https://stupperich.de"; // TODO: Business-Reading URL
+
+// ── Design-Tokens ─────────────────────────────────────────────────────────────
+const ACCENT   = "#5F7680";
+const ACCENT_BG = "rgba(95, 118, 128, 0.09)"; // sehr helles Teal für definierte Zentren
+const CARD     = "#F9F7F4";
+const BORDER   = "#E8E3DC";
+const DIVIDER  = "#EFEFEF";
+const DARK     = "#1A2126";
+const BODY     = "#2D3748"; // Anthrazit statt Braun
+const MUTED    = "#6B7280";
+const WARM     = "#B8956A";
+
+// ── SVG Icons ─────────────────────────────────────────────────────────────────
+function Icon({ name, size = 15, color = ACCENT }: { name: string; size?: number; color?: string }) {
+  const paths: Record<string, React.ReactNode> = {
+    bolt:         <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2" />,
+    target:       <><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="6"/><circle cx="12" cy="12" r="2"/></>,
+    key:          <><circle cx="7.5" cy="15.5" r="5.5"/><path d="M21 2l-9.6 9.6"/><path d="M15.5 7.5l3 3L22 7l-3-3"/></>,
+    layers:       <><path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5"/><path d="M2 12l10 5 10-5"/></>,
+    trendingUp:   <><polyline points="22 7 13.5 15.5 8.5 10.5 2 17"/><polyline points="16 7 22 7 22 13"/></>,
+    trendingDown: <><polyline points="22 17 13.5 8.5 8.5 13.5 2 7"/><polyline points="16 17 22 17 22 11"/></>,
+    lightbulb:    <><path d="M15 14c.2-1 .7-1.7 1.5-2.5 1-.9 1.5-2.2 1.5-3.5A6 6 0 006 8c0 1.3.5 2.6 1.5 3.5.7.7 1.2 1.5 1.5 2.5"/><path d="M9 18h6"/><path d="M10 22h4"/></>,
+    eye:          <><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></>,
+    mic:          <><path d="M12 2a3 3 0 013 3v7a3 3 0 01-6 0V5a3 3 0 013-3z"/><path d="M19 10v2a7 7 0 01-14 0v-2"/><line x1="12" y1="19" x2="12" y2="22"/></>,
+    compass:      <><circle cx="12" cy="12" r="10"/><polygon points="16.24 7.76 14.12 14.12 7.76 16.24 9.88 9.88 16.24 7.76"/></>,
+    heart:        <path d="M20.84 4.61a5.5 5.5 0 00-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 00-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 000-7.78z"/>,
+    zap:          <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2" />,
+    shield:       <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>,
+    activity:     <polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/>,
+    anchor:       <><circle cx="12" cy="5" r="3"/><line x1="12" y1="22" x2="12" y2="8"/><path d="M5 12H2a10 10 0 0020 0h-3"/></>,
+    download:     <><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></>,
+    mail:         <><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></>,
+    arrowRight:   <><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></>,
+  };
+  return (
+    <svg width={size} height={size} viewBox="0 0 24 24" fill="none"
+      stroke={color} strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round"
+      aria-hidden="true" style={{ flexShrink: 0 }}>
+      {paths[name]}
+    </svg>
+  );
 }
 
-export default function ChartDisplay({ data, onReset }: ChartDisplayProps) {
+const CENTER_ICONS: Record<string, string> = {
+  head: "lightbulb", ajna: "eye", throat: "mic", g: "compass",
+  heart: "heart", sacral: "zap", spleen: "shield", solar: "activity", root: "anchor",
+};
+
+function isDefined(type: string) { return type === "defined" || type === "unconscious"; }
+
+function SectionLabel({ children }: { children: React.ReactNode }) {
+  return <p className="text-xs font-semibold uppercase tracking-widest mb-3" style={{ color: MUTED }}>{children}</p>;
+}
+
+// Zeile in Business-Basis
+function BasisRow({
+  icon, label, businessTitle, valueContent, businessText, last = false,
+}: {
+  icon: string; label: string; businessTitle?: string;
+  valueContent: React.ReactNode; businessText?: string; last?: boolean;
+}) {
   return (
-    <div className="space-y-8">
-      <div className="flex justify-between items-center">
-        <h2 className="text-2xl font-bold text-primary">
-          {data.firstName}s Chart
-        </h2>
-        <button
-          onClick={onReset}
-          className="px-4 py-2 text-sm bg-secondary text-white rounded-md hover:bg-opacity-90"
-        >
-          {LABELS.newChart}
-        </button>
+    <div className="px-5 py-4"
+      style={{ borderBottom: last ? "none" : `0.5px solid ${DIVIDER}`, borderLeft: `3px solid ${ACCENT}` }}>
+      <div className="flex items-center gap-1.5 mb-1.5">
+        <Icon name={icon} size={12} color={MUTED} />
+        <p className="text-xs uppercase tracking-wider font-semibold" style={{ color: MUTED }}>{label}</p>
+      </div>
+      {businessTitle && (
+        <p className="text-xs font-semibold mb-2" style={{ color: ACCENT }}>{businessTitle}</p>
+      )}
+      <div className="mb-1">{valueContent}</div>
+      {businessText && (
+        <p className="text-xs leading-relaxed mt-2" style={{ color: BODY }}>{businessText}</p>
+      )}
+    </div>
+  );
+}
+
+// ── Hauptkomponente ───────────────────────────────────────────────────────────
+export default function ChartDisplay({
+  data, inputData, onReset,
+}: {
+  data: ChartResponse; inputData: ChartRequest | null; onReset: () => void;
+}) {
+  const typeMeta         = getTypeMetadata(data.type.code);
+  const profileMeta      = getProfileMetadata(data.profile.code);
+  const profileValue     = profileMeta ? `${data.profile.code} – ${profileMeta.label}` : data.profile.code;
+  const authorityLabel   = getAuthorityLabel(data.authority.code);
+  const authorityBizText = getAuthorityBusinessText(data.authority.code);
+
+  function handlePdfDownload() {
+    generateAndDownloadPdf(data, inputData);
+  }
+
+  return (
+    <div className="space-y-8 pb-12" style={{ background: "#FFFFFF" }}>
+
+      {/* ── 1. HEADER ── */}
+      <div>
+        <div className="flex justify-end mb-5">
+          <button onClick={onReset}
+            className="text-xs px-3 py-1.5 hover:bg-gray-50 transition-colors"
+            style={{ border: `0.5px solid ${BORDER}`, color: ACCENT }}>
+            {LABELS.newChart}
+          </button>
+        </div>
+        <div style={{ borderLeft: `3px solid ${ACCENT}`, paddingLeft: "16px", marginBottom: "20px" }}>
+          <p className="text-xs uppercase tracking-widest mb-1.5" style={{ color: ACCENT }}>
+            Human Design · Business-Auswertung
+          </p>
+          <h1 className="text-2xl md:text-3xl font-semibold tracking-tight" style={{ color: DARK }}>
+            Deine Human Design Business-Energie
+          </h1>
+          <p className="text-sm mt-1" style={{ color: BODY }}>
+            Wie du arbeitest, entscheidest und im Business wirkst.
+          </p>
+        </div>
+        <div className="px-5 py-4" style={{ background: CARD, border: `0.5px solid ${BORDER}` }}>
+          <p className="font-semibold text-base" style={{ color: DARK }}>
+            {data.firstName}{inputData?.lastName ? ` ${inputData.lastName}` : ""}
+          </p>
+          {inputData && (
+            <p className="text-sm mt-0.5" style={{ color: MUTED }}>
+              {inputData.birthDate}
+              {inputData.birthTime && ` · ${inputData.birthTime} Uhr`}
+              {inputData.birthPlace && ` · ${inputData.birthPlace}`}
+            </p>
+          )}
+        </div>
       </div>
 
-      <div className="grid md:grid-cols-2 gap-6">
-        <TypeSection type={data.type} />
-        <AuthoritySection authority={data.authority} />
+      {/* ── 2. BUSINESS-BASIS ── */}
+      <div>
+        <SectionLabel>Deine Business-Basis</SectionLabel>
+        <div style={{ border: `0.5px solid ${BORDER}` }}>
+          {/* Intro */}
+          <div className="px-5 py-3" style={{ borderBottom: `0.5px solid ${DIVIDER}`, background: CARD }}>
+            <p className="text-sm" style={{ color: BODY }}>
+              Vier Aspekte deines Human Designs, die zeigen, wie du arbeitest, Chancen aufgreifst, Einfluss nimmst und Entscheidungen triffst.
+            </p>
+          </div>
+
+          <BasisRow
+            icon="bolt" label="Deine Arbeitsenergie"
+            valueContent={
+              <div className="flex items-baseline gap-2 flex-wrap">
+                <span className="text-sm font-semibold" style={{ color: DARK }}>{data.type.label}</span>
+                {typeMeta && (
+                  <span className="text-xs font-medium px-2 py-0.5"
+                    style={{ background: `${ACCENT}18`, color: ACCENT }}>
+                    {typeMeta.merkmal}
+                  </span>
+                )}
+              </div>
+            }
+            businessText={typeMeta?.typeBusinessText}
+          />
+
+          <BasisRow
+            icon="target" label="Strategie"
+            businessTitle="Wie du Chancen & Aufgaben angehst"
+            valueContent={
+              <span className="text-sm font-semibold" style={{ color: DARK }}>
+                {typeMeta?.strategieLabel ?? typeMeta?.strategie ?? "–"}
+              </span>
+            }
+            businessText={typeMeta?.strategieBusinessText}
+          />
+
+          <BasisRow
+            icon="layers" label="Profil"
+            businessTitle="Wie du Einfluss nimmst"
+            valueContent={
+              <span className="text-sm font-semibold" style={{ color: DARK }}>{profileValue}</span>
+            }
+            businessText={profileMeta?.businessText}
+          />
+
+          <BasisRow
+            icon="key" label="Entscheidungs-Autorität"
+            businessTitle="Wie du wichtige Entscheidungen triffst"
+            valueContent={
+              <span className="text-sm font-semibold" style={{ color: DARK }}>{authorityLabel}</span>
+            }
+            businessText={authorityBizText ?? undefined}
+            last
+          />
+        </div>
       </div>
 
-      <ProfileSection profile={data.profile} />
-
-      <div className="grid md:grid-cols-2 gap-6">
-        <CentersSection centers={data.centers} />
-        <ChannelsSection channels={data.channels} />
+      {/* ── 3. AUTORITÄT – CTA ── */}
+      <div className="px-5 py-5" style={{ background: CARD, border: `0.5px solid ${BORDER}` }}>
+        <p className="text-sm font-medium mb-1" style={{ color: DARK }}>
+          Wie funktioniert deine Autorität im Alltag wirklich?
+        </p>
+        <p className="text-sm mb-4" style={{ color: BODY }}>
+          Finde heraus, woran du erkennst, ob eine Entscheidung wirklich richtig für dich ist.
+        </p>
+        <a href={CTA_AUTORITAET_URL} target="_blank" rel="noopener noreferrer"
+          className="inline-flex items-center gap-2 text-sm font-medium px-4 py-2 transition-opacity hover:opacity-80"
+          style={{ background: ACCENT, color: "#fff" }}>
+          Zum Autoritäts-Check
+          <Icon name="arrowRight" size={14} color="#fff" />
+        </a>
       </div>
 
-      <GatesSection gates={data.gates} />
+      {/* ── 4. ENERGIE-KOMPASS ── */}
+      {typeMeta && (
+        <div>
+          <SectionLabel>Energie-Kompass</SectionLabel>
+          <p className="text-sm mb-4" style={{ color: BODY }}>
+            Dein Energie-Kompass zeigt dir, woran du erkennst, ob du gerade im Einklang mit deiner natürlichen Energie handelst.
+          </p>
+          <div className="grid grid-cols-2 divide-x"
+            style={{ border: `0.5px solid ${BORDER}` }}>
+            <div className="px-5 py-4" style={{ background: CARD }}>
+              <div className="flex items-center gap-1.5 mb-2">
+                <Icon name="trendingUp" size={13} />
+                <p className="text-xs uppercase tracking-wider font-medium" style={{ color: MUTED }}>
+                  In deiner Energie
+                </p>
+              </div>
+              <p className="text-base font-semibold mb-2" style={{ color: ACCENT }}>{typeMeta.higherSelf}</p>
+              <p className="text-xs leading-relaxed" style={{ color: BODY }}>
+                Dein inneres Zeichen, dass du auf dem richtigen Weg bist.
+              </p>
+            </div>
+            <div className="px-5 py-4" style={{ background: CARD }}>
+              <div className="flex items-center gap-1.5 mb-2">
+                <Icon name="trendingDown" size={13} color={WARM} />
+                <p className="text-xs uppercase tracking-wider font-medium" style={{ color: MUTED }}>
+                  Dein Warnsignal
+                </p>
+              </div>
+              <p className="text-base font-semibold mb-2" style={{ color: WARM }}>{typeMeta.notSelf}</p>
+              <p className="text-xs leading-relaxed" style={{ color: BODY }}>
+                Dein Hinweis, wann du dich von deiner natürlichen Energie entfernst.
+              </p>
+            </div>
+          </div>
+        </div>
+      )}
 
-      <IncarnationCrossSection incarnationCross={data.incarnationCross} />
+      {/* ── 5. ENERGIEZENTREN ── */}
+      <div>
+        <SectionLabel>Deine Energie im Business</SectionLabel>
+        <h2 className="text-base font-semibold mb-1" style={{ color: DARK }}>Deine 9 Energiezentren</h2>
+        <p className="text-sm mb-4 leading-relaxed" style={{ color: BODY }}>
+          Jeder Mensch hat im Human Design dieselben neun Energiezentren, jedes steht für ein anderes Thema. Je nach persönlichem Design sind sie definiert oder offen. Im Business zeigen sie, wie du arbeitest, Führungsverantwortung übernimmst, kommunizierst und auf andere wirkst.
+        </p>
 
-      <Bodygraph centers={data.centers} channels={data.channels} />
+        {/* Legende VOR den Zentren */}
+        <div className="grid grid-cols-2 gap-3 mb-4">
+          <div className="p-4 rounded-xl" style={{ background: ACCENT_BG, border: `0.5px solid ${BORDER}` }}>
+            <div className="flex items-center gap-2 mb-1.5">
+              <span className="w-2.5 h-2.5 rounded-full flex-shrink-0" style={{ background: ACCENT }} />
+              <p className="text-xs font-semibold uppercase tracking-wider" style={{ color: ACCENT }}>Definiert</p>
+            </div>
+            <p className="text-xs leading-relaxed" style={{ color: BODY }}>
+              Konstante Energie, die du dauerhaft trägst und nach außen ausstrahlst.
+            </p>
+          </div>
+          <div className="p-4 rounded-xl" style={{ background: CARD, border: `0.5px solid ${BORDER}` }}>
+            <div className="flex items-center gap-2 mb-1.5">
+              <span className="w-2.5 h-2.5 rounded-full border-2 border-gray-300 flex-shrink-0" />
+              <p className="text-xs font-semibold uppercase tracking-wider" style={{ color: MUTED }}>Offen</p>
+            </div>
+            <p className="text-xs leading-relaxed" style={{ color: BODY }}>
+              Flexible Zone, in der du die Energie anderer stark aufnimmst und spiegelst.
+            </p>
+          </div>
+        </div>
+        <p className="text-xs mb-5 italic" style={{ color: MUTED }}>
+          Es gibt kein besser oder schlechter, nur anders. Beide Zustände haben ihre eigene Stärke.
+        </p>
 
-      <ImpulseSection impulse={data.shortImpulse} />
+        {/* Zentren-Liste */}
+        <div className="space-y-2">
+          {data.centers.map((center: Center) => {
+            const defType    = center.definitionType ?? (center.defined ? "defined" : "open");
+            const defined    = isDefined(defType);
+            const ct         = getCenterTexts(center.code);
+            const desc       = ct ? (defined ? ct.defined : ct.open) : null;
+            const iconName   = CENTER_ICONS[center.code] ?? "target";
 
-      <EmailCaptureSection />
-
-      <div className="text-center text-xs text-gray-400 mt-8 pb-4">
-        <p>Berechnet mit {data.calculationSource || "Swiss Ephemeris"}</p>
+            return (
+              <div key={center.code} className="rounded-xl overflow-hidden"
+                style={{
+                  border: `0.5px solid ${defined ? "rgba(95,118,128,0.25)" : BORDER}`,
+                  borderLeft: `3px solid ${defined ? ACCENT : "#D4CFC8"}`,
+                  background: defined ? ACCENT_BG : "#FFFFFF",
+                }}>
+                <div className="px-4 py-3.5">
+                  <div className="flex items-start gap-3">
+                    <div className="mt-0.5">
+                      <Icon name={iconName} size={15} color={defined ? ACCENT : "#C4BEB8"} />
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <span className="text-base font-semibold leading-tight block mb-0.5"
+                        style={{ color: defined ? DARK : "#5A6370" }}>
+                        {ct?.businessTitle ?? center.name}
+                      </span>
+                      <div className="flex items-center gap-1.5 flex-wrap">
+                        <span className="text-xs" style={{ color: MUTED }}>
+                          {center.name}, bei dir <em>{defined ? "definiert" : "offen"}</em>
+                        </span>
+                        {ct && (
+                          <span className="text-xs" style={{ color: MUTED }}>· {ct.themen}</span>
+                        )}
+                      </div>
+                      {desc && (
+                        <p className="text-xs leading-relaxed mt-2" style={{ color: BODY }}>{desc}</p>
+                      )}
+                    </div>
+                  </div>
+                </div>
+              </div>
+            );
+          })}
+        </div>
       </div>
+
+      {/* ── 6. CTA NACH ZENTREN ── */}
+      <div className="px-6 py-7 text-center" style={{ background: DARK }}>
+        <p className="text-lg font-semibold mb-2" style={{ color: "#F9F7F4" }}>
+          Du bist mehr als dein Energietyp.
+        </p>
+        <p className="text-sm mb-5 leading-relaxed" style={{ color: "#A8B4B6" }}>
+          Deine Zentren zeigen einzelne Facetten. Spannend wird es, wenn wir anschauen, wie deine Energie,
+          deine Entscheidungen, deine Kommunikation und deine Wirkung zusammenspielen.
+        </p>
+        <a href={CTA_READING_URL} target="_blank" rel="noopener noreferrer"
+          className="inline-flex items-center gap-2 text-sm font-medium px-5 py-2.5 transition-opacity hover:opacity-90"
+          style={{ background: ACCENT, color: "#fff" }}>
+          Mein Human Design Business Reading entdecken
+          <Icon name="arrowRight" size={14} color="#fff" />
+        </a>
+        <p className="text-xs mt-3" style={{ color: "#6B7A7C" }}>
+          Persönlich. Konkret. Auf deinen Business-Alltag übersetzt.
+        </p>
+      </div>
+
+      {/* ── 7. ABSCHLUSS ── */}
+      <div className="px-5 py-5" style={{ background: CARD, border: `0.5px solid ${BORDER}` }}>
+        <p className="text-sm font-semibold mb-1" style={{ color: DARK }}>
+          Speichere deine Business-Energie
+        </p>
+        <p className="text-xs mb-4" style={{ color: MUTED }}>
+          Nimm deine Auswertung mit — als Erinnerung für deinen Alltag.
+        </p>
+        <div className="flex flex-col sm:flex-row gap-3">
+          <button onClick={handlePdfDownload}
+            className="flex items-center justify-center gap-2 text-sm px-4 py-2.5 transition-opacity hover:opacity-80"
+            style={{ border: `0.5px solid ${BORDER}`, color: BODY }}>
+            <Icon name="download" size={14} color={BODY} />
+            PDF herunterladen
+          </button>
+          <button disabled className="flex items-center justify-center gap-2 text-sm px-4 py-2.5 opacity-40 cursor-not-allowed"
+            style={{ border: `0.5px solid ${BORDER}`, color: BODY }}>
+            <Icon name="mail" size={14} color={BODY} />
+            Ergebnis per E-Mail erhalten
+          </button>
+        </div>
+        <p className="text-xs mt-3" style={{ color: MUTED }}>E-Mail-Versand folgt in Kürze.</p>
+      </div>
+
+      <p className="text-right text-xs" style={{ color: "#C4BEB8" }}>
+        {data.calculationSource || "Swiss Ephemeris"}
+      </p>
     </div>
   );
 }

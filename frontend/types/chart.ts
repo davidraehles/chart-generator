@@ -4,6 +4,7 @@
 
 export interface ChartRequest {
   firstName: string;
+  lastName?: string;
   birthDate: string; // Format: TT.MM.JJJJ
   birthTime: string; // Format: HH:MM
   birthTimeApproximate: boolean;
@@ -62,6 +63,7 @@ export interface ChartResponse {
   incarnationCross: IncarnationCross;
   shortImpulse: string;
   calculationSource?: string;
+  variableCode?: string; // e.g. "LRRR"
 }
 
 export interface EmailCaptureRequest {
