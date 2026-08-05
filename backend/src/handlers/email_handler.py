@@ -33,6 +33,8 @@ class EmailHandler:
         db_session: Session,
         ip_address: Optional[str] = None,
         user_agent: Optional[str] = None,
+        first_name: Optional[str] = None,
+        hd_type: Optional[str] = None,
     ) -> dict:
         """
         Capture email for Business Reading interest.
@@ -71,7 +73,12 @@ class EmailHandler:
         # Create new email capture
         try:
             email_capture = self.Model(
-                email=email, ip_address=ip_address, user_agent=user_agent, consent_given=True
+                email=email,
+                first_name=first_name,
+                hd_type=hd_type,
+                ip_address=ip_address,
+                user_agent=user_agent,
+                consent_given=True,
             )
             db_session.add(email_capture)
             db_session.commit()

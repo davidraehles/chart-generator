@@ -10,6 +10,7 @@ import {
   getCenterTexts,
 } from "@/utils/hdTypeMapping";
 import { generateAndDownloadPdf } from "@/utils/generatePdf";
+import EmailCaptureSection from "@/components/EmailCaptureSection";
 
 // ── Konfigurierbare CTA-URLs ──────────────────────────────────────────────────
 const CTA_AUTORITAET_URL = "https://stupperich.de"; // TODO: Autoritäts-Check URL
@@ -380,6 +381,12 @@ export default function ChartDisplay({
         </div>
         <p className="text-xs mt-3" style={{ color: MUTED }}>E-Mail-Versand folgt in Kürze.</p>
       </div>
+
+      {/* ── 8. TRIGGER-LETTERS ── */}
+      <EmailCaptureSection
+        hdType={data.type.code}
+        firstName={data.firstName}
+      />
 
       <p className="text-right text-xs" style={{ color: "#C4BEB8" }}>
         {data.calculationSource || "Swiss Ephemeris"}

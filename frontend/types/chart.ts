@@ -68,6 +68,8 @@ export interface ChartResponse {
 
 export interface EmailCaptureRequest {
   email: string;
+  first_name?: string;
+  hd_type?: string;
 }
 
 export interface EmailCaptureResponse {

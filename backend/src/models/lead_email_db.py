@@ -23,6 +23,8 @@ class LeadEmailDB(Base):
 
     id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
     email = Column(String(255), nullable=False, index=True)
+    first_name = Column(String(100), nullable=True)
+    hd_type = Column(String(20), nullable=True, index=True)
     status = Column(String(50), nullable=False, default="pending")
     source = Column(String(100), nullable=True)
     created_at = Column(DateTime, nullable=False, default=lambda: datetime.now(timezone.utc))

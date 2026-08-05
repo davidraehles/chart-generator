@@ -2,7 +2,9 @@
 
 from fastapi import FastAPI, HTTPException, Request
 from fastapi.middleware.cors import CORSMiddleware
-from fastapi.responses import JSONResponse
+from fastapi.responses import JSONResponse, StreamingResponse
+import csv
+import io
 import os
 from dotenv import load_dotenv
 import html
@@ -295,6 +297,8 @@ async def capture_email(request: Request, email_request: EmailCaptureRequest):
             db_session=db_session,
             ip_address=None,
             user_agent=None,
+            first_name=email_request.first_name,
+            hd_type=email_request.hd_type,
         )
 
         return EmailCaptureResponse(
@@ -314,6 +318,47 @@ async def capture_email(request: Request, email_request: EmailCaptureRequest):
                 "field": "email",
                 "error": "Ein unerwarteter Fehler ist aufgetreten. Bitte versuche es später noch einmal."
             },
+        )
+    finally:
+        if db_session:
+            db_session.close()
+
+
+@app.get("/api/admin/leads")
+async def export_leads(token: str = ""):
+    """
+    Export all email leads as CSV.
+    Protected by ADMIN_TOKEN env var.
+    """
+    admin_token = os.getenv("ADMIN_TOKEN", "")
+    if not admin_token or token != admin_token:
+        raise HTTPException(status_code=403, detail="Forbidden")
+
+    from src.models.lead_email_db import LeadEmailDB
+    db_session = None
+    try:
+        db_session = get_db_session()
+        leads = db_session.query(LeadEmailDB).filter(
+            LeadEmailDB.deleted_at.is_(None)
+        ).order_by(LeadEmailDB.created_at.desc()).all()
+
+        output = io.StringIO()
+        writer = csv.writer(output)
+        writer.writerow(["email", "first_name", "hd_type", "status", "created_at"])
+        for lead in leads:
+            writer.writerow([
+                lead.email,
+                lead.first_name or "",
+                lead.hd_type or "",
+                lead.status,
+                lead.created_at.strftime("%Y-%m-%d %H:%M") if lead.created_at else "",
+            ])
+
+        output.seek(0)
+        return StreamingResponse(
+            iter([output.getvalue()]),
+            media_type="text/csv",
+            headers={"Content-Disposition": "attachment; filename=leads.csv"},
         )
     finally:
         if db_session:
