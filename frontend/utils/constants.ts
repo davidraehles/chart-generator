@@ -56,9 +56,9 @@ export const ERROR_MESSAGES = {
 };
 
 export const PLACEHOLDERS = {
-  firstName: "Silke",
-  lastName: "Stupperich",
-  birthDate: "06.07.1972",
-  birthTime: "14:32",
-  birthPlace: "Aachen, Deutschland",
+  firstName: "Dein Vorname",
+  lastName: "Dein Nachname",
+  birthDate: "TT.MM.JJJJ",
+  birthTime: "HH:MM",
+  birthPlace: "Dein Geburtsort",
 };
