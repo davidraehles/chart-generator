@@ -220,6 +220,18 @@ export default function ChartForm({ onSuccess, onError, onRequest }: ChartFormPr
         </p>
       </div>
 
+      {/* ── Über Silke ── */}
+      <div className="my-6 py-4 text-center" style={{ borderTop: `0.5px solid ${BORDER}`, borderBottom: `0.5px solid ${BORDER}` }}>
+        <p className="text-xs font-semibold uppercase tracking-widest mb-1" style={{ color: ACCENT }}>
+          Entwickelt von
+        </p>
+        <p className="text-sm font-semibold" style={{ color: DARK }}>Silke Stupperich</p>
+        <p className="text-xs mt-1.5 leading-relaxed" style={{ color: MUTED }}>
+          20 Jahre Erfahrung in Kommunikation, Change und Transformation auf Top-Management-Ebene
+          · ausgebildete Human Design Readerin nach Codes of Life®
+        </p>
+      </div>
+
       {/* ── Formular ── */}
       <form onSubmit={handleSubmit} className="space-y-5"
         style={{ background: "#F9F7F4", border: `0.5px solid ${BORDER}`, padding: "28px" }}>
@@ -328,14 +340,6 @@ export default function ChartForm({ onSuccess, onError, onRequest }: ChartFormPr
         Deine Angaben werden ausschließlich zur Berechnung deiner persönlichen Human Design Business-Energie verwendet.
       </p>
 
-      {/* ── Über Silke ── */}
-      <div className="mt-8 pt-5 text-center" style={{ borderTop: `0.5px solid ${BORDER}` }}>
-        <p className="text-xs font-medium" style={{ color: MUTED }}>Entwickelt von Silke Stupperich</p>
-        <p className="text-xs mt-1.5 leading-relaxed" style={{ color: "#C4BEB8" }}>
-          20 Jahre Erfahrung in Kommunikation, Change und Transformation auf Top-Management-Ebene
-          und ausgebildete Human Design Readerin nach Codes of Life®
-        </p>
-      </div>
     </div>
   );
 }
