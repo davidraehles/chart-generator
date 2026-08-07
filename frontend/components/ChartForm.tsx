@@ -206,7 +206,7 @@ export default function ChartForm({ onSuccess, onError, onRequest }: ChartFormPr
     <div>
       {/* ── Intro ── */}
       <div className="-mx-4 md:-mx-8 px-6 md:px-10 pt-8 pb-7 mb-7"
-        style={{ background: "rgba(95,118,128,0.07)", borderBottom: `1.5px solid rgba(95,118,128,0.18)` }}>
+        style={{ background: "rgba(95,118,128,0.07)" }}>
         <p className="text-sm font-semibold uppercase tracking-widest mb-4" style={{ color: ACCENT }}>
           Human Design · Business Energy Calculator
         </p>
@@ -221,7 +221,8 @@ export default function ChartForm({ onSuccess, onError, onRequest }: ChartFormPr
         <div className="pt-4" style={{ borderTop: `0.5px solid rgba(95,118,128,0.2)` }}>
           <p className="text-sm font-semibold" style={{ color: DARK }}>Konzipiert von Silke Stupperich</p>
           <p className="text-xs mt-1 leading-relaxed" style={{ color: MUTED }}>
-            20 Jahre Kommunikation, Change & Transformation auf Top-Management-Ebene · Human Design Readerin nach Codes of Life®
+            20 Jahre Kommunikation, Change & Transformation auf Top-Management-Ebene<br />
+            Human Design Readerin nach Codes of Life®
           </p>
         </div>
       </div>
