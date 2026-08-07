@@ -175,15 +175,7 @@ export default function ChartDisplay({
       {/* ── 2. BUSINESS-BASIS ── */}
       <div>
         <SectionLabel>Deine Business-Basis</SectionLabel>
-        <div className="-mx-4 md:-mx-8 px-4 md:px-8 py-6" style={{ background: "rgba(95,118,128,0.06)" }}>
-        <div style={{ border: `0.5px solid ${BORDER}` }}>
-          {/* Intro */}
-          <div className="px-5 py-3" style={{ background: CARD }}>
-            <p className="text-sm" style={{ color: BODY }}>
-              Vier Aspekte deines Human Designs, die zeigen, wie du arbeitest, Chancen aufgreifst, Einfluss nimmst und Entscheidungen triffst.
-            </p>
-          </div>
-
+        <div className="-mx-4 md:-mx-8 px-4 md:px-8 pt-2 pb-6" style={{ background: "rgba(95,118,128,0.06)" }}>
           {/* 2×2 Raster auf Desktop, untereinander auf Mobile */}
           <div className="basis-grid">
             <BasisRow
@@ -231,7 +223,6 @@ export default function ChartDisplay({
               last
             />
           </div>
-        </div>
         </div>
       </div>
 
