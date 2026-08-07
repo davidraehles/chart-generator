@@ -39,6 +39,7 @@ function Icon({ name, size = 15, color = ACCENT }: { name: string; size?: number
     lightbulb:    <><path d="M15 14c.2-1 .7-1.7 1.5-2.5 1-.9 1.5-2.2 1.5-3.5A6 6 0 006 8c0 1.3.5 2.6 1.5 3.5.7.7 1.2 1.5 1.5 2.5"/><path d="M9 18h6"/><path d="M10 22h4"/></>,
     eye:          <><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></>,
     mic:          <><path d="M12 2a3 3 0 013 3v7a3 3 0 01-6 0V5a3 3 0 013-3z"/><path d="M19 10v2a7 7 0 01-14 0v-2"/><line x1="12" y1="19" x2="12" y2="22"/></>,
+    radio:        <><path d="M5 12.55a11 11 0 0114.08 0"/><path d="M1.42 9a16 16 0 0121.16 0"/><path d="M8.53 16.11a6 6 0 016.95 0"/><circle cx="12" cy="20" r="1" fill="currentColor"/></>,
     compass:      <><circle cx="12" cy="12" r="10"/><polygon points="16.24 7.76 14.12 14.12 7.76 16.24 9.88 9.88 16.24 7.76"/></>,
     heart:        <path d="M20.84 4.61a5.5 5.5 0 00-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 00-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 000-7.78z"/>,
     zap:          <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2" />,
@@ -61,6 +62,19 @@ function Icon({ name, size = 15, color = ACCENT }: { name: string; size?: number
 const CENTER_ICONS: Record<string, string> = {
   head: "lightbulb", ajna: "eye", throat: "mic", g: "compass",
   heart: "heart", sacral: "zap", spleen: "shield", solar: "activity", root: "anchor",
+};
+
+// Deutsche HD-Zentren-Namen (für den kleinen Untertitel)
+const HD_CENTER_NAMES: Record<string, string> = {
+  head:   "Inspirations-Zentrum",
+  ajna:   "Verstandes-Zentrum",
+  throat: "Kehl-Zentrum",
+  g:      "Selbst-Zentrum",
+  heart:  "Herz/Ego-Zentrum",
+  sacral: "Sakral-Zentrum",
+  spleen: "Milz-Zentrum",
+  solar:  "Emotions-Zentrum",
+  root:   "Wurzel-Zentrum",
 };
 
 function isDefined(type: string) { return type === "defined" || type === "unconscious"; }
@@ -278,20 +292,20 @@ export default function ChartDisplay({
         <div className="grid grid-cols-2 gap-3 mb-4">
           <div className="p-4 rounded-xl" style={{ background: ACCENT_BG, border: `0.5px solid ${BORDER}` }}>
             <div className="flex items-center gap-2 mb-1.5">
-              <span className="w-2.5 h-2.5 rounded-full flex-shrink-0" style={{ background: ACCENT }} />
+              <Icon name="mic" size={13} color={ACCENT} />
               <p className="text-xs font-semibold uppercase tracking-wider" style={{ color: ACCENT }}>Definiert</p>
             </div>
             <p className="text-xs leading-relaxed" style={{ color: BODY }}>
-              Konstante Energie, die du dauerhaft trägst und nach außen ausstrahlst.
+              Konstante Energie, die dir verlässlich zur Verfügung steht und die du nach außen ausstrahlst. Stell es dir wie ein Mikrofon vor: Du sendest diese Energie in dein Umfeld.
             </p>
           </div>
           <div className="p-4 rounded-xl" style={{ background: CARD, border: `0.5px solid ${BORDER}` }}>
             <div className="flex items-center gap-2 mb-1.5">
-              <span className="w-2.5 h-2.5 rounded-full border-2 border-gray-300 flex-shrink-0" />
+              <Icon name="radio" size={13} color={MUTED} />
               <p className="text-xs font-semibold uppercase tracking-wider" style={{ color: MUTED }}>Offen</p>
             </div>
             <p className="text-xs leading-relaxed" style={{ color: BODY }}>
-              Flexible Zone, in der du die Energie anderer stark aufnimmst und spiegelst.
+              Ein Bereich, in dem du besonders empfänglich für die Energie anderer bist. Das funktioniert wie ein Radio: Du empfängst, was in deinem Umfeld sendet, und verstärkst es häufig.
             </p>
           </div>
         </div>
@@ -326,8 +340,10 @@ export default function ChartDisplay({
                         {ct?.businessTitle ?? center.name}
                       </span>
                       <div className="flex items-center gap-1.5 flex-wrap">
-                        <span className="text-xs" style={{ color: MUTED }}>
-                          {ct?.businessTitle ?? center.name}, bei dir <em>{defined ? "definiert" : "offen"}</em>
+                        <span className="inline-flex items-center gap-1 text-xs" style={{ color: MUTED }}>
+                          {HD_CENTER_NAMES[center.code] ?? center.name}, bei dir{" "}
+                          <em>{defined ? "definiert" : "offen"}</em>
+                          <Icon name={defined ? "mic" : "radio"} size={10} color={defined ? ACCENT : MUTED} />
                         </span>
                         {ct && (
                           <span className="text-xs" style={{ color: MUTED }}>· {ct.themen}</span>
