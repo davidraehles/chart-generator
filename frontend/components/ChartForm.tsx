@@ -207,7 +207,7 @@ export default function ChartForm({ onSuccess, onError, onRequest }: ChartFormPr
       {/* ── Intro ── */}
       <div className="mb-7" style={{ borderLeft: `3px solid ${ACCENT}`, paddingLeft: "16px" }}>
         <p className="text-xs font-semibold uppercase tracking-widest mb-3" style={{ color: ACCENT }}>
-          Human Design · Business-Auswertung
+          Human Design · Business Energy Calculator
         </p>
         <h1 className="text-2xl font-semibold tracking-tight leading-snug mb-3" style={{ color: DARK }}>
           Entdecke, wie du arbeitest, Entscheidungen triffst, kommunizierst und auf andere wirkst.
