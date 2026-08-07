@@ -228,21 +228,18 @@ export default function ChartDisplay({
         </div>
       </div>
 
-      {/* ── 3. ENTSCHEIDUNGS-METHODE CTA ── */}
+      {/* ── 3. ENTSCHEIDUNGS-ARCHITEKTUR CTA ── */}
       <div className="px-5 py-6" style={{ background: CARD, border: `0.5px solid ${BORDER}` }}>
-        <p className="text-base font-semibold mb-2 leading-snug" style={{ color: DARK }}>
-          Entscheide klar - auch wenn der Druck hoch ist.
-        </p>
-        <p className="text-sm mb-1 leading-relaxed" style={{ color: BODY }}>
-          Du arbeitest mit echten Situationen aus deinem Führungsalltag und verstehst, wie du Entscheidungen triffst, die wirklich zu dir passen.
+        <p className="text-xs font-semibold uppercase tracking-widest mb-3" style={{ color: ACCENT }}>
+          Deine Entscheidungs-Architektur vertiefen
         </p>
         <p className="text-sm mb-5 leading-relaxed" style={{ color: BODY }}>
-          Individuell abgestimmt auf deine Entscheidungs-Architektur. Selbstgesteuert, digital, in deiner Geschwindigkeit.
+          Du kennst jetzt deine Entscheidungs-Architektur. Erfahre, wie du sie im Führungsalltag aktiv nutzt, auch unter Zeitdruck und Erwartungen von außen.
         </p>
         <a href={CTA_AUTORITAET_URL} target="_blank" rel="noopener noreferrer"
           className="inline-flex items-center gap-2 text-sm font-medium px-4 py-2.5 transition-opacity hover:opacity-80"
           style={{ background: ACCENT, color: "#fff" }}>
-          Zur Entscheidungs-Methode
+          Meine Entscheidungs-Architektur vertiefen
           <Icon name="arrowRight" size={14} color="#fff" />
         </a>
       </div>
