@@ -205,25 +205,24 @@ export default function ChartForm({ onSuccess, onError, onRequest }: ChartFormPr
   return (
     <div>
       {/* ── Intro ── */}
-      <div className="mb-7" style={{ borderLeft: `3px solid ${ACCENT}`, paddingLeft: "16px" }}>
-        <p className="text-xs font-semibold uppercase tracking-widest mb-3" style={{ color: ACCENT }}>
+      <div className="mb-7">
+        <p className="text-sm font-semibold uppercase tracking-widest mb-4" style={{ color: ACCENT }}>
           Human Design · Business Energy Calculator
         </p>
-        <h1 className="text-2xl font-semibold tracking-tight leading-snug mb-3" style={{ color: DARK }}>
-          Entdecke, wie du arbeitest, Entscheidungen triffst, kommunizierst und auf andere wirkst.
+        <h1 className="text-2xl md:text-3xl font-semibold tracking-tight leading-snug mb-3" style={{ color: DARK }}>
+          Entdecke, wie du authentisch führst, arbeitest, Entscheidungen triffst und kommunizierst.
         </h1>
-        <p className="text-sm" style={{ color: MUTED }}>
-          Mit deiner persönlichen Human Design Business-Energie.
+        <p className="text-base leading-relaxed mb-6" style={{ color: BODY }}>
+          Deine Human Design Business-Energie zeigt dir präzise, was dich wirksam macht und was dich ausbremst.
         </p>
-      </div>
 
-      {/* ── Silke – Vertrauenssignal ── */}
-      <div className="mb-7 pb-5" style={{ borderBottom: `0.5px solid ${BORDER}` }}>
-        <p className="text-sm font-semibold" style={{ color: DARK }}>Konzipiert von Silke Stupperich</p>
-        <p className="text-xs mt-1 leading-relaxed" style={{ color: MUTED }}>
-          20 Jahre Kommunikation, Change & Transformation auf Top-Management-Ebene
-          {" · "}Human Design Readerin nach Codes of Life®
-        </p>
+        {/* ── Silke – Vertrauenssignal ── */}
+        <div className="pt-5 pb-6" style={{ borderTop: `0.5px solid ${BORDER}`, borderBottom: `0.5px solid ${BORDER}` }}>
+          <p className="text-sm font-semibold" style={{ color: DARK }}>Konzipiert von Silke Stupperich</p>
+          <p className="text-xs mt-1 leading-relaxed" style={{ color: MUTED }}>
+            20 Jahre Kommunikation, Change & Transformation auf Top-Management-Ebene · Human Design Readerin nach Codes of Life®
+          </p>
+        </div>
       </div>
 
       {/* ── Formular ── */}
