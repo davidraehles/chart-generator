@@ -39,7 +39,7 @@ function Icon({ name, size = 15, color = ACCENT }: { name: string; size?: number
     lightbulb:    <><path d="M15 14c.2-1 .7-1.7 1.5-2.5 1-.9 1.5-2.2 1.5-3.5A6 6 0 006 8c0 1.3.5 2.6 1.5 3.5.7.7 1.2 1.5 1.5 2.5"/><path d="M9 18h6"/><path d="M10 22h4"/></>,
     eye:          <><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></>,
     mic:          <><path d="M12 2a3 3 0 013 3v7a3 3 0 01-6 0V5a3 3 0 013-3z"/><path d="M19 10v2a7 7 0 01-14 0v-2"/><line x1="12" y1="19" x2="12" y2="22"/></>,
-    radio:        <><path d="M5 12.55a11 11 0 0114.08 0"/><path d="M1.42 9a16 16 0 0121.16 0"/><path d="M8.53 16.11a6 6 0 016.95 0"/><circle cx="12" cy="20" r="1" fill="currentColor"/></>,
+    radio:        <><rect x="2" y="8" width="20" height="13" rx="2"/><path d="M9 8V5l7-3"/><circle cx="7.5" cy="14.5" r="2"/><line x1="13" y1="11" x2="20" y2="11"/><line x1="13" y1="15" x2="20" y2="15"/></>,
     compass:      <><circle cx="12" cy="12" r="10"/><polygon points="16.24 7.76 14.12 14.12 7.76 16.24 9.88 9.88 16.24 7.76"/></>,
     heart:        <path d="M20.84 4.61a5.5 5.5 0 00-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 00-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 000-7.78z"/>,
     zap:          <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2" />,
@@ -80,7 +80,12 @@ const HD_CENTER_NAMES: Record<string, string> = {
 function isDefined(type: string) { return type === "defined" || type === "unconscious"; }
 
 function SectionLabel({ children }: { children: React.ReactNode }) {
-  return <p className="text-sm font-semibold uppercase tracking-widest mb-3" style={{ color: "#4A5568" }}>{children}</p>;
+  return (
+    <p className="inline-block text-xs font-semibold uppercase tracking-widest mb-3 px-2.5 py-1"
+      style={{ color: ACCENT, background: ACCENT_BG, borderRadius: "3px" }}>
+      {children}
+    </p>
+  );
 }
 
 // Zeile in Business-Basis
@@ -138,10 +143,10 @@ export default function ChartDisplay({
         </div>
         <div style={{ borderLeft: `3px solid ${ACCENT}`, paddingLeft: "16px", marginBottom: "20px" }}>
           <p className="text-xs uppercase tracking-widest mb-1.5" style={{ color: ACCENT }}>
-            Human Design · Business-Auswertung
+            Human Design · Business Energy Calculator
           </p>
           <h1 className="text-2xl md:text-3xl font-semibold tracking-tight" style={{ color: DARK }}>
-            Deine Human Design Business-Energie
+            Deine Business-Energie Auswertung
           </h1>
           <p className="text-sm mt-1" style={{ color: BODY }}>
             Wie du arbeitest, entscheidest und im Business wirkst.
@@ -162,7 +167,7 @@ export default function ChartDisplay({
       </div>
 
       {/* ── 2. BUSINESS-BASIS ── */}
-      <div>
+      <div className="-mx-4 md:-mx-8 px-4 md:px-8 py-6" style={{ background: "rgba(95,118,128,0.06)" }}>
         <SectionLabel>Deine Business-Basis</SectionLabel>
         <div style={{ border: `0.5px solid ${BORDER}` }}>
           {/* Intro */}
@@ -209,7 +214,7 @@ export default function ChartDisplay({
             />
 
             <BasisRow
-              icon="key" label="Entscheidungs-Autorität"
+              icon="key" label="Entscheidungs-Architektur"
               businessTitle="Wie du wichtige Entscheidungen triffst"
               containerClassName="basis-cell-br"
               valueContent={
@@ -285,19 +290,21 @@ export default function ChartDisplay({
 
         {/* Legende VOR den Zentren */}
         <div className="grid grid-cols-2 gap-3 mb-4">
-          <div className="p-4 rounded-xl" style={{ background: ACCENT_BG, border: `0.5px solid ${BORDER}` }}>
-            <div className="flex items-center gap-2 mb-1.5">
-              <Icon name="mic" size={13} color={ACCENT} />
+          <div className="p-4 rounded-xl" style={{ background: ACCENT_BG, border: `1.5px solid rgba(95,118,128,0.3)` }}>
+            <div className="flex items-center gap-1.5 mb-1.5">
+              <span style={{ width: 8, height: 8, borderRadius: "50%", background: ACCENT, flexShrink: 0 }} />
               <p className="text-xs font-semibold uppercase tracking-wider" style={{ color: ACCENT }}>Definiert</p>
+              <Icon name="mic" size={12} color={ACCENT} />
             </div>
             <p className="text-xs leading-relaxed" style={{ color: BODY }}>
               Konstante Energie, die dir verlässlich zur Verfügung steht und die du nach außen ausstrahlst. Stell es dir wie ein Mikrofon vor: Du sendest diese Energie in dein Umfeld.
             </p>
           </div>
-          <div className="p-4 rounded-xl" style={{ background: CARD, border: `0.5px solid ${BORDER}` }}>
-            <div className="flex items-center gap-2 mb-1.5">
-              <Icon name="radio" size={13} color={MUTED} />
+          <div className="p-4 rounded-xl" style={{ background: "#FFFFFF", border: `1.5px solid ${BORDER}` }}>
+            <div className="flex items-center gap-1.5 mb-1.5">
+              <span style={{ width: 8, height: 8, borderRadius: "50%", background: "#FFFFFF", border: `1.5px solid ${BORDER}`, flexShrink: 0 }} />
               <p className="text-xs font-semibold uppercase tracking-wider" style={{ color: MUTED }}>Offen</p>
+              <Icon name="radio" size={12} color={MUTED} />
             </div>
             <p className="text-xs leading-relaxed" style={{ color: BODY }}>
               Ein Bereich, in dem du besonders empfänglich für die Energie anderer bist. Das funktioniert wie ein Radio: Du empfängst, was in deinem Umfeld sendet, und verstärkst es häufig.
@@ -320,7 +327,7 @@ export default function ChartDisplay({
             return (
               <div key={center.code} className="rounded-xl overflow-hidden"
                 style={{
-                  border: `0.5px solid ${defined ? "rgba(95,118,128,0.25)" : BORDER}`,
+                  border: defined ? `0.5px solid rgba(95,118,128,0.25)` : `1.5px solid ${BORDER}`,
                   borderLeft: `3px solid ${defined ? ACCENT : "#D4CFC8"}`,
                   background: defined ? ACCENT_BG : "#FFFFFF",
                 }}>
@@ -337,6 +344,7 @@ export default function ChartDisplay({
                       <div className="flex items-center gap-1.5 flex-wrap">
                         <span className="inline-flex items-center gap-1 text-xs" style={{ color: MUTED }}>
                           {HD_CENTER_NAMES[center.code] ?? center.name}, bei dir{" "}
+                          <span style={{ width: 7, height: 7, borderRadius: "50%", background: defined ? ACCENT : "#FFFFFF", border: defined ? "none" : `1.5px solid ${BORDER}`, display: "inline-block", flexShrink: 0 }} />
                           <em>{defined ? "definiert" : "offen"}</em>
                           <Icon name={defined ? "mic" : "radio"} size={10} color={defined ? ACCENT : MUTED} />
                         </span>
