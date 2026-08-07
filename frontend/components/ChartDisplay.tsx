@@ -147,24 +147,24 @@ export default function ChartDisplay({
             Human Design · Business Energy Calculator
           </p>
           <h1 className="text-2xl md:text-3xl font-semibold tracking-tight" style={{ color: DARK }}>
-            Deine Business-Energie Auswertung
+            Deine Business-Energie, {data.firstName}
           </h1>
           <p className="text-sm mt-1" style={{ color: BODY }}>
             Wie du arbeitest, entscheidest und im Business wirkst.
           </p>
         </div>
-        <div className="px-5 py-4" style={{ background: CARD, border: `0.5px solid ${BORDER}` }}>
-          <p className="font-semibold text-base" style={{ color: DARK }}>
-            {data.firstName}{inputData?.lastName ? ` ${inputData.lastName}` : ""}
-          </p>
-          {inputData && (
-            <p className="text-sm mt-0.5" style={{ color: MUTED }}>
+        {inputData && (
+          <div className="px-5 py-4" style={{ background: CARD, border: `0.5px solid ${BORDER}` }}>
+            <p className="text-xs font-semibold uppercase tracking-wider mb-1" style={{ color: MUTED }}>
+              Deine Geburtsdaten
+            </p>
+            <p className="text-sm" style={{ color: MUTED }}>
               {inputData.birthDate}
               {inputData.birthTime && ` · ${inputData.birthTime} Uhr`}
               {inputData.birthPlace && ` · ${inputData.birthPlace}`}
             </p>
-          )}
-        </div>
+          </div>
+        )}
       </div>
 
       {/* ── 2. BUSINESS-BASIS ── */}
