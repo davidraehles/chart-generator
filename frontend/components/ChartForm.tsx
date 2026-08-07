@@ -205,30 +205,24 @@ export default function ChartForm({ onSuccess, onError, onRequest }: ChartFormPr
   return (
     <div>
       {/* ── Intro ── */}
-      <div className="mb-8" style={{ borderLeft: `3px solid ${ACCENT}`, paddingLeft: "16px" }}>
-        <p className="text-xs font-semibold uppercase tracking-widest mb-1.5" style={{ color: ACCENT }}>
+      <div className="mb-7" style={{ borderLeft: `3px solid ${ACCENT}`, paddingLeft: "16px" }}>
+        <p className="text-xs font-semibold uppercase tracking-widest mb-3" style={{ color: ACCENT }}>
           Human Design · Business-Auswertung
         </p>
-        <h1 className="text-2xl md:text-3xl font-semibold tracking-tight mb-2" style={{ color: DARK }}>
-          Deine Human Design Business-Energie
-        </h1>
-        <p className="text-sm leading-relaxed" style={{ color: BODY }}>
+        <h1 className="text-2xl font-semibold tracking-tight leading-snug mb-3" style={{ color: DARK }}>
           Entdecke, wie du arbeitest, Entscheidungen triffst, kommunizierst und auf andere wirkst.
-        </p>
-        <p className="text-sm mt-1" style={{ color: MUTED }}>
-          Gib deine Geburtsdaten ein und erhalte deinen persönlichen Human Design Business-Fokus.
+        </h1>
+        <p className="text-sm" style={{ color: MUTED }}>
+          Mit deiner persönlichen Human Design Business-Energie.
         </p>
       </div>
 
-      {/* ── Über Silke ── */}
-      <div className="my-6 py-4 text-center" style={{ borderTop: `0.5px solid ${BORDER}`, borderBottom: `0.5px solid ${BORDER}` }}>
-        <p className="text-xs font-semibold uppercase tracking-widest mb-1" style={{ color: ACCENT }}>
-          Entwickelt von
-        </p>
-        <p className="text-sm font-semibold" style={{ color: DARK }}>Silke Stupperich</p>
-        <p className="text-xs mt-1.5 leading-relaxed" style={{ color: MUTED }}>
-          20 Jahre Erfahrung in Kommunikation, Change und Transformation auf Top-Management-Ebene
-          · ausgebildete Human Design Readerin nach Codes of Life®
+      {/* ── Silke – Vertrauenssignal ── */}
+      <div className="mb-7 pb-5" style={{ borderBottom: `0.5px solid ${BORDER}` }}>
+        <p className="text-sm font-semibold" style={{ color: DARK }}>Entwickelt von Silke Stupperich</p>
+        <p className="text-xs mt-1 leading-relaxed" style={{ color: MUTED }}>
+          20 Jahre Kommunikation, Change & Transformation auf Top-Management-Ebene
+          {" · "}Human Design Readerin nach Codes of Life®
         </p>
       </div>
 
