@@ -98,7 +98,7 @@ function BasisRow({
 }) {
   return (
     <div className={`px-5 py-4 ${containerClassName}`}
-      style={{ borderBottom: last ? "none" : `0.5px solid ${DIVIDER}`, borderLeft: `3px solid ${ACCENT}` }}>
+      style={{ borderLeft: `3px solid ${ACCENT}` }}>
       <div className="inline-flex items-center gap-1.5 mb-2 px-2 py-0.5" style={{ background: `${ACCENT}18`, borderRadius: "3px" }}>
         <Icon name={icon} size={11} color={ACCENT} />
         <p className="text-xs uppercase tracking-wider font-semibold" style={{ color: ACCENT }}>{label}</p>

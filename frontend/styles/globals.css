@@ -32,10 +32,6 @@ body {
     display: grid;
     grid-template-columns: 1fr 1fr;
   }
-  .basis-grid .basis-cell-tr,
-  .basis-grid .basis-cell-br {
-    border-left: 0.5px solid #EFEFEF;
-  }
   .basis-grid .basis-cell-bl {
     border-bottom: none !important;
   }
