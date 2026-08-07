@@ -334,6 +334,11 @@ export default function ChartForm({ onSuccess, onError, onRequest }: ChartFormPr
         Deine Angaben werden ausschließlich zur Berechnung deiner persönlichen Human Design Business-Energie verwendet.
       </p>
 
+      {/* ── Rechtlicher Hinweis ── */}
+      <p className="mt-2 text-center text-xs" style={{ color: "#C4BEB8" }}>
+        Diese Auswertung basiert auf deinen Geburtsdaten und zeigt ausgewählte Human Design Elemente — ohne Bodygraph.
+      </p>
+
     </div>
   );
 }
