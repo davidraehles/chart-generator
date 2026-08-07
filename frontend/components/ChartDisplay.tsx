@@ -168,8 +168,9 @@ export default function ChartDisplay({
       </div>
 
       {/* ── 2. BUSINESS-BASIS ── */}
-      <div className="-mx-4 md:-mx-8 px-4 md:px-8 py-6" style={{ background: "rgba(95,118,128,0.06)" }}>
+      <div>
         <SectionLabel>Deine Business-Basis</SectionLabel>
+        <div className="-mx-4 md:-mx-8 px-4 md:px-8 py-6" style={{ background: "rgba(95,118,128,0.06)" }}>
         <div style={{ border: `0.5px solid ${BORDER}` }}>
           {/* Intro */}
           <div className="px-5 py-3" style={{ borderBottom: `0.5px solid ${DIVIDER}`, background: CARD }}>
@@ -181,7 +182,7 @@ export default function ChartDisplay({
           {/* 2×2 Raster auf Desktop, untereinander auf Mobile */}
           <div className="basis-grid">
             <BasisRow
-              icon="bolt" label="Deine Arbeitsenergie"
+              icon="bolt" label="Arbeitsenergie"
               businessTitle="Wie du am effektivsten arbeitest"
               containerClassName="basis-cell-tl"
               valueContent={
@@ -226,6 +227,7 @@ export default function ChartDisplay({
             />
           </div>
         </div>
+        </div>
       </div>
 
       {/* ── 3. ENTSCHEIDUNGS-ARCHITEKTUR CTA ── */}
@@ -251,7 +253,7 @@ export default function ChartDisplay({
           <p className="text-sm mb-4" style={{ color: BODY }}>
             Dein Energie-Kompass zeigt dir zwei typische Signale, an denen du erkennst, ob deine Arbeitsweise gerade wirklich zu dir passt.
           </p>
-          <div className="grid grid-cols-2 divide-x"
+          <div className="grid grid-cols-2"
             style={{ border: `0.5px solid ${BORDER}` }}>
             <div className="px-5 py-4" style={{ background: CARD }}>
               <div className="flex items-center gap-1.5 mb-2">
