@@ -365,33 +365,13 @@ export default function ChartDisplay({
         </div>
       </div>
 
-      {/* ── 6. CTA NACH ZENTREN ── */}
-      <div className="px-6 py-7 text-center" style={{ background: DARK }}>
-        <p className="text-lg font-semibold mb-2" style={{ color: "#F9F7F4" }}>
-          Du bist mehr als dein Energietyp.
-        </p>
-        <p className="text-sm mb-5 leading-relaxed" style={{ color: "#A8B4B6" }}>
-          Deine Zentren zeigen einzelne Facetten. Spannend wird es, wenn wir anschauen, wie deine Energie,
-          deine Entscheidungen, deine Kommunikation und deine Wirkung zusammenspielen.
-        </p>
-        <a href={CTA_READING_URL} target="_blank" rel="noopener noreferrer"
-          className="inline-flex items-center gap-2 text-sm font-medium px-5 py-2.5 transition-opacity hover:opacity-90"
-          style={{ background: ACCENT, color: "#fff" }}>
-          Mein Human Design Business Reading entdecken
-          <Icon name="arrowRight" size={14} color="#fff" />
-        </a>
-        <p className="text-xs mt-3" style={{ color: "#6B7A7C" }}>
-          Persönlich. Konkret. Auf deinen Business-Alltag übersetzt.
-        </p>
-      </div>
-
-      {/* ── 7. ABSCHLUSS ── */}
+      {/* ── 6. PDF HERUNTERLADEN ── */}
       <div className="px-5 py-5" style={{ background: CARD, border: `0.5px solid ${BORDER}` }}>
         <p className="text-sm font-semibold mb-1" style={{ color: DARK }}>
           Speichere deine Business-Energie
         </p>
         <p className="text-xs mb-4" style={{ color: MUTED }}>
-          Nimm deine Auswertung mit — als Erinnerung für deinen Alltag.
+          Nimm deine Auswertung mit - als Erinnerung für deinen Alltag.
         </p>
         <div className="flex flex-col sm:flex-row gap-3">
           <button onClick={handlePdfDownload}
@@ -408,14 +388,32 @@ export default function ChartDisplay({
           </button>
           */}
         </div>
-        {/* <p className="text-xs mt-3" style={{ color: MUTED }}>E-Mail-Versand folgt in Kürze.</p> */}
       </div>
 
-      {/* ── 8. TRIGGER-LETTERS ── */}
+      {/* ── 7. TRIGGER-LETTERS ── */}
       <EmailCaptureSection
         hdType={data.type.code}
         firstName={data.firstName}
       />
+
+      {/* ── 8. HUMAN DESIGN BUSINESS READING ── */}
+      <div className="px-6 py-8 text-center" style={{ background: DARK }}>
+        <p className="text-xs font-semibold uppercase tracking-widest mb-4" style={{ color: ACCENT }}>
+          Human Design Business Reading
+        </p>
+        <p className="text-lg font-semibold mb-3 leading-snug" style={{ color: "#F9F7F4" }}>
+          Jetzt kennst du die einzelnen Facetten. Im Reading schauen wir auf das Zusammenspiel.
+        </p>
+        <p className="text-sm mb-6 leading-relaxed" style={{ color: "#A8B4B6" }}>
+          Wie wirken deine Energie, deine Entscheidungen, deine Kommunikation und deine Führung zusammen?
+        </p>
+        <a href={CTA_READING_URL} target="_blank" rel="noopener noreferrer"
+          className="inline-flex items-center gap-2 text-sm font-medium px-5 py-2.5 transition-opacity hover:opacity-90"
+          style={{ background: ACCENT, color: "#fff" }}>
+          Mein Human Design Business Reading entdecken
+          <Icon name="arrowRight" size={14} color="#fff" />
+        </a>
+      </div>
 
       <p className="text-right text-xs" style={{ color: "#C4BEB8" }}>
         {data.calculationSource || "Swiss Ephemeris"}
