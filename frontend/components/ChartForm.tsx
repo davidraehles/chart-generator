@@ -327,6 +327,15 @@ export default function ChartForm({ onSuccess, onError, onRequest }: ChartFormPr
       <p className="mt-4 text-center text-xs" style={{ color: "#C4BEB8" }}>
         Deine Angaben werden ausschließlich zur Berechnung deiner persönlichen Human Design Business-Energie verwendet.
       </p>
+
+      {/* ── Über Silke ── */}
+      <div className="mt-8 pt-5 text-center" style={{ borderTop: `0.5px solid ${BORDER}` }}>
+        <p className="text-xs font-medium" style={{ color: MUTED }}>Entwickelt von Silke Stupperich</p>
+        <p className="text-xs mt-1.5 leading-relaxed" style={{ color: "#C4BEB8" }}>
+          20 Jahre Erfahrung in Kommunikation, Change und Transformation auf Top-Management-Ebene
+          und ausgebildete Human Design Readerin nach Codes of Life®
+        </p>
+      </div>
     </div>
   );
 }

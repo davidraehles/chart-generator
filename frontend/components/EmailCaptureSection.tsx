@@ -81,12 +81,10 @@ export default function EmailCaptureSection({ hdType, firstName }: EmailCaptureS
           Kostenlos · 6 Impulse über 12 Monate
         </p>
         <h3 className="text-base font-semibold mb-1" style={{ color: DARK }}>
-          Deine persönlichen Trigger-Letters
+          Trigger-Letter
         </h3>
         <p className="text-sm leading-relaxed" style={{ color: BODY }}>
-          {typeLabel
-            ? `Speziell für deinen Energietyp als ${typeLabel}: 6 Impulse, die dir zeigen, wie du deine Energie konkret im Alltag nutzt.`
-            : "6 Impulse zu deinem Energietyp — konkret, anwendbar, auf dich zugeschnitten."}
+          12 Monate, 6 persönliche Trigger, abgestimmt auf deine individuelle Business-Energie. Erhalte alle zwei Monate einen Impuls, der dich zum Reflektieren bringt, Aha-Momente auslöst und dir hilft, deine Business-Energie noch besser zu verstehen und im Führungsalltag bewusst einzusetzen.
         </p>
       </div>
 
@@ -109,7 +107,7 @@ export default function EmailCaptureSection({ hdType, firstName }: EmailCaptureS
           disabled={loading || !email}
           className="px-5 py-2.5 text-sm font-medium text-white whitespace-nowrap transition-opacity hover:opacity-90 disabled:opacity-50 disabled:cursor-not-allowed"
           style={{ background: ACCENT }}>
-          {loading ? "…" : "Trigger-Letters erhalten"}
+          {loading ? "…" : "Trigger-Letter kostenlos abonnieren"}
         </button>
       </form>
 

@@ -66,18 +66,18 @@ const CENTER_ICONS: Record<string, string> = {
 function isDefined(type: string) { return type === "defined" || type === "unconscious"; }
 
 function SectionLabel({ children }: { children: React.ReactNode }) {
-  return <p className="text-xs font-semibold uppercase tracking-widest mb-3" style={{ color: MUTED }}>{children}</p>;
+  return <p className="text-sm font-semibold uppercase tracking-widest mb-3" style={{ color: "#4A5568" }}>{children}</p>;
 }
 
 // Zeile in Business-Basis
 function BasisRow({
-  icon, label, businessTitle, valueContent, businessText, last = false,
+  icon, label, businessTitle, valueContent, businessText, last = false, containerClassName = "",
 }: {
   icon: string; label: string; businessTitle?: string;
-  valueContent: React.ReactNode; businessText?: string; last?: boolean;
+  valueContent: React.ReactNode; businessText?: string; last?: boolean; containerClassName?: string;
 }) {
   return (
-    <div className="px-5 py-4"
+    <div className={`px-5 py-4 ${containerClassName}`}
       style={{ borderBottom: last ? "none" : `0.5px solid ${DIVIDER}`, borderLeft: `3px solid ${ACCENT}` }}>
       <div className="flex items-center gap-1.5 mb-1.5">
         <Icon name={icon} size={12} color={MUTED} />
@@ -158,51 +158,58 @@ export default function ChartDisplay({
             </p>
           </div>
 
-          <BasisRow
-            icon="bolt" label="Deine Arbeitsenergie"
-            valueContent={
-              <div className="flex items-baseline gap-2 flex-wrap">
-                <span className="text-sm font-semibold" style={{ color: DARK }}>{data.type.label}</span>
-                {typeMeta && (
-                  <span className="text-xs font-medium px-2 py-0.5"
-                    style={{ background: `${ACCENT}18`, color: ACCENT }}>
-                    {typeMeta.merkmal}
-                  </span>
-                )}
-              </div>
-            }
-            businessText={typeMeta?.typeBusinessText}
-          />
+          {/* 2×2 Raster auf Desktop, untereinander auf Mobile */}
+          <div className="basis-grid">
+            <BasisRow
+              icon="bolt" label="Deine Arbeitsenergie"
+              containerClassName="basis-cell-tl"
+              valueContent={
+                <div className="flex items-baseline gap-2 flex-wrap">
+                  <span className="text-sm font-semibold" style={{ color: DARK }}>{data.type.label}</span>
+                  {typeMeta && (
+                    <span className="text-xs font-medium px-2 py-0.5"
+                      style={{ background: `${ACCENT}18`, color: ACCENT }}>
+                      {typeMeta.merkmal}
+                    </span>
+                  )}
+                </div>
+              }
+              businessText={typeMeta?.typeBusinessText}
+            />
 
-          <BasisRow
-            icon="target" label="Strategie"
-            businessTitle="Wie du Chancen & Aufgaben angehst"
-            valueContent={
-              <span className="text-sm font-semibold" style={{ color: DARK }}>
-                {typeMeta?.strategieLabel ?? typeMeta?.strategie ?? "–"}
-              </span>
-            }
-            businessText={typeMeta?.strategieBusinessText}
-          />
+            <BasisRow
+              icon="target" label="Strategie"
+              businessTitle="Wie du Chancen & Aufgaben angehst"
+              containerClassName="basis-cell-tr"
+              valueContent={
+                <span className="text-sm font-semibold" style={{ color: DARK }}>
+                  {typeMeta?.strategieLabel ?? typeMeta?.strategie ?? "–"}
+                </span>
+              }
+              businessText={typeMeta?.strategieBusinessText}
+            />
 
-          <BasisRow
-            icon="layers" label="Profil"
-            businessTitle="Wie du Einfluss nimmst"
-            valueContent={
-              <span className="text-sm font-semibold" style={{ color: DARK }}>{profileValue}</span>
-            }
-            businessText={profileMeta?.businessText}
-          />
+            <BasisRow
+              icon="layers" label="Profil"
+              businessTitle="Wie du Einfluss nimmst"
+              containerClassName="basis-cell-bl"
+              valueContent={
+                <span className="text-sm font-semibold" style={{ color: DARK }}>{profileValue}</span>
+              }
+              businessText={profileMeta?.businessText}
+            />
 
-          <BasisRow
-            icon="key" label="Entscheidungs-Autorität"
-            businessTitle="Wie du wichtige Entscheidungen triffst"
-            valueContent={
-              <span className="text-sm font-semibold" style={{ color: DARK }}>{authorityLabel}</span>
-            }
-            businessText={authorityBizText ?? undefined}
-            last
-          />
+            <BasisRow
+              icon="key" label="Entscheidungs-Autorität"
+              businessTitle="Wie du wichtige Entscheidungen triffst"
+              containerClassName="basis-cell-br"
+              valueContent={
+                <span className="text-sm font-semibold" style={{ color: DARK }}>{authorityLabel}</span>
+              }
+              businessText={authorityBizText ?? undefined}
+              last
+            />
+          </div>
         </div>
       </div>
 
@@ -227,7 +234,7 @@ export default function ChartDisplay({
         <div>
           <SectionLabel>Energie-Kompass</SectionLabel>
           <p className="text-sm mb-4" style={{ color: BODY }}>
-            Dein Energie-Kompass zeigt dir, woran du erkennst, ob du gerade im Einklang mit deiner natürlichen Energie handelst.
+            Dein Energie-Kompass zeigt dir zwei typische Signale, an denen du erkennst, ob deine Arbeitsweise gerade wirklich zu dir passt.
           </p>
           <div className="grid grid-cols-2 divide-x"
             style={{ border: `0.5px solid ${BORDER}` }}>
@@ -320,7 +327,7 @@ export default function ChartDisplay({
                       </span>
                       <div className="flex items-center gap-1.5 flex-wrap">
                         <span className="text-xs" style={{ color: MUTED }}>
-                          {center.name}, bei dir <em>{defined ? "definiert" : "offen"}</em>
+                          {ct?.businessTitle ?? center.name}, bei dir <em>{defined ? "definiert" : "offen"}</em>
                         </span>
                         {ct && (
                           <span className="text-xs" style={{ color: MUTED }}>· {ct.themen}</span>
@@ -373,13 +380,15 @@ export default function ChartDisplay({
             <Icon name="download" size={14} color={BODY} />
             PDF herunterladen
           </button>
+          {/* E-Mail-Versand vorübergehend ausgeblendet — wird später aktiviert
           <button disabled className="flex items-center justify-center gap-2 text-sm px-4 py-2.5 opacity-40 cursor-not-allowed"
             style={{ border: `0.5px solid ${BORDER}`, color: BODY }}>
             <Icon name="mail" size={14} color={BODY} />
             Ergebnis per E-Mail erhalten
           </button>
+          */}
         </div>
-        <p className="text-xs mt-3" style={{ color: MUTED }}>E-Mail-Versand folgt in Kürze.</p>
+        {/* <p className="text-xs mt-3" style={{ color: MUTED }}>E-Mail-Versand folgt in Kürze.</p> */}
       </div>
 
       {/* ── 8. TRIGGER-LETTERS ── */}

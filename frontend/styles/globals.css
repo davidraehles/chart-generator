@@ -26,6 +26,21 @@ body {
   color: var(--primary);
 }
 
+/* Business-Basis 2×2 Raster auf Desktop */
+@media (min-width: 768px) {
+  .basis-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+  }
+  .basis-grid .basis-cell-tr,
+  .basis-grid .basis-cell-br {
+    border-left: 0.5px solid #EFEFEF;
+  }
+  .basis-grid .basis-cell-bl {
+    border-bottom: none !important;
+  }
+}
+
 @media print {
   @page {
     margin: 2cm;
