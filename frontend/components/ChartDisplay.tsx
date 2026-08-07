@@ -1,5 +1,6 @@
 "use client";
 
+import { useEffect } from "react";
 import { ChartRequest, ChartResponse, Center } from "@/types/chart";
 import { LABELS } from "@/utils/constants";
 import {
@@ -126,6 +127,10 @@ export default function ChartDisplay({
   const authorityLabel   = getAuthorityLabel(data.authority.code);
   const authorityBizText = getAuthorityBusinessText(data.authority.code);
 
+  useEffect(() => {
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  }, []);
+
   function handlePdfDownload() {
     generateAndDownloadPdf(data, inputData);
   }
@@ -173,7 +178,7 @@ export default function ChartDisplay({
         <div className="-mx-4 md:-mx-8 px-4 md:px-8 py-6" style={{ background: "rgba(95,118,128,0.06)" }}>
         <div style={{ border: `0.5px solid ${BORDER}` }}>
           {/* Intro */}
-          <div className="px-5 py-3" style={{ borderBottom: `0.5px solid ${DIVIDER}`, background: CARD }}>
+          <div className="px-5 py-3" style={{ background: CARD }}>
             <p className="text-sm" style={{ color: BODY }}>
               Vier Aspekte deines Human Designs, die zeigen, wie du arbeitest, Chancen aufgreifst, Einfluss nimmst und Entscheidungen triffst.
             </p>
