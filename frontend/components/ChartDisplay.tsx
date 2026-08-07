@@ -227,18 +227,21 @@ export default function ChartDisplay({
         </div>
       </div>
 
-      {/* ── 3. AUTORITÄT – CTA ── */}
-      <div className="px-5 py-5" style={{ background: CARD, border: `0.5px solid ${BORDER}` }}>
-        <p className="text-sm font-medium mb-1" style={{ color: DARK }}>
-          Wie funktioniert deine Autorität im Alltag wirklich?
+      {/* ── 3. ENTSCHEIDUNGS-METHODE CTA ── */}
+      <div className="px-5 py-6" style={{ background: CARD, border: `0.5px solid ${BORDER}` }}>
+        <p className="text-base font-semibold mb-2 leading-snug" style={{ color: DARK }}>
+          Entscheide klar - auch wenn der Druck hoch ist.
         </p>
-        <p className="text-sm mb-4" style={{ color: BODY }}>
-          Finde heraus, woran du erkennst, ob eine Entscheidung wirklich richtig für dich ist.
+        <p className="text-sm mb-1 leading-relaxed" style={{ color: BODY }}>
+          Du arbeitest mit echten Situationen aus deinem Führungsalltag und verstehst, wie du Entscheidungen triffst, die wirklich zu dir passen.
+        </p>
+        <p className="text-sm mb-5 leading-relaxed" style={{ color: BODY }}>
+          Individuell abgestimmt auf deine Entscheidungs-Architektur. Selbstgesteuert, digital, in deiner Geschwindigkeit.
         </p>
         <a href={CTA_AUTORITAET_URL} target="_blank" rel="noopener noreferrer"
-          className="inline-flex items-center gap-2 text-sm font-medium px-4 py-2 transition-opacity hover:opacity-80"
+          className="inline-flex items-center gap-2 text-sm font-medium px-4 py-2.5 transition-opacity hover:opacity-80"
           style={{ background: ACCENT, color: "#fff" }}>
-          Zum Autoritäts-Check
+          Zur Entscheidungs-Methode
           <Icon name="arrowRight" size={14} color="#fff" />
         </a>
       </div>
