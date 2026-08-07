@@ -46,6 +46,7 @@ function Icon({ name, size = 15, color = ACCENT }: { name: string; size?: number
     shield:       <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>,
     activity:     <polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/>,
     anchor:       <><circle cx="12" cy="5" r="3"/><line x1="12" y1="22" x2="12" y2="8"/><path d="M5 12H2a10 10 0 0020 0h-3"/></>,
+    bubble:       <path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/>,
     download:     <><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></>,
     mail:         <><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></>,
     arrowRight:   <><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></>,
@@ -60,7 +61,7 @@ function Icon({ name, size = 15, color = ACCENT }: { name: string; size?: number
 }
 
 const CENTER_ICONS: Record<string, string> = {
-  head: "lightbulb", ajna: "eye", throat: "mic", g: "compass",
+  head: "lightbulb", ajna: "eye", throat: "bubble", g: "compass",
   heart: "heart", sacral: "zap", spleen: "shield", solar: "activity", root: "anchor",
 };
 
@@ -82,7 +83,7 @@ function isDefined(type: string) { return type === "defined" || type === "uncons
 function SectionLabel({ children }: { children: React.ReactNode }) {
   return (
     <p className="inline-block text-xs font-semibold uppercase tracking-widest mb-3 px-2.5 py-1"
-      style={{ color: ACCENT, background: ACCENT_BG, borderRadius: "3px" }}>
+      style={{ color: "#FFFFFF", background: "#3D465A", borderRadius: "3px" }}>
       {children}
     </p>
   );
