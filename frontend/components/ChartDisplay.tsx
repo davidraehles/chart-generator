@@ -93,9 +93,9 @@ function BasisRow({
   return (
     <div className={`px-5 py-4 ${containerClassName}`}
       style={{ borderBottom: last ? "none" : `0.5px solid ${DIVIDER}`, borderLeft: `3px solid ${ACCENT}` }}>
-      <div className="flex items-center gap-1.5 mb-1.5">
-        <Icon name={icon} size={12} color={MUTED} />
-        <p className="text-xs uppercase tracking-wider font-semibold" style={{ color: MUTED }}>{label}</p>
+      <div className="inline-flex items-center gap-1.5 mb-2 px-2 py-0.5" style={{ background: `${ACCENT}18`, borderRadius: "3px" }}>
+        <Icon name={icon} size={11} color={ACCENT} />
+        <p className="text-xs uppercase tracking-wider font-semibold" style={{ color: ACCENT }}>{label}</p>
       </div>
       {businessTitle && (
         <p className="text-xs font-semibold mb-2" style={{ color: ACCENT }}>{businessTitle}</p>
@@ -176,17 +176,12 @@ export default function ChartDisplay({
           <div className="basis-grid">
             <BasisRow
               icon="bolt" label="Deine Arbeitsenergie"
+              businessTitle="Wie du am effektivsten arbeitest"
               containerClassName="basis-cell-tl"
               valueContent={
-                <div className="flex items-baseline gap-2 flex-wrap">
-                  <span className="text-sm font-semibold" style={{ color: DARK }}>{data.type.label}</span>
-                  {typeMeta && (
-                    <span className="text-xs font-medium px-2 py-0.5"
-                      style={{ background: `${ACCENT}18`, color: ACCENT }}>
-                      {typeMeta.merkmal}
-                    </span>
-                  )}
-                </div>
+                <span className="text-sm font-semibold" style={{ color: DARK }}>
+                  {data.type.label}{typeMeta?.merkmal ? ` = ${typeMeta.merkmal}` : ""}
+                </span>
               }
               businessText={typeMeta?.typeBusinessText}
             />
