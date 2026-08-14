@@ -14,7 +14,7 @@ import { generateAndDownloadPdf } from "@/utils/generatePdf";
 import EmailCaptureSection from "@/components/EmailCaptureSection";
 
 // ── Konfigurierbare CTA-URLs ──────────────────────────────────────────────────
-const CTA_AUTORITAET_URL = "https://www.stupperich.de/challenge-page/kurs-entscheidungsarchitektur";
+const CTA_AUTORITAET_URL = "https://www.stupperich.de/challenge-page/praxistraining-emotionale-autorit%C3%A4t";
 const CTA_READING_URL    = "https://stupperich.de"; // TODO: Business-Reading URL
 
 // ── Design-Tokens ─────────────────────────────────────────────────────────────
