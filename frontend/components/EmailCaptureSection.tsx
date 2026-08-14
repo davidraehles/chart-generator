@@ -25,10 +25,11 @@ interface EmailCaptureSectionProps {
 }
 
 export default function EmailCaptureSection({ hdType, firstName }: EmailCaptureSectionProps) {
-  const [email, setEmail]     = useState("");
-  const [loading, setLoading] = useState(false);
-  const [success, setSuccess] = useState(false);
-  const [error, setError]     = useState("");
+  const [email, setEmail]       = useState("");
+  const [consent, setConsent]   = useState(false);
+  const [loading, setLoading]   = useState(false);
+  const [success, setSuccess]   = useState(false);
+  const [error, setError]       = useState("");
 
   const typeLabel = hdType ? TYPE_LABELS[hdType] : null;
 
@@ -39,6 +40,12 @@ export default function EmailCaptureSection({ hdType, firstName }: EmailCaptureS
 
     if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
       setError(ERROR_MESSAGES.invalidEmail);
+      setLoading(false);
+      return;
+    }
+
+    if (!consent) {
+      setError("Bitte stimme der Einwilligung zu.");
       setLoading(false);
       return;
     }
@@ -89,26 +96,50 @@ export default function EmailCaptureSection({ hdType, firstName }: EmailCaptureS
       </div>
 
       {/* Form */}
-      <form onSubmit={handleSubmit} className="flex gap-3 items-start">
-        <div className="flex-1">
-          <input
-            type="email"
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-            placeholder="deine@email.de"
-            disabled={loading}
-            className="w-full px-4 py-2.5 text-sm border focus:outline-none focus:ring-1 focus:ring-[#5F7680] transition-colors"
-            style={{ borderColor: error ? "#C0392B" : BORDER }}
-          />
-          {error && <p className="mt-1 text-xs" style={{ color: "#C0392B" }}>{error}</p>}
+      <form onSubmit={handleSubmit}>
+        <div className="flex gap-3 items-start mb-3">
+          <div className="flex-1">
+            <input
+              type="email"
+              value={email}
+              onChange={(e) => { setEmail(e.target.value); setError(""); }}
+              placeholder="deine@email.de"
+              disabled={loading}
+              className="w-full px-4 py-2.5 text-sm border focus:outline-none focus:ring-1 focus:ring-[#5F7680] transition-colors"
+              style={{ borderColor: error ? "#C0392B" : BORDER }}
+            />
+          </div>
+          <button
+            type="submit"
+            disabled={loading || !email || !consent}
+            className="px-5 py-2.5 text-sm font-medium text-white whitespace-nowrap transition-opacity hover:opacity-90 disabled:opacity-50 disabled:cursor-not-allowed"
+            style={{ background: ACCENT }}>
+            {loading ? "…" : "Trigger-Letter kostenlos abonnieren"}
+          </button>
         </div>
-        <button
-          type="submit"
-          disabled={loading || !email}
-          className="px-5 py-2.5 text-sm font-medium text-white whitespace-nowrap transition-opacity hover:opacity-90 disabled:opacity-50 disabled:cursor-not-allowed"
-          style={{ background: ACCENT }}>
-          {loading ? "…" : "Trigger-Letter kostenlos abonnieren"}
-        </button>
+
+        {/* Einwilligung */}
+        <label className="flex items-start gap-2 cursor-pointer select-none">
+          <input
+            type="checkbox"
+            checked={consent}
+            onChange={(e) => { setConsent(e.target.checked); setError(""); }}
+            className="mt-0.5 w-4 h-4 shrink-0"
+            style={{ accentColor: ACCENT }}
+          />
+          <span className="text-xs leading-relaxed" style={{ color: MUTED }}>
+            Ja, ich möchte 6 Trigger-Letter zu meiner Business-Energie erhalten — kostenlos, abgestimmt auf meinen Human Design Typ. Ich kann mich jederzeit abmelden.{" "}
+            <a
+              href="https://www.stupperich.de/datenschutz"
+              target="_blank"
+              rel="noopener noreferrer"
+              style={{ color: ACCENT, textDecoration: "underline" }}>
+              Datenschutz
+            </a>
+          </span>
+        </label>
+
+        {error && <p className="mt-2 text-xs" style={{ color: "#C0392B" }}>{error}</p>}
       </form>
 
       <p className="mt-3 text-xs" style={{ color: MUTED }}>
