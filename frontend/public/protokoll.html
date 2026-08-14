@@ -275,6 +275,18 @@
       cursor: pointer;
     }
     .btn-outline:hover { border-color: var(--sage); color: var(--sage); }
+    .btn-reset {
+      padding: 11px 16px;
+      background: none;
+      color: var(--muted);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      font: inherit;
+      font-size: 13px;
+      cursor: pointer;
+      margin-left: auto;
+    }
+    .btn-reset:hover { color: var(--red-fg); border-color: var(--red-fg); }
     .save-msg { font-size: 14px; font-weight: 700; color: #3A6B4A; }
 
     /* ── SHARE BOX ── */
@@ -480,6 +492,7 @@
   <div class="action-row">
     <button class="btn-sage" id="btn-save">Speichern</button>
     <button class="btn-outline" id="btn-print">Drucken / PDF</button>
+    <button class="btn-reset" id="btn-reset">Protokoll zurücksetzen</button>
     <span class="save-msg" id="save-msg"></span>
   </div>
 
@@ -701,18 +714,19 @@
         if (disp && disp.classList.contains('p-val')) disp.textContent = v;
       }
     });
-    // Emotion buttons
-    document.querySelectorAll('.emo-btn').forEach(btn => {
-      const { d, slot } = btn.dataset;
-      const v = getSlot(d, slot)['emotion'];
-      btn.classList.toggle('sel', btn.dataset.val === v);
-    });
-    // Direction buttons
-    document.querySelectorAll('.dir-btn').forEach(btn => {
-      const { d, slot } = btn.dataset;
-      const v = getSlot(d, slot)['direction'];
-      btn.classList.toggle('sel', btn.dataset.val === v);
-    });
+    // Emotion + Direction buttons: nur wiederherstellen wenn via Share-URL geladen
+    if (window._loadedFromHash) {
+      document.querySelectorAll('.emo-btn').forEach(btn => {
+        const { d, slot } = btn.dataset;
+        const v = getSlot(d, slot)['emotion'];
+        btn.classList.toggle('sel', btn.dataset.val === v);
+      });
+      document.querySelectorAll('.dir-btn').forEach(btn => {
+        const { d, slot } = btn.dataset;
+        const v = getSlot(d, slot)['direction'];
+        btn.classList.toggle('sel', btn.dataset.val === v);
+      });
+    }
     updateTabs();
   }
 
@@ -743,7 +757,7 @@
   function load() {
     let enc = null;
     const hash = window.location.hash;
-    if (hash.startsWith('#data=')) enc = hash.slice(6);
+    if (hash.startsWith('#data=')) { enc = hash.slice(6); window._loadedFromHash = true; }
     if (!enc) { try { enc = localStorage.getItem(STORE); } catch(e) {} }
     if (enc) { try { state = decode(enc); } catch(e) {} }
     applyAll();
@@ -797,6 +811,12 @@
 
   document.getElementById('btn-save').addEventListener('click', () => save(true));
   document.getElementById('btn-print').addEventListener('click', () => { save(false); window.print(); });
+
+  document.getElementById('btn-reset').addEventListener('click', () => {
+    if (!confirm('Protokoll wirklich zurücksetzen? Alle eingetragenen Daten werden gelöscht.')) return;
+    try { localStorage.removeItem(STORE); } catch(e) {}
+    window.location.href = window.location.pathname;
+  });
 
   document.getElementById('q-input').addEventListener('input', debouncedSave);
 
