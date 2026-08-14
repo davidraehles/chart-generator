@@ -219,7 +219,7 @@ export default function ChartForm({ onSuccess, onError, onRequest }: ChartFormPr
 
         {/* ── Silke – Vertrauenssignal ── */}
         <div className="pt-4" style={{ borderTop: `0.5px solid rgba(95,118,128,0.2)` }}>
-          <p className="text-sm font-semibold" style={{ color: DARK }}>Konzipiert von Silke Stupperich</p>
+          <p className="text-sm font-semibold" style={{ color: DARK }}>Human Design für den Businessalltag übersetzt von Silke Stupperich</p>
           <p className="text-xs mt-1 leading-relaxed" style={{ color: MUTED }}>
             20 Jahre Kommunikation, Change & Transformation auf Top-Management-Ebene<br />
             Human Design Readerin nach Codes of Life®
