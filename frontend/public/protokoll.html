@@ -456,10 +456,11 @@
 
 <section class="intro-box">
   <div class="inner">
-    <div class="intro-greeting">Herzlich willkommen.</div>
-    <p>Schön, dass du dir diese Zeit nimmst. Dieses Protokoll begleitet dich durch sieben Tage bewusster Selbstbeobachtung — morgens und abends je ein kurzer Eintrag. Es ist für Menschen gedacht, die ihre Emotionale Autorität besser verstehen möchten: nicht theoretisch, sondern im Alltag, in einer echten Entscheidung.</p>
-    <p>Der Befund am Ende zeigt dir, ob sich in deinen Einträgen eine wiederkehrende Richtung abzeichnet. <strong>Es ist kein Orakel.</strong> Es macht keinen Anspruch darauf, was die richtige Entscheidung für dich ist — das kann dieses Tool nicht wissen, und das will es auch gar nicht. Die Entscheidung liegt immer bei dir.</p>
-    <div class="intro-note">Dieses Tool ersetzt keine Beratung und gibt keine Lebensempfehlungen. Es schafft Raum, um die eigene innere Dynamik klarer zu sehen — mehr nicht.</div>
+    <div class="intro-greeting">Toll, dass du dir Zeit nimmst, um deine Entscheidungsarchitektur besser zu verstehen.</div>
+    <p>Dieses Protokoll begleitet dich durch 7 Tage bewusster Selbstbeobachtung. Morgens und abends je ein kurzer Eintrag. Es ist für Menschen gedacht, die ihre Emotionale Autorität besser verstehen möchten: nicht theoretisch, sondern im Alltag, in einer echten Entscheidung.</p>
+    <p>Der Befund am Ende zeigt dir, ob sich in deinen Einträgen eine wiederkehrende Richtung abzeichnet. <strong>Es ist kein Orakel. Es erhebt keinen Anspruch darauf, was die richtige Entscheidung für dich ist!</strong></p>
+    <p>Das kann weder dieses Tool noch ein anderes Tool wissen, und das ist auch gar nicht der Sinn.</p>
+    <p>Die Entscheidung liegt immer bei dir.</p>
   </div>
 </section>
 
@@ -471,7 +472,7 @@
 
   <div class="setup-card">
     <div class="card-label">Deine Ausgangsfrage</div>
-    <textarea class="q-input" id="q-input" placeholder="Welche Entscheidung beobachtest du in diesen 7 Tagen?"></textarea>
+    <textarea class="q-input" id="q-input" placeholder="Schreibe hier … (welche Entscheidung du in diesen 7 Tagen beobachtest)"></textarea>
   </div>
 
   <div id="entries"></div>
@@ -586,9 +587,9 @@
     body.appendChild(el('div', 'f-rule'));
     body.appendChild(buildPressureField(d, slot));
     body.appendChild(el('div', 'f-rule'));
-    body.appendChild(buildTextField(d, slot, 'body_sense', '4 · Körperliche Wahrnehmung', 'Schultern, Atem, Bauch, Kehle … (ein paar Worte)'));
+    body.appendChild(buildTextField(d, slot, 'body_sense', '4 · Körperliche Wahrnehmung', 'Schreibe hier … (was du körperlich wahrnimmst – Schultern, Atem, Bauch, Kehle …)'));
     body.appendChild(el('div', 'f-rule'));
-    body.appendChild(buildTextField(d, slot, 'new_info', '5 · Neue Information, Folge oder Bedingung', 'Was ist heute neu aufgetaucht?'));
+    body.appendChild(buildTextField(d, slot, 'new_info', '5 · Neue Information, Folge oder Bedingung', 'Schreibe hier … (was heute neu aufgetaucht ist)'));
     card.appendChild(body);
     return card;
   }
@@ -642,7 +643,7 @@
     pw.appendChild(display);
     pw.appendChild(el('span', 'p-lim', '10'));
     g.appendChild(pw);
-    const src = buildTA(d, slot, 'pressure_src', 'Woher kommt der Druck? (ein Satz genügt)');
+    const src = buildTA(d, slot, 'pressure_src', 'Schreibe hier … (woher der Druck kommt)');
     g.appendChild(src);
     return g;
   }
