@@ -867,7 +867,7 @@
       ['Wesentliche Bedingung', b.condition || '—'],
     ].map(([lbl, val]) => `<div class="befund-row"><div class="br-lbl">${lbl}</div><div class="br-val">${val}</div></div>`).join('');
     const nextStep = b.readiness === 'entscheidungsreif'
-      ? `Deine Emotionale Autorität hat gesprochen. Du kannst diese Entscheidung jetzt kommunizieren — ohne weiteres Abwarten.`
+      ? `Deine Einträge zeigen eine deutlich wiederkehrende Richtung. Prüfe jetzt, ob dieser Befund deinem eigenen Entscheidungsstand entspricht.`
       : b.readiness === 'tendenz'
       ? `Beobachte noch 2–3 Tage weiter${b.stillOpen ? `, besonders: ${b.stillOpen}` : ''}.`
       : `Fülle das Protokoll weitere Tage aus. ${b.stillOpen ? `Offene Frage: ${b.stillOpen}` : 'Neue Informationen können die Richtung klären.'}`;
