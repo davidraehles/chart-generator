@@ -339,6 +339,63 @@
       .day-tab { font-size: 11px; padding: 10px 2px; }
     }
 
+    /* ── ENTSCHEIDUNGSBEFUND ── */
+    .befund-section {
+      margin-top: 28px;
+      background: #fff;
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      overflow: hidden;
+    }
+    .befund-hd {
+      display: flex; align-items: flex-start; justify-content: space-between; gap: 16px;
+      padding: 20px 24px 16px;
+      border-bottom: 1px solid var(--border);
+    }
+    .befund-hd h2 { font-size: 17px; font-weight: 700; color: var(--stone); }
+    .befund-hd-sub { font-size: 12px; color: var(--muted); margin-top: 2px; letter-spacing: .3px; }
+    .btn-befund-calc {
+      flex-shrink: 0;
+      background: var(--sage); color: #fff;
+      border: none; border-radius: 6px;
+      padding: 8px 16px; font-size: 13px; font-weight: 600;
+      cursor: pointer; transition: background .15s;
+    }
+    .btn-befund-calc:hover { background: var(--sage-dark); }
+    .befund-body { padding: 20px 24px; }
+    .befund-placeholder { color: var(--muted); font-size: 14px; }
+    .befund-badge {
+      display: inline-block;
+      padding: 5px 14px; border-radius: 20px;
+      font-size: 13px; font-weight: 700; letter-spacing: .4px;
+      margin-bottom: 14px;
+    }
+    .badge-reif  { background: #DFF0E8; color: #2D5040; }
+    .badge-tendenz { background: #FFF3D6; color: #6B4F10; }
+    .badge-offen { background: #F3EBEB; color: #5C2D2D; }
+    .befund-lead { font-size: 15px; margin-bottom: 18px; line-height: 1.5; }
+    .befund-rows { display: grid; grid-template-columns: 1fr 1fr; gap: 10px 20px; margin-bottom: 18px; }
+    @media (max-width: 560px) { .befund-rows { grid-template-columns: 1fr; } }
+    .befund-row { }
+    .br-lbl { font-size: 11px; letter-spacing: 1.5px; text-transform: uppercase; color: var(--muted); margin-bottom: 3px; }
+    .br-val { font-size: 14px; font-weight: 600; color: var(--stone); }
+    .dir-pips { display: flex; gap: 5px; flex-wrap: wrap; margin-top: 6px; margin-bottom: 14px; }
+    .pip {
+      width: 20px; height: 20px; border-radius: 50%;
+      font-size: 9px; display: flex; align-items: center; justify-content: center;
+      font-weight: 700; color: #fff;
+    }
+    .pip-ja     { background: #4A7C5E; }
+    .pip-nein   { background: #8B4A4A; }
+    .pip-noch   { background: var(--gold); }
+    .pip-leer   { background: transparent; border: 1.5px solid var(--border); }
+    .befund-next {
+      background: #EDF2F4; border-radius: 8px;
+      padding: 14px 16px;
+    }
+    .befund-next-lbl { font-size: 11px; letter-spacing: 1.5px; text-transform: uppercase; color: var(--muted); margin-bottom: 5px; }
+    .befund-next-val { font-size: 14px; font-weight: 600; color: var(--stone); }
+
     /* ── PRINT ── */
     @media print {
       .day-bar, .action-row, .share-box, .day-nav button { display: none !important; }
@@ -381,6 +438,19 @@
     <button class="btn-sage" id="btn-save">Speichern</button>
     <button class="btn-outline" id="btn-print">Drucken / PDF</button>
     <span class="save-msg" id="save-msg"></span>
+  </div>
+
+  <div class="befund-section" id="befund-section">
+    <div class="befund-hd">
+      <div>
+        <h2>Dein Entscheidungsbefund</h2>
+        <div class="befund-hd-sub">nach 7 Tagen Emotionaler Autorität</div>
+      </div>
+      <button class="btn-befund-calc" id="btn-befund">Befund berechnen</button>
+    </div>
+    <div class="befund-body" id="befund-body">
+      <p class="befund-placeholder">Fülle mindestens 4 Tage aus, um deinen Befund zu berechnen.</p>
+    </div>
   </div>
 
   <div class="share-box">
@@ -701,6 +771,126 @@
     const url = encodeURIComponent(document.getElementById('share-url').value);
     window.location.href = `mailto:?subject=Mein%207-Tage-Entscheidungsprotokoll&body=Hier%20ist%20mein%20pers%C3%B6nlicher%20Link%3A%0A%0A${url}`;
   });
+
+
+  /* ── ENTSCHEIDUNGSBEFUND ── */
+  function computeBefund() {
+    collectAll();
+    const points = [];
+    for (let d = 1; d <= 7; d++) {
+      for (const sl of ['morning','evening']) {
+        const s = ((state.days[d] || {})[sl]) || {};
+        if (s.direction) {
+          points.push({
+            day: d, slot: sl,
+            direction: s.direction,
+            emotion: s.emotion !== undefined ? parseFloat(s.emotion) : null,
+            new_info: (s.new_info || '').trim(),
+            pressure_src: (s.pressure_src || '').trim(),
+            body_sense: (s.body_sense || '').trim(),
+          });
+        }
+      }
+    }
+    const counts = { 'Ja': 0, 'Nein': 0, 'Noch nicht': 0 };
+    points.forEach(p => { if (counts[p.direction] !== undefined) counts[p.direction]++; });
+    const total = points.length;
+    let dominant = null;
+    if (counts['Ja'] > counts['Nein'] && counts['Ja'] > counts['Noch nicht']) dominant = 'Ja';
+    else if (counts['Nein'] > counts['Ja'] && counts['Nein'] > counts['Noch nicht']) dominant = 'Nein';
+    const domPoints = dominant ? points.filter(p => p.direction === dominant) : [];
+    const domEmotions = domPoints.map(p => p.emotion).filter(e => e !== null);
+    const minEmo = domEmotions.length ? Math.min(...domEmotions) : null;
+    const maxEmo = domEmotions.length ? Math.max(...domEmotions) : null;
+    let wendepunkt = null, lastOther = null;
+    if (dominant) {
+      for (const p of points) { if (p.direction !== dominant) lastOther = p; }
+      if (lastOther) {
+        const idx = points.indexOf(lastOther);
+        for (let i = idx + 1; i < points.length; i++) {
+          if (points[i].direction === dominant) { wendepunkt = points[i]; break; }
+        }
+      }
+      if (!wendepunkt && domPoints.length) wendepunkt = domPoints[0];
+    }
+    let keyPerspective = '';
+    if (wendepunkt) keyPerspective = wendepunkt.new_info || wendepunkt.body_sense || '';
+    const nochNichtPts = points.filter(p => p.direction === 'Noch nicht');
+    let condition = '';
+    for (let i = nochNichtPts.length - 1; i >= 0; i--) {
+      const c = nochNichtPts[i].new_info || nochNichtPts[i].pressure_src;
+      if (c) { condition = c; break; }
+    }
+    const recentNonDom = points.filter(p => p.day >= 6 && p.direction !== dominant);
+    let stillOpen = '';
+    for (const p of recentNonDom) { if (p.new_info) { stillOpen = p.new_info; break; } }
+    const consistency = total > 0 && dominant ? counts[dominant] / total : 0;
+    const survivedLow = minEmo !== null && minEmo <= 0;
+    const daysWithDom = dominant ? [...new Set(domPoints.map(p => p.day))].length : 0;
+    let readiness;
+    if (dominant && consistency >= 0.57 && survivedLow && daysWithDom >= 4) readiness = 'entscheidungsreif';
+    else if (dominant && (consistency >= 0.38 || daysWithDom >= 3)) readiness = 'tendenz';
+    else readiness = 'offen';
+    return { points, counts, total, dominant, readiness, consistency, daysWithDom, minEmo, maxEmo, wendepunkt, keyPerspective, condition, stillOpen };
+  }
+
+  function renderBefund(b) {
+    const body = document.getElementById('befund-body');
+    if (b.total < 4) {
+      body.innerHTML = '<p class="befund-placeholder">Fülle mindestens 4 Tage aus, um deinen Befund zu berechnen.</p>';
+      return;
+    }
+    const badgeClass = b.readiness === 'entscheidungsreif' ? 'badge-reif' : b.readiness === 'tendenz' ? 'badge-tendenz' : 'badge-offen';
+    const badgeLabel = b.readiness === 'entscheidungsreif' ? '✓ Entscheidungsreif' : b.readiness === 'tendenz' ? '→ Tendenz erkennbar' : '○ Noch offen';
+    const leadText = b.readiness === 'entscheidungsreif'
+      ? `Nach ${b.total} Einträgen über ${b.daysWithDom} Tage zeigt sich ein klares <strong>${b.dominant}</strong> — und diese Richtung hat auch emotionale Tiefs überlebt.`
+      : b.readiness === 'tendenz'
+      ? `Eine Richtung zeichnet sich ab: <strong>${b.dominant || 'unklar'}</strong>. Die Entscheidung ist noch nicht vollständig gereift.`
+      : 'Deine Einträge zeigen noch keine klare Richtung. Mehr Zeit oder neue Perspektiven können Klarheit bringen.';
+    const pips = [];
+    for (let d = 1; d <= 7; d++) {
+      for (const sl of ['morning','evening']) {
+        const p = b.points.find(x => x.day === d && x.slot === sl);
+        if (!p) { pips.push('<span class="pip pip-leer" title="—"></span>'); continue; }
+        const cls = p.direction === 'Ja' ? 'pip-ja' : p.direction === 'Nein' ? 'pip-nein' : 'pip-noch';
+        const lbl = p.direction === 'Ja' ? 'J' : p.direction === 'Nein' ? 'N' : '?';
+        pips.push(`<span class="pip ${cls}" title="Tag ${d} ${sl === 'morning' ? 'Morgen' : 'Abend'}: ${p.direction}">${lbl}</span>`);
+      }
+    }
+    const emoStr = b.minEmo !== null ? `${b.minEmo >= 0 ? '+' : ''}${b.minEmo} bis +${b.maxEmo}` : '—';
+    const rows = [
+      ['Derzeitige Richtung', b.dominant ? `<strong>${b.dominant}</strong>` : '—'],
+      ['Konsistenz', b.dominant ? `${Math.round(b.consistency * 100)} % der Einträge` : '—'],
+      ['Emotionale Bandbreite', emoStr],
+      ['Erster stabiler Impuls', b.wendepunkt ? `Tag ${b.wendepunkt.day}, ${b.wendepunkt.slot === 'morning' ? 'Morgen' : 'Abend'}` : '—'],
+      ['Entscheidende Perspektive', b.keyPerspective || '—'],
+      ['Wesentliche Bedingung', b.condition || '—'],
+    ].map(([lbl, val]) => `<div class="befund-row"><div class="br-lbl">${lbl}</div><div class="br-val">${val}</div></div>`).join('');
+    const nextStep = b.readiness === 'entscheidungsreif'
+      ? `Deine Emotionale Autorität hat gesprochen. Du kannst diese Entscheidung jetzt kommunizieren — ohne weiteres Abwarten.`
+      : b.readiness === 'tendenz'
+      ? `Beobachte noch 2–3 Tage weiter${b.stillOpen ? `, besonders: ${b.stillOpen}` : ''}.`
+      : `Fülle das Protokoll weitere Tage aus. ${b.stillOpen ? `Offene Frage: ${b.stillOpen}` : 'Neue Informationen können die Richtung klären.'}`;
+    body.innerHTML = `
+      <div class="befund-badge ${badgeClass}">${badgeLabel}</div>
+      <div class="befund-lead">${leadText}</div>
+      <div class="dir-pips">${pips.join('')}</div>
+      <div class="befund-rows">${rows}</div>
+      <div class="befund-next">
+        <div class="befund-next-lbl">Dein nächster Schritt</div>
+        <div class="befund-next-val">${nextStep}</div>
+      </div>`;
+  }
+
+  document.getElementById('btn-befund').addEventListener('click', () => {
+    save(false);
+    renderBefund(computeBefund());
+  });
+
+  setTimeout(() => {
+    const b = computeBefund();
+    if (b.total >= 6) renderBefund(b);
+  }, 200);
 
 })();
 </script>
