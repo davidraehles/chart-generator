@@ -68,11 +68,11 @@ export default function EmailCaptureSection({ hdType, firstName }: EmailCaptureS
   if (success) {
     return (
       <div className="mt-6 px-5 py-5"
-        style={{ borderLeft: `3px solid ${ACCENT}`, background: "#F0F4F5" }}>
+        style={{ background: DARK, border: "1px solid rgba(255,255,255,0.08)", borderLeft: `3px solid ${ACCENT}` }}>
         <p className="text-sm font-semibold mb-1" style={{ color: ACCENT }}>
           Du bist dabei.
         </p>
-        <p className="text-sm leading-relaxed" style={{ color: BODY }}>
+        <p className="text-sm leading-relaxed" style={{ color: "#A8B4B6" }}>
           Dein erster Business Energy Trigger ist auf dem Weg zu dir.
           {typeLabel ? ` Speziell für deinen Typ als ${typeLabel}.` : ""}
         </p>
@@ -81,16 +81,16 @@ export default function EmailCaptureSection({ hdType, firstName }: EmailCaptureS
   }
 
   return (
-    <div className="mt-6" style={{ background: "#EEF2F3", border: `1px solid ${BORDER}`, padding: "24px" }}>
+    <div className="mt-6" style={{ background: DARK, border: "1px solid rgba(255,255,255,0.08)", padding: "24px" }}>
       {/* Headline */}
       <div className="mb-4" style={{ borderLeft: `3px solid ${ACCENT}`, paddingLeft: "14px" }}>
         <p className="text-xs font-semibold uppercase tracking-widest mb-1" style={{ color: ACCENT }}>
           Kostenlos · 6 Impulse über 6 Monate
         </p>
-        <h3 className="text-base font-semibold mb-1" style={{ color: DARK }}>
+        <h3 className="text-base font-semibold mb-1" style={{ color: "#F9F7F4" }}>
           Business Energy Trigger
         </h3>
-        <p className="text-sm leading-relaxed" style={{ color: BODY }}>
+        <p className="text-sm leading-relaxed" style={{ color: "#A8B4B6" }}>
           6 Monate, 6 persönliche Business Energy Trigger, abgestimmt auf deinen Human Design Typ. Jeden Monat ein Impuls, der dich zum Reflektieren bringt, Aha-Momente auslöst und dir hilft, deine Business-Energie bewusster einzusetzen. Kein Newsletter. 6 Mails. Danach Schluss.
         </p>
       </div>
@@ -106,7 +106,7 @@ export default function EmailCaptureSection({ hdType, firstName }: EmailCaptureS
               placeholder="deine@email.de"
               disabled={loading}
               className="w-full px-4 py-2.5 text-sm border focus:outline-none focus:ring-1 focus:ring-[#5F7680] transition-colors"
-              style={{ borderColor: error ? "#C0392B" : BORDER }}
+              style={{ borderColor: error ? "#C0392B" : "rgba(255,255,255,0.2)", background: "#FFFFFF", color: "#1A2126" }}
             />
           </div>
           <button
@@ -127,7 +127,7 @@ export default function EmailCaptureSection({ hdType, firstName }: EmailCaptureS
             className="mt-0.5 w-4 h-4 shrink-0"
             style={{ accentColor: ACCENT }}
           />
-          <span className="text-xs leading-relaxed" style={{ color: MUTED }}>
+          <span className="text-xs leading-relaxed" style={{ color: "#A8B4B6" }}>
             Ja, ich möchte 6 Business Energy Trigger zu meiner Business-Energie erhalten — kostenlos, abgestimmt auf meinen Human Design Typ. Ich kann mich jederzeit abmelden.{" "}
             <a
               href="https://www.stupperich.de/datenschutz"
@@ -142,7 +142,7 @@ export default function EmailCaptureSection({ hdType, firstName }: EmailCaptureS
         {error && <p className="mt-2 text-xs" style={{ color: "#C0392B" }}>{error}</p>}
       </form>
 
-      <p className="mt-3 text-xs" style={{ color: MUTED }}>
+      <p className="mt-3 text-xs" style={{ color: "#6B7280" }}>
         Kein Spam. Kein Newsletter. Nur 6 Mails. Danach Schluss.
       </p>
     </div>

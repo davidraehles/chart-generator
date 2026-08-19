@@ -395,14 +395,14 @@ export default function ChartDisplay({
       />
 
       {/* ── 8. HUMAN DESIGN BUSINESS READING ── */}
-      <div className="px-6 py-8 text-center" style={{ background: DARK }}>
+      <div className="px-6 py-8 text-center" style={{ background: "#EEF2F3", border: `1px solid ${BORDER}` }}>
         <p className="text-xs font-semibold uppercase tracking-widest mb-4" style={{ color: ACCENT }}>
           Human Design Business Reading
         </p>
-        <p className="text-lg font-semibold mb-3 leading-snug" style={{ color: "#F9F7F4" }}>
+        <p className="text-lg font-semibold mb-3 leading-snug" style={{ color: DARK }}>
           Jetzt kennst du die einzelnen Facetten. Im Reading schauen wir auf das Zusammenspiel.
         </p>
-        <p className="text-sm mb-6 leading-relaxed" style={{ color: "#A8B4B6" }}>
+        <p className="text-sm mb-6 leading-relaxed" style={{ color: BODY }}>
           Wie wirken deine Energie, deine Entscheidungen, deine Kommunikation und deine Führung zusammen?
         </p>
         <a href={CTA_READING_URL} target="_blank" rel="noopener noreferrer"
