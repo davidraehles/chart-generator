@@ -81,7 +81,7 @@ export default function EmailCaptureSection({ hdType, firstName }: EmailCaptureS
   }
 
   return (
-    <div className="mt-6" style={{ borderTop: `0.5px solid ${BORDER}`, paddingTop: "24px" }}>
+    <div className="mt-6" style={{ background: "#EEF2F3", border: `1px solid ${BORDER}`, padding: "24px" }}>
       {/* Headline */}
       <div className="mb-4" style={{ borderLeft: `3px solid ${ACCENT}`, paddingLeft: "14px" }}>
         <p className="text-xs font-semibold uppercase tracking-widest mb-1" style={{ color: ACCENT }}>
@@ -143,7 +143,7 @@ export default function EmailCaptureSection({ hdType, firstName }: EmailCaptureS
       </form>
 
       <p className="mt-3 text-xs" style={{ color: MUTED }}>
-        Kein Spam. Kein Newsletter. Nur 6 Mails, dann ist es vorbei.
+        Kein Spam. Kein Newsletter. Nur 6 Mails. Danach Schluss.
       </p>
     </div>
   );
