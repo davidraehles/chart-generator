@@ -73,7 +73,7 @@ export default function EmailCaptureSection({ hdType, firstName }: EmailCaptureS
           Du bist dabei.
         </p>
         <p className="text-sm leading-relaxed" style={{ color: BODY }}>
-          Dein erster Trigger-Letter ist auf dem Weg zu dir.
+          Dein erster Business Energy Trigger ist auf dem Weg zu dir.
           {typeLabel ? ` Speziell für deinen Typ als ${typeLabel}.` : ""}
         </p>
       </div>
@@ -85,13 +85,13 @@ export default function EmailCaptureSection({ hdType, firstName }: EmailCaptureS
       {/* Headline */}
       <div className="mb-4" style={{ borderLeft: `3px solid ${ACCENT}`, paddingLeft: "14px" }}>
         <p className="text-xs font-semibold uppercase tracking-widest mb-1" style={{ color: ACCENT }}>
-          Kostenlos · 6 Impulse über 12 Monate
+          Kostenlos · 6 Impulse über 6 Monate
         </p>
         <h3 className="text-base font-semibold mb-1" style={{ color: DARK }}>
-          Trigger-Letter
+          Business Energy Trigger
         </h3>
         <p className="text-sm leading-relaxed" style={{ color: BODY }}>
-          12 Monate, 6 persönliche Trigger, abgestimmt auf deine individuelle Business-Energie. Erhalte alle zwei Monate einen Impuls, der dich zum Reflektieren bringt, Aha-Momente auslöst und dir hilft, deine Business-Energie noch besser zu verstehen und im Führungsalltag bewusst einzusetzen.
+          6 Monate, 6 persönliche Business Energy Trigger, abgestimmt auf deinen Human Design Typ. Jeden Monat ein Impuls, der dich zum Reflektieren bringt, Aha-Momente auslöst und dir hilft, deine Business-Energie bewusster einzusetzen. Kein Newsletter. 6 Mails. Danach Schluss.
         </p>
       </div>
 
@@ -114,7 +114,7 @@ export default function EmailCaptureSection({ hdType, firstName }: EmailCaptureS
             disabled={loading || !email || !consent}
             className="px-5 py-2.5 text-sm font-medium text-white whitespace-nowrap transition-opacity hover:opacity-90 disabled:opacity-50 disabled:cursor-not-allowed"
             style={{ background: ACCENT }}>
-            {loading ? "…" : "Trigger-Letter kostenlos abonnieren"}
+            {loading ? "…" : "Business Energy Trigger kostenlos anfordern"}
           </button>
         </div>
 
@@ -128,7 +128,7 @@ export default function EmailCaptureSection({ hdType, firstName }: EmailCaptureS
             style={{ accentColor: ACCENT }}
           />
           <span className="text-xs leading-relaxed" style={{ color: MUTED }}>
-            Ja, ich möchte 6 Trigger-Letter zu meiner Business-Energie erhalten — kostenlos, abgestimmt auf meinen Human Design Typ. Ich kann mich jederzeit abmelden.{" "}
+            Ja, ich möchte 6 Business Energy Trigger zu meiner Business-Energie erhalten — kostenlos, abgestimmt auf meinen Human Design Typ. Ich kann mich jederzeit abmelden.{" "}
             <a
               href="https://www.stupperich.de/datenschutz"
               target="_blank"
