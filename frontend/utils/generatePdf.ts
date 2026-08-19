@@ -1,242 +1,495 @@
 import { ChartRequest, ChartResponse } from "@/types/chart";
 import {
   getTypeMetadata,
-  getProfileLabel,
+  getProfileMetadata,
   getAuthorityLabel,
   getAuthorityBusinessText,
   getCenterTexts,
 } from "@/utils/hdTypeMapping";
 
-const ACCENT = "#5F7680";
-const WARM   = "#B8956A";
-
 function isDef(type: string) { return type === "defined" || type === "unconscious"; }
+
+// Inline SVG icons (same as ChartDisplay)
+const ICONS: Record<string, string> = {
+  bolt:       `<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#5F7680" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>`,
+  target:     `<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#5F7680" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="6"/><circle cx="12" cy="12" r="2"/></svg>`,
+  layers:     `<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#5F7680" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5"/><path d="M2 12l10 5 10-5"/></svg>`,
+  key:        `<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#5F7680" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><circle cx="7.5" cy="15.5" r="5.5"/><path d="M21 2l-9.6 9.6"/><path d="M15.5 7.5l3 3L22 7l-3-3"/></svg>`,
+  up:         `<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#5F7680" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><polyline points="22 7 13.5 15.5 8.5 10.5 2 17"/><polyline points="16 7 22 7 22 13"/></svg>`,
+  down:       `<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#B8956A" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><polyline points="22 17 13.5 8.5 8.5 13.5 2 7"/><polyline points="16 17 22 17 22 11"/></svg>`,
+  mic:        `<svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="#5F7680" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2a3 3 0 013 3v7a3 3 0 01-6 0V5a3 3 0 013-3z"/><path d="M19 10v2a7 7 0 01-14 0v-2"/><line x1="12" y1="19" x2="12" y2="22"/></svg>`,
+  radio:      `<svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="#9CA3AF" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="8" width="20" height="13" rx="2"/><path d="M9 8V5l7-3"/><circle cx="7.5" cy="14.5" r="2"/><line x1="13" y1="11" x2="20" y2="11"/><line x1="13" y1="15" x2="20" y2="15"/></svg>`,
+  lightbulb:  `<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M15 14c.2-1 .7-1.7 1.5-2.5 1-.9 1.5-2.2 1.5-3.5A6 6 0 006 8c0 1.3.5 2.6 1.5 3.5.7.7 1.2 1.5 1.5 2.5"/><path d="M9 18h6"/><path d="M10 22h4"/></svg>`,
+  eye:        `<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>`,
+  bubble:     `<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/></svg>`,
+  compass:    `<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polygon points="16.24 7.76 14.12 14.12 7.76 16.24 9.88 9.88 16.24 7.76"/></svg>`,
+  heart:      `<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M20.84 4.61a5.5 5.5 0 00-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 00-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 000-7.78z"/></svg>`,
+  zap:        `<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>`,
+  shield:     `<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>`,
+  activity:   `<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>`,
+  anchor:     `<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="5" r="3"/><line x1="12" y1="22" x2="12" y2="8"/><path d="M5 12H2a10 10 0 0020 0h-3"/></svg>`,
+};
+
+const CENTER_ICONS: Record<string, string> = {
+  head: "lightbulb", ajna: "eye", throat: "bubble", g: "compass",
+  heart: "heart", sacral: "zap", spleen: "shield", solar: "activity", root: "anchor",
+};
+
+const HD_CENTER_NAMES: Record<string, string> = {
+  head: "Inspirations-Zentrum", ajna: "Verstandes-Zentrum", throat: "Kehl-Zentrum",
+  g: "Selbst-Zentrum", heart: "Herz/Ego-Zentrum", sacral: "Sakral-Zentrum",
+  spleen: "Milz-Zentrum", solar: "Emotions-Zentrum", root: "Wurzel-Zentrum",
+};
 
 export function generateAndDownloadPdf(
   data: ChartResponse,
   inputData: ChartRequest | null
 ) {
-  const typeMeta        = getTypeMetadata(data.type.code);
-  const profileLabel    = getProfileLabel(data.profile.code);
-  const profileValue    = profileLabel ? `${data.profile.code} – ${profileLabel}` : data.profile.code;
-  const authorityLabel  = getAuthorityLabel(data.authority.code);
-  const authorityBiz    = getAuthorityBusinessText(data.authority.code) ?? "";
+  const typeMeta       = getTypeMetadata(data.type.code);
+  const profileMeta    = getProfileMetadata(data.profile.code);
+  const profileValue   = profileMeta ? `${data.profile.code} – ${profileMeta.label}` : data.profile.code;
+  const authorityLabel = getAuthorityLabel(data.authority.code);
+  const authorityBiz   = getAuthorityBusinessText(data.authority.code) ?? "";
 
-  // ── Zentren HTML ──────────────────────────────────────────────────────────
-  const centersHtml = data.centers.map((center) => {
-    const defType = center.definitionType ?? (center.defined ? "defined" : "open");
-    const defined = isDef(defType);
-    const ct      = getCenterTexts(center.code);
-    const desc    = ct ? (defined ? ct.defined : ct.open) : "";
-
-    return `
-      <div class="center-card ${defined ? "defined" : "open"}">
-        <div class="center-header">
-          <span class="center-title">${ct?.businessTitle ?? center.name}</span>
-          <span class="center-sub">${center.name}, bei dir <em>${defined ? "definiert" : "offen"}</em></span>
-        </div>
-        ${ct ? `<div class="center-themen">${ct.themen}</div>` : ""}
-        ${desc ? `<div class="center-desc">${desc}</div>` : ""}
-      </div>`;
-  }).join("");
-
-  // ── Persönliche Daten ─────────────────────────────────────────────────────
   const birthLine = inputData
     ? [inputData.birthDate, inputData.birthTime ? `${inputData.birthTime} Uhr` : "", inputData.birthPlace]
         .filter(Boolean).join(" · ")
     : "";
 
-  // ── Vollständiges HTML ────────────────────────────────────────────────────
+  // ── Zentren ────────────────────────────────────────────────────────────────
+  const centersHtml = data.centers.map((center) => {
+    const defType = center.definitionType ?? (center.defined ? "defined" : "open");
+    const defined = isDef(defType);
+    const ct      = getCenterTexts(center.code);
+    const desc    = ct ? (defined ? ct.defined : ct.open) : "";
+    const iconKey = CENTER_ICONS[center.code] ?? "target";
+    const icon    = (ICONS[iconKey] ?? "").replace("currentColor", defined ? "#5F7680" : "#9CA3AF");
+
+    return `
+      <div class="center-row ${defined ? "defined" : "open"}">
+        <div class="center-icon">${icon}</div>
+        <div class="center-body">
+          <div class="center-top">
+            <span class="center-title">${ct?.businessTitle ?? center.name}</span>
+            <span class="center-badge ${defined ? "badge-def" : "badge-open"}">${defined ? "definiert" : "offen"} ${defined ? ICONS.mic : ICONS.radio}</span>
+          </div>
+          <div class="center-meta">${HD_CENTER_NAMES[center.code] ?? center.name}${ct ? ` · ${ct.themen}` : ""}</div>
+          ${desc ? `<div class="center-desc">${desc}</div>` : ""}
+        </div>
+      </div>`;
+  }).join("");
+
   const html = `<!DOCTYPE html>
 <html lang="de">
 <head>
   <meta charset="UTF-8">
   <title>Human Design Business-Energie – ${data.firstName}</title>
   <style>
-    * { box-sizing: border-box; margin: 0; padding: 0; }
-    @page {
-      size: A4;
-      margin: 16mm 18mm 16mm 18mm;
-    }
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    @page { size: A4; margin: 0; }
+
     body {
-      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Arial, sans-serif;
-      font-size: 10pt;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Helvetica Neue", Arial, sans-serif;
+      font-size: 9.5pt;
       color: #1A2126;
       background: #fff;
-      line-height: 1.5;
+      line-height: 1.55;
     }
 
-    /* ── Header ── */
-    .header { margin-bottom: 20px; padding-bottom: 14px; border-bottom: 1.5px solid ${ACCENT}; }
-    .header-label { font-size: 7.5pt; text-transform: uppercase; letter-spacing: 0.12em; color: ${ACCENT}; margin-bottom: 4px; }
-    .header-title { font-size: 17pt; font-weight: 700; color: #1A2126; margin-bottom: 4px; letter-spacing: -0.02em; }
-    .header-sub { font-size: 9pt; color: #374151; margin-bottom: 10px; }
-    .person-name { font-size: 12pt; font-weight: 600; color: #1A2126; }
-    .person-birth { font-size: 8.5pt; color: #6B7280; margin-top: 2px; }
+    /* ── COVER ──────────────────────────────────────────────────────────────── */
+    .cover {
+      background: #1A2126;
+      padding: 24mm 18mm 20mm;
+      position: relative;
+    }
+    .cover-accent-bar {
+      position: absolute;
+      top: 0; left: 0; right: 0;
+      height: 3px;
+      background: #5F7680;
+    }
+    .cover-eyebrow {
+      font-size: 7pt;
+      text-transform: uppercase;
+      letter-spacing: 0.18em;
+      color: #5F7680;
+      font-weight: 600;
+      margin-bottom: 14px;
+    }
+    .cover-name {
+      font-size: 30pt;
+      font-weight: 700;
+      color: #F9F7F4;
+      letter-spacing: -0.03em;
+      line-height: 1.1;
+      margin-bottom: 10px;
+    }
+    .cover-sub {
+      font-size: 10pt;
+      color: #A8B4B6;
+      line-height: 1.5;
+      margin-bottom: 22px;
+      max-width: 360px;
+    }
+    .cover-divider {
+      width: 40px;
+      height: 1px;
+      background: #5F7680;
+      margin-bottom: 14px;
+    }
+    .cover-birth {
+      font-size: 8pt;
+      color: #6B7C80;
+    }
 
-    /* ── Section ── */
-    .section { margin-bottom: 18px; }
-    .section-label { font-size: 7pt; text-transform: uppercase; letter-spacing: 0.12em; color: #6B7280; font-weight: 600; margin-bottom: 8px; }
-    .section-title { font-size: 11pt; font-weight: 600; color: #1A2126; margin-bottom: 4px; }
-    .section-intro { font-size: 9pt; color: #374151; margin-bottom: 10px; line-height: 1.55; }
+    /* ── BODY ───────────────────────────────────────────────────────────────── */
+    .body { padding: 12mm 18mm 12mm; }
 
-    /* ── Business Basis ── */
-    .basis-card { border: 0.5px solid #E8E3DC; page-break-inside: avoid; }
-    .basis-intro { background: #F9F7F4; padding: 8px 12px; border-bottom: 0.5px solid #EFEFEF; font-size: 8.5pt; color: #374151; }
-    .basis-row { display: flex; gap: 10px; padding: 9px 12px; border-bottom: 0.5px solid #EFEFEF; border-left: 3px solid ${ACCENT}; }
+    /* ── SECTION ────────────────────────────────────────────────────────────── */
+    .section { margin-bottom: 20px; }
+    .section-head {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin-bottom: 12px;
+      border-bottom: 1px solid #EFEFEF;
+      padding-bottom: 6px;
+    }
+    .section-chip {
+      font-size: 6.5pt;
+      text-transform: uppercase;
+      letter-spacing: 0.13em;
+      font-weight: 700;
+      color: #fff;
+      background: #5F7680;
+      padding: 2px 7px;
+      flex-shrink: 0;
+    }
+    .section-title {
+      font-size: 10pt;
+      font-weight: 600;
+      color: #374151;
+    }
+
+    /* ── BASIS ROWS ─────────────────────────────────────────────────────────── */
+    .basis-row {
+      display: flex;
+      gap: 12px;
+      align-items: flex-start;
+      padding: 11px 0 11px 14px;
+      border-left: 2px solid #5F7680;
+      border-bottom: 0.5px solid #F3F4F6;
+    }
     .basis-row:last-child { border-bottom: none; }
-    .basis-label-wrap { min-width: 0; }
-    .basis-label { font-size: 7pt; text-transform: uppercase; letter-spacing: 0.1em; color: #6B7280; font-weight: 600; }
-    .basis-sublabel { font-size: 7.5pt; color: #6B7280; font-style: italic; margin-bottom: 3px; }
-    .basis-value { font-size: 9.5pt; font-weight: 600; color: #1A2126; }
-    .basis-value-text { font-size: 9pt; color: #1A2126; }
-    .merkmal { display: inline-block; font-size: 7.5pt; font-weight: 600; color: ${ACCENT}; background: rgba(95,118,128,0.12); padding: 1px 7px; margin-left: 6px; }
-    .auth-text { font-size: 8.5pt; color: #374151; margin-top: 3px; line-height: 1.5; }
+    .basis-icon { margin-top: 1px; flex-shrink: 0; }
+    .basis-content { flex: 1; min-width: 0; }
+    .basis-label {
+      font-size: 6.5pt;
+      text-transform: uppercase;
+      letter-spacing: 0.13em;
+      font-weight: 700;
+      color: #5F7680;
+      margin-bottom: 1px;
+    }
+    .basis-sub {
+      font-size: 7.5pt;
+      color: #9CA3AF;
+      margin-bottom: 4px;
+    }
+    .basis-value {
+      font-size: 10.5pt;
+      font-weight: 700;
+      color: #1A2126;
+      margin-bottom: 5px;
+      line-height: 1.3;
+    }
+    .basis-text {
+      font-size: 8.5pt;
+      color: #374151;
+      line-height: 1.6;
+    }
 
-    /* ── Kompass ── */
-    .kompass-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 0; border: 0.5px solid #E8E3DC; }
-    .kompass-cell { padding: 10px 12px; background: #F9F7F4; }
-    .kompass-cell:first-child { border-right: 0.5px solid #E8E3DC; }
-    .kompass-cell-label { font-size: 7pt; text-transform: uppercase; letter-spacing: 0.1em; color: #6B7280; font-weight: 600; margin-bottom: 4px; }
-    .kompass-value { font-size: 11pt; font-weight: 700; margin-bottom: 3px; }
-    .kompass-desc { font-size: 8pt; color: #374151; }
-    .color-accent { color: ${ACCENT}; }
-    .color-warm   { color: ${WARM}; }
+    /* ── KOMPASS ────────────────────────────────────────────────────────────── */
+    .kompass-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+    }
+    .kompass-cell {
+      padding: 12px 14px;
+      border: 0.5px solid #E8E3DC;
+    }
+    .kompass-top {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      margin-bottom: 6px;
+    }
+    .kompass-label {
+      font-size: 6.5pt;
+      text-transform: uppercase;
+      letter-spacing: 0.13em;
+      font-weight: 700;
+      color: #6B7280;
+    }
+    .kompass-value {
+      font-size: 14pt;
+      font-weight: 700;
+      margin-bottom: 4px;
+      line-height: 1.2;
+    }
+    .kompass-desc { font-size: 8pt; color: #374151; line-height: 1.5; }
+    .color-accent { color: #5F7680; }
+    .color-warm   { color: #B8956A; }
 
-    /* ── Zentren ── */
-    .zentren-legend { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 10px; }
-    .legend-cell { padding: 8px 10px; border: 0.5px solid #E8E3DC; font-size: 8pt; }
-    .legend-cell.def { background: rgba(95,118,128,0.09); }
-    .legend-label { font-size: 7pt; text-transform: uppercase; letter-spacing: 0.1em; font-weight: 600; margin-bottom: 3px; }
-    .legend-note { font-size: 7.5pt; color: #374151; font-style: italic; margin-bottom: 8px; }
+    /* ── ZENTREN ────────────────────────────────────────────────────────────── */
+    .legend-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 8px;
+      margin-bottom: 8px;
+    }
+    .legend-cell {
+      display: flex;
+      align-items: flex-start;
+      gap: 7px;
+      font-size: 8pt;
+      color: #374151;
+      padding: 8px 10px;
+      border: 0.5px solid #E8E3DC;
+    }
+    .legend-cell.def { background: rgba(95,118,128,0.06); }
+    .legend-label {
+      font-size: 6.5pt;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      font-weight: 700;
+      display: block;
+      margin-bottom: 2px;
+    }
+    .legend-note {
+      font-size: 7.5pt;
+      color: #9CA3AF;
+      font-style: italic;
+      margin-bottom: 10px;
+    }
 
-    .center-card { padding: 9px 12px; border: 0.5px solid #E8E3DC; border-left: 3px solid #D4CFC8; margin-bottom: 5px; page-break-inside: avoid; }
-    .center-card.defined { background: rgba(95,118,128,0.09); border-left-color: ${ACCENT}; border-color: rgba(95,118,128,0.25); }
-    .center-header { display: flex; align-items: baseline; gap: 8px; flex-wrap: wrap; margin-bottom: 2px; }
-    .center-title { font-size: 9.5pt; font-weight: 600; color: #1A2126; }
-    .center-card:not(.defined) .center-title { color: #4A5568; }
-    .center-sub { font-size: 8pt; color: #6B7280; }
-    .center-themen { font-size: 7.5pt; color: #6B7280; margin-bottom: 4px; }
-    .center-desc { font-size: 8.5pt; color: #374151; line-height: 1.5; }
+    .center-row {
+      display: flex;
+      gap: 10px;
+      align-items: flex-start;
+      padding: 9px 12px 9px 0;
+      border-bottom: 0.5px solid #F3F4F6;
+      page-break-inside: avoid;
+    }
+    .center-row:last-child { border-bottom: none; }
+    .center-icon { flex-shrink: 0; margin-top: 2px; width: 20px; text-align: center; }
+    .center-body { flex: 1; min-width: 0; }
+    .center-top {
+      display: flex;
+      align-items: center;
+      gap: 7px;
+      margin-bottom: 2px;
+      flex-wrap: wrap;
+    }
+    .center-title {
+      font-size: 9.5pt;
+      font-weight: 600;
+      color: #1A2126;
+    }
+    .center-row.open .center-title { color: #4A5568; }
+    .center-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 3px;
+      font-size: 6.5pt;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      font-weight: 700;
+      padding: 1px 5px;
+    }
+    .badge-def { background: rgba(95,118,128,0.12); color: #5F7680; }
+    .badge-open { background: #F3F4F6; color: #6B7280; }
+    .center-meta { font-size: 7.5pt; color: #9CA3AF; margin-bottom: 3px; }
+    .center-desc { font-size: 8.5pt; color: #374151; line-height: 1.55; }
 
-    /* ── CTA Box ── */
-    .cta-box { background: #1A2126; color: #F9F7F4; padding: 14px 16px; margin-top: 18px; text-align: center; page-break-inside: avoid; }
-    .cta-title { font-size: 11pt; font-weight: 600; margin-bottom: 5px; }
-    .cta-text { font-size: 8.5pt; color: #A8B4B6; margin-bottom: 8px; line-height: 1.5; }
-    .cta-url { font-size: 8pt; color: ${ACCENT}; }
+    /* ── CTA ────────────────────────────────────────────────────────────────── */
+    .cta-box {
+      margin-top: 18px;
+      padding: 15px 16px;
+      border: 0.5px solid #E8E3DC;
+      border-left: 3px solid #5F7680;
+      page-break-inside: avoid;
+    }
+    .cta-eyebrow {
+      font-size: 6.5pt;
+      text-transform: uppercase;
+      letter-spacing: 0.14em;
+      font-weight: 700;
+      color: #5F7680;
+      margin-bottom: 4px;
+    }
+    .cta-title {
+      font-size: 10pt;
+      font-weight: 700;
+      color: #1A2126;
+      margin-bottom: 4px;
+      line-height: 1.35;
+    }
+    .cta-text {
+      font-size: 8.5pt;
+      color: #374151;
+      line-height: 1.55;
+      margin-bottom: 6px;
+    }
+    .cta-url { font-size: 8pt; color: #5F7680; font-weight: 600; }
 
-    /* ── Footer ── */
-    .footer { margin-top: 16px; padding-top: 8px; border-top: 0.5px solid #E8E3DC; display: flex; justify-content: space-between; }
-    .footer-text { font-size: 7.5pt; color: #C4BEB8; }
+    /* ── FOOTER ─────────────────────────────────────────────────────────────── */
+    .footer {
+      margin-top: 14px;
+      padding-top: 7px;
+      border-top: 0.5px solid #EFEFEF;
+      display: flex;
+      justify-content: space-between;
+    }
+    .footer-text { font-size: 7pt; color: #C4BEB8; }
+
+    @media print {
+      body, .cover { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+    }
   </style>
 </head>
 <body>
 
-  <!-- Header -->
-  <div class="header">
-    <div class="header-label">Human Design · Business-Auswertung</div>
-    <div class="header-title">Deine Human Design Business-Energie</div>
-    <div class="header-sub">Wie du arbeitest, entscheidest und im Business wirkst.</div>
-    <div class="person-name">${data.firstName}${inputData?.lastName ? ` ${inputData.lastName}` : ""}</div>
-    ${birthLine ? `<div class="person-birth">${birthLine}</div>` : ""}
+  <!-- COVER -->
+  <div class="cover">
+    <div class="cover-accent-bar"></div>
+    <div class="cover-eyebrow">Human Design · Business Energy Calculator</div>
+    <div class="cover-name">${data.firstName}${inputData?.lastName ? `<br>${inputData.lastName}` : ""}</div>
+    <div class="cover-sub">Deine Business-Energie, Entscheidungs-Architektur und Wirkung auf einen Blick.</div>
+    <div class="cover-divider"></div>
+    ${birthLine ? `<div class="cover-birth">${birthLine}</div>` : ""}
   </div>
 
-  <!-- Business-Basis -->
-  <div class="section">
-    <div class="section-label">Deine Business-Basis</div>
-    <div class="basis-card">
-      <div class="basis-intro">Die Basis ist deine energetische Bauweise.</div>
+  <div class="body">
+
+    <!-- Business-Basis -->
+    <div class="section">
+      <div class="section-head">
+        <span class="section-chip">Business-Basis</span>
+        <span class="section-title">Deine energetische Grundstruktur</span>
+      </div>
 
       <div class="basis-row">
-        <div class="basis-label-wrap">
-          <div class="basis-label">Energietyp</div>
-          <div class="basis-sublabel">Deine Grundenergie, deine Bedienungsanleitung</div>
-          <div class="basis-value">
-            ${data.type.label}
-            ${typeMeta ? `<span class="merkmal">${typeMeta.merkmal}</span>` : ""}
+        <div class="basis-icon">${ICONS.bolt}</div>
+        <div class="basis-content">
+          <div class="basis-label">Arbeitsenergie</div>
+          <div class="basis-sub">Wie du am effektivsten arbeitest</div>
+          <div class="basis-value">${data.type.label}${typeMeta ? ` — ${typeMeta.merkmal}` : ""}</div>
+          ${typeMeta?.typeBusinessText ? `<div class="basis-text">${typeMeta.typeBusinessText}</div>` : ""}
+        </div>
+      </div>
+
+      <div class="basis-row">
+        <div class="basis-icon">${ICONS.target}</div>
+        <div class="basis-content">
+          <div class="basis-label">Strategie</div>
+          <div class="basis-sub">Wie du Chancen &amp; Aufgaben angehst</div>
+          <div class="basis-value">${typeMeta?.strategieLabel ?? typeMeta?.strategie ?? ""}</div>
+          ${typeMeta?.strategieBusinessText ? `<div class="basis-text">${typeMeta.strategieBusinessText}</div>` : ""}
+        </div>
+      </div>
+
+      <div class="basis-row">
+        <div class="basis-icon">${ICONS.layers}</div>
+        <div class="basis-content">
+          <div class="basis-label">Profil</div>
+          <div class="basis-sub">Wie du Einfluss nimmst</div>
+          <div class="basis-value">${profileValue}</div>
+          ${profileMeta?.businessText ? `<div class="basis-text">${profileMeta.businessText}</div>` : ""}
+        </div>
+      </div>
+
+      <div class="basis-row">
+        <div class="basis-icon">${ICONS.key}</div>
+        <div class="basis-content">
+          <div class="basis-label">Entscheidungs-Architektur</div>
+          <div class="basis-sub">Wie du wichtige Entscheidungen triffst</div>
+          <div class="basis-value">${authorityLabel}</div>
+          ${authorityBiz ? `<div class="basis-text">${authorityBiz}</div>` : ""}
+        </div>
+      </div>
+    </div>
+
+    <!-- Energie-Kompass -->
+    ${typeMeta ? `
+    <div class="section">
+      <div class="section-head">
+        <span class="section-chip">Energie-Kompass</span>
+        <span class="section-title">Deine zwei Signale</span>
+      </div>
+      <div class="kompass-grid">
+        <div class="kompass-cell">
+          <div class="kompass-top">
+            ${ICONS.up}
+            <span class="kompass-label">In deiner Energie</span>
+          </div>
+          <div class="kompass-value color-accent">${typeMeta.higherSelf}</div>
+          <div class="kompass-desc">Dein inneres Zeichen, dass du auf dem richtigen Weg bist.</div>
+        </div>
+        <div class="kompass-cell">
+          <div class="kompass-top">
+            ${ICONS.down}
+            <span class="kompass-label">Dein Warnsignal</span>
+          </div>
+          <div class="kompass-value color-warm">${typeMeta.notSelf}</div>
+          <div class="kompass-desc">Dein Hinweis, wann du dich von deiner natürlichen Energie entfernst.</div>
+        </div>
+      </div>
+    </div>
+    ` : ""}
+
+    <!-- Zentren -->
+    <div class="section">
+      <div class="section-head">
+        <span class="section-chip">9 Energiezentren</span>
+        <span class="section-title">Wie du im Business wirkst</span>
+      </div>
+
+      <div class="legend-row">
+        <div class="legend-cell def">
+          <div>
+            <span class="legend-label" style="color:#5F7680">${ICONS.mic} Definiert</span>
+            Konstante Energie, die du dauerhaft trägst und ausstrahlst.
+          </div>
+        </div>
+        <div class="legend-cell">
+          <div>
+            <span class="legend-label" style="color:#6B7280">${ICONS.radio} Offen</span>
+            Empfangsbereich — du nimmst die Energie anderer hier besonders auf.
           </div>
         </div>
       </div>
+      <div class="legend-note">Es gibt kein besser oder schlechter, nur anders.</div>
 
-      <div class="basis-row">
-        <div class="basis-label-wrap">
-          <div class="basis-label">Strategie</div>
-          <div class="basis-sublabel">Dein Leitfaden</div>
-          <div class="basis-value-text">${typeMeta?.strategie ?? ""}</div>
-        </div>
-      </div>
-
-      <div class="basis-row">
-        <div class="basis-label-wrap">
-          <div class="basis-label">Profil</div>
-          <div class="basis-sublabel">Deine Wesenszüge</div>
-          <div class="basis-value-text">${profileValue}</div>
-        </div>
-      </div>
-
-      <div class="basis-row">
-        <div class="basis-label-wrap">
-          <div class="basis-label">Entscheidungs-Autorität</div>
-          <div class="basis-sublabel">Wie du Entscheidungen triffst, wenn du deinen Kopf ausschaltest</div>
-          <div class="basis-value">${authorityLabel}</div>
-          ${authorityBiz ? `<div class="auth-text">${authorityBiz}</div>` : ""}
-        </div>
-      </div>
+      ${centersHtml}
     </div>
-  </div>
 
-  <!-- Energie-Kompass -->
-  ${typeMeta ? `
-  <div class="section">
-    <div class="section-label">Energie-Kompass</div>
-    <div class="section-intro">Dein Energie-Kompass zeigt dir, woran du erkennst, ob du gerade im Einklang mit deiner natürlichen Energie handelst.</div>
-    <div class="kompass-grid">
-      <div class="kompass-cell">
-        <div class="kompass-cell-label">In deiner Energie</div>
-        <div class="kompass-value color-accent">${typeMeta.higherSelf}</div>
-        <div class="kompass-desc">Dein inneres Zeichen, dass du auf dem richtigen Weg bist.</div>
-      </div>
-      <div class="kompass-cell">
-        <div class="kompass-cell-label">Dein Warnsignal</div>
-        <div class="kompass-value color-warm">${typeMeta.notSelf}</div>
-        <div class="kompass-desc">Dein Hinweis, wann du dich von deiner natürlichen Energie entfernst.</div>
-      </div>
+    <!-- CTA -->
+    <div class="cta-box">
+      <div class="cta-eyebrow">Human Design Business Reading</div>
+      <div class="cta-title">Jetzt kennst du die einzelnen Facetten. Im Reading schauen wir auf das Zusammenspiel.</div>
+      <div class="cta-text">Wie wirken deine Energie, deine Entscheidungen, deine Kommunikation und deine Führung wirklich zusammen?</div>
+      <div class="cta-url">stupperich.de</div>
     </div>
-  </div>
-  ` : ""}
 
-  <!-- Energiezentren -->
-  <div class="section">
-    <div class="section-label">Deine Energie im Business</div>
-    <div class="section-title">Deine 9 Energiezentren</div>
-    <div class="section-intro">Jeder Mensch hat im Human Design dieselben neun Energiezentren, jedes steht für ein anderes Thema. Je nach persönlichem Design sind sie definiert oder offen. Im Business zeigen sie, wie du arbeitest, Führungsverantwortung übernimmst, kommunizierst und auf andere wirkst.</div>
-
-    <div class="zentren-legend">
-      <div class="legend-cell def">
-        <div class="legend-label" style="color:${ACCENT}">Definiert</div>
-        Konstante Energie, die du dauerhaft trägst und nach außen ausstrahlst.
-      </div>
-      <div class="legend-cell">
-        <div class="legend-label" style="color:#6B7280">Offen</div>
-        Flexible Zone, in der du die Energie anderer stark aufnimmst und spiegelst.
-      </div>
+    <!-- Footer -->
+    <div class="footer">
+      <span class="footer-text">stupperich.de · Human Design Business Energy Calculator</span>
+      <span class="footer-text">${data.calculationSource ?? "Swiss Ephemeris"}</span>
     </div>
-    <div class="legend-note">Es gibt kein besser oder schlechter, nur anders. Beide Zustände haben ihre eigene Stärke.</div>
 
-    ${centersHtml}
-  </div>
-
-  <!-- CTA -->
-  <div class="cta-box">
-    <div class="cta-title">Du bist mehr als dein Energietyp.</div>
-    <div class="cta-text">Deine Zentren zeigen einzelne Facetten. Spannend wird es, wenn wir anschauen, wie deine Energie, deine Entscheidungen, deine Kommunikation und deine Wirkung zusammenspielen.</div>
-    <div class="cta-url">Human Design Business Reading: stupperich.de</div>
-  </div>
-
-  <!-- Footer -->
-  <div class="footer">
-    <span class="footer-text">stupperich.de</span>
-    <span class="footer-text">${data.calculationSource ?? "Swiss Ephemeris"}</span>
   </div>
 
   <script>window.onload = function() { window.print(); }</script>
