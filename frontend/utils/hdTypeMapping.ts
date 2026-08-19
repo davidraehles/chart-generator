@@ -1,6 +1,6 @@
 /**
  * Human Design Mappings — Quelle: content/Bezeichnungen-Texte.xlsx
- * Letzte Aktualisierung: 05.08.26
+ * Letzte Aktualisierung: 19.08.26
  */
 
 export interface TypeMetadata {
@@ -20,7 +20,7 @@ const HD_TYPE_MAPPING: Record<string, TypeMetadata> = {
     strategie: "Auf das Leben reagieren",
     strategieLabel: "Reagieren statt erzwingen",
     strategieBusinessText:
-      "Du musst nicht alles selbst anstoßen. Deine stärksten Schritte entstehen oft, wenn etwas im Außen eine klare Reaktion in dir auslöst. Warte auf den richtigen Impuls, bevor du loslegst.",
+      "Du musst nicht alles selbst anstoßen. Deine stärkste Energie entsteht, wenn du auf konkrete Chancen, Anforderungen oder Impulse reagierst, die etwas in dir auslösen. Genau dort lohnt es sich, deine Energie und Priorität einzusetzen.",
     typeBusinessText:
       "Du bist stark, wenn du dich auf Arbeit einlässt, die dich wirklich antreibt, und mit konstanter Energie anderen zeigst, was echte Ausdauer bedeutet.",
     higherSelf: "Befriedigung/Freude",
@@ -104,7 +104,7 @@ const HD_PROFILE_MAPPING: Record<string, ProfileMetadata> = {
       "Dein Einfluss entsteht, weil andere in dir eine Lösung sehen. Du wirst für Probleme gerufen, die andere nicht lösen können.",
   },
   "3/5": {
-    label: "Erfahrener Problemlöser",
+    label: "Erfahrener Problemlöser (Troubleshooter)",
     businessText:
       "Dein Einfluss entsteht durch praktische Erfahrung und pragmatische Lösungen. Was bei dir funktioniert, hat den Praxistest bestanden.",
   },
@@ -172,21 +172,21 @@ export function getAuthorityLabel(authorityCode: string): string {
 // Werte aus Sheet "Autoritäten" — Business-Text
 const HD_AUTHORITY_BUSINESS_TEXTS: Record<string, string> = {
   emotional:
-    "Du triffst wichtige Entscheidungen am besten mit etwas Zeit, wenn emotionale Klarheit entstanden ist.",
+    "Die häufigste und am wenigsten verstandenen Entscheidungs-Architektur im Business. Du triffst Entscheidungen am besten mit etwas Zeit, wenn emotionale Klarheit entstanden ist.",
   sacral:
-    "Du triffst wichtige Entscheidungen aus deiner unmittelbaren Bauchreaktion heraus.",
+    "Dein Körper antwortet vor dem Kopf und er irrt sich dabei selten. Du triffst Entscheidungen aus deiner unmittelbaren Körperreaktion heraus.",
   spleen:
-    "Du triffst wichtige Entscheidungen intuitiv im Moment, dein erster leiser Impuls weist dir den Weg.",
+    "Deine verlässlichste Entscheidung kommt in einer Sekunde. Ignorierst du deinen ersten Impuls, der dir subtil deinen Weg weist, könnte das teuer werden.",
   ego_manifested:
-    "Du triffst wichtige Entscheidungen danach, was du wirklich willst und wofür du deine Willenskraft einsetzen möchtest.",
+    "Du triffst Entscheidungen danach, was du wirklich willst und wofür du deine Willenskraft einsetzen möchtest. Nicht nach dem, was von dir erwartet wird.",
   ego_projected:
-    "Du triffst wichtige Entscheidungen danach, was du wirklich willst und wofür du deine Willenskraft einsetzen möchtest.",
+    "Du triffst Entscheidungen danach, was du wirklich willst und wofür du deine Willenskraft einsetzen möchtest. Nicht nach dem, was von dir erwartet wird.",
   self_projected:
-    "Du triffst wichtige Entscheidungen, indem du laut aussprichst, was dich bewegt, und dabei deine Richtung hörst.",
+    "Du brauchst keine externe Meinung. Wenn eine Entscheidung zu deinen Werten und Zielen passt, spürst du es als öffnendes Gefühl in der Brust. Das ist dein Go.",
   mental:
-    "Du triffst wichtige Entscheidungen, indem du sie in einem passenden Umfeld mit vertrauten Menschen reflektierst.",
+    "Du triffst Entscheidungen, indem du sie in einem passenden Umfeld mit vertrauten Menschen reflektierst, was dich bewegt, und dabei deine Richtung hörst.",
   lunar:
-    "Du triffst wichtige Entscheidungen langsam und benötigst Zeit, möglichst 28 Tage (Mondzyklus), damit Klarheit entsteht.",
+    "Die seltenste und kniffligste Entscheidungsarchitektur im Business, denn du benötigst für wichtige Entscheidungen einen ganzen Zyklus, möglicherweise 28 Tage Zeit.",
 };
 
 export function getAuthorityBusinessText(authorityCode: string): string | null {
@@ -206,39 +206,39 @@ const HD_CENTER_TEXTS: Record<string, CenterTexts> = {
     businessTitle: "Inspiration & Klarheit",
     themen: "Inspiration, Hinterfragen, Einsicht",
     defined:
-      "Du verfügst oft über eine aktive innere Quelle von Fragen und Ideen. Inspiration entsteht bei dir tendenziell von innen, und du hinterfragst häufig weiter, auch wenn andere längst zufrieden sind.",
+      "Du hast eine konstante innere Quelle von Fragen und Ideen. Inspiration kommt von innen. Du denkst weiter, auch wenn andere längst zufrieden sind.",
     open:
-      "Du inspirierst dich leicht an anderen und deiner Umgebung. Manche Gedanken sind wirklich deine und manche hast du einfach aufgefangen. Das zu unterscheiden lohnt sich.",
+      "Du inspirierst dich leicht an anderen und deiner Umgebung. Manche Gedanken sind wirklich deine und manche hast du einfach aufgegangen. Das zu unterscheiden lohnt sich.",
   },
   ajna: {
     businessTitle: "Denken & Analyse",
     themen: "Wissen, Logik, mentale Sicherheit",
     defined:
-      "Du neigst dazu, strukturiert zu denken und tendenziell schnell zu klaren Einschätzungen zu kommen. Dein Kopf arbeitet fokussiert und du findest oft gut den Überblick zwischen relevanten und irrelevanten Informationen.",
+      "Du analysierst verlässlich und kommst zu klaren Einschätzungen. Dein Kopf arbeitet strukturiert. Du musst nicht lange grübeln, um zu einem Urteil zu kommen.",
     open:
-      "Du kannst sehr verschieden denken: je nach Mensch und Situation. Das macht dich flexibel. Der Haken: Du kannst leicht in die Gedankenwelt anderer geraten. Es lohnt sich zu prüfen, welche Gedanken wirklich deine sind.",
+      "Du kannst sehr verschieden denken: Je nach Mensch und Situation. Das macht dich flexibel. Der Haken: Du landest schnell im Kopf anderer. Schau, welche Gedanken wirklich deine sind.",
   },
   throat: {
     businessTitle: "Ausdruck & Wirkung",
     themen: "Ausdruck, Gestik, Mimik, Handlung",
     defined:
-      "Kommunikation liegt dir meist natürlich. Du findest häufig die eigenen Worte und hast ein gutes Gespür dafür, wie du Dinge ausdrückst und Menschen erreichst.",
+      "Du findest deine eigenen Worte und zwar jederzeit. Kommunizieren liegt dir. Du bringst Dinge in die Welt und weißt, wie du Menschen erreichst.",
     open:
-      "Du redest, wenn der Moment passt und schweigst, wenn er es nicht tut. Das ist kein Fehler, sondern Stärke. Du hast oft ein gutes Gespür für die passenden Worte im richtigen Moment. Warte auf diesen Moment, reagiere nicht auf Druck.",
+      "Du redest, wenn der Moment passt und schweigst, wenn es nicht tut. Das ist kein Fehler, sondern Stärke. Du findest spielend die passenden Worte für den aktuellen Empfänger. Warte auf den richtigen Moment, reagiere nicht auf Druck.",
   },
   g: {
     businessTitle: "Identität & Richtung",
     themen: "Identität, Richtung, Werte",
     defined:
-      "Du hast meist ein stabiles Gespür dafür, wer du bist, wofür du stehst und in welche Richtung du willst. Diese innere Klarheit kann im Business wie im Leben als Anker wirken – auch für die Menschen um dich herum.",
+      "Du weißt, wer du bist, wohin du willst und du kennst deine Werte sehr genau. Diese Klarheit ist im Business wie im Leben ein echter Anker für dich. Nicht nur für dich, sondern auch für die Menschen um dich herum.",
     open:
-      "Du kannst dich gut an verschiedene Umgebungen und Situationen anpassen und siehst im Wandel oft eher Chancen als Probleme. Wichtig: Nicht jede Richtung, die du spürst, ist deine eigene. Regelmäßig innehalten lohnt sich.",
+      "Du passt dich spielend verschiedenen Umgebungen und Situationen gut an und im Wandel siehst du eher Chancen als Probleme. Wichtig: Nicht jede Richtung, die du spürst, ist deine eigene. Regelmäßig innehalten lohnt sich.",
   },
   heart: {
     businessTitle: "Wille & Selbstwert",
     themen: "Willenskraft, Selbstwert",
     defined:
-      "Du bringst eine natürliche Willenskraft mit, die dir hilft, Zusagen konsequent zu verfolgen. Du neigst dazu, das durchzuhalten, was du ankündigst – das schafft Verlässlichkeit. Du hast ein gutes Gespür für deinen eigenen Wert.",
+      "Du hast eine konstante Willenskraft. Was du sagst, meinst du und hältst es durch. Versprechen sind bei dir keine leeren Worte. Du kennst deinen Wert sehr genau und das ist gut so.",
     open:
       "Deine Energie für Durchsetzen und Versprechen ist variabel. Du brauchst echte Überzeugung, um langfristig dranzubleiben. Du darfst darauf achten, dass die Prioritäten, Ziele und Erwartungen anderer nicht automatisch zu deinen eigenen werden. Schätz dich genauso wert und gib dir selbst Platz.",
   },
@@ -246,7 +246,7 @@ const HD_CENTER_TEXTS: Record<string, CenterTexts> = {
     businessTitle: "Lebenskraft & Umsetzung",
     themen: "Lebenskraft, Schaffenskraft",
     defined:
-      "Du verfügst tendenziell über eine stabile Lebensenergie, die sich durch Tun regeneriert. Arbeit, die dir liegt, kann dich aufladen statt zu erschöpfen. Du darfst aufpassen, dass du deine Energie nicht dauerhaft in Aufgaben steckst, die dich mehr auslaugen als erfüllen.",
+      "Du hast eine stabile Lebensenergie, die sich durch Tun regeneriert. Arbeit, die dir liegt, macht dich nicht müde, sie lädt dich auf. Du darfst aufpassen, dass du die Energie nicht dauerhaft in Aufgaben steckst, die dich mehr auslaugen als erfüllen.",
     open:
       "Deine Energie ist situativ. Sie hängt davon ab, womit und mit wem du arbeitest. Das ist kein Mangel sondern ein Hinweis, was wirklich zu dir passt. Du darfst aufpassen, dass du nicht das Arbeitstempo anderer übernimmst und über deine eigenen Grenzen gehst.",
   },
@@ -254,9 +254,9 @@ const HD_CENTER_TEXTS: Record<string, CenterTexts> = {
     businessTitle: "Intuition & Sicherheit",
     themen: "Intuition, Gesundheit, Überleben",
     defined:
-      "Du verfügst häufig über ein feines Bauchgefühl, das sich als zuverlässig erweisen kann. Du erkennst oft im ersten Moment, ob etwas stimmig ist oder nicht. Es lohnt sich, diesem ersten Impuls mehr zu vertrauen und ihn dann mit deiner Autorität zu prüfen.",
+      "Dein Bauchgefühl ist zuverlässig. Du erkennst im ersten Moment, ob etwas stimmt oder nicht und liegst damit häufiger richtig, als du denkst. Lerne, deinem ersten Impuls zu vertrauen und prüfe dann mit deiner Autorität.",
     open:
-      "Du neigst dazu, die Energie und den Zustand anderer stark aufzunehmen. Das kann dich sehr empathisch machen, bedeutet aber auch, dass klare Grenzen wichtig sind, damit du nicht alles mit nach Hause nimmst.",
+      "Du spürst die Energie und den Zustand anderer sehr stark. Das macht dich empathisch, aber du brauchst klare Grenzen, damit du nicht alles mit nach Hause nimmst.",
   },
   solar: {
     businessTitle: "Emotionen & Beziehungen",
@@ -270,7 +270,7 @@ const HD_CENTER_TEXTS: Record<string, CenterTexts> = {
     businessTitle: "Antrieb & Stabilität",
     themen: "Antrieb, Erdung, Sicherheit",
     defined:
-      "Du verfügst tendenziell über einen starken inneren Antrieb und kannst Druck gut für die Umsetzung nutzen. In stressigen Situationen kannst du anderen oft Stabilität und Sicherheit vermitteln. Du darfst aufpassen, aus deinem Antrieb keinen permanenten Leistungsdruck zu machen.",
+      "Du hast einen starken inneren Antrieb, nutzt Druck für die Umsetzung und hast damit einen starken Antrieb, Dinge zu erledigen und abzuhaken. In stressigen Situationen vermittelst du anderen Stabilität und Sicherheit. Du darfst aufpassen, aus deinem Antrieb keinen permanenten Leistungsdruck zu machen.",
     open:
       "Du bist flexibel, kannst dich schnell auf neue Situationen einstellen und spürst, wann Handeln sinnvoll ist. Gleichzeitig nimmst du Druck und Hektik anderer stark auf. Das kann antreiben, kann aber auch stressen. Rhythmus und echte Pausen sind für dich kein Luxus, sondern notwendig. Du darfst aufpassen, nicht vorschnell zu handeln, nur um diesen Druck loszuwerden.",
   },
