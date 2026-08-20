@@ -157,6 +157,24 @@ export default function ChartForm({ onSuccess, onError, onRequest }: ChartFormPr
     if (errors[name]) clearError(name);
   };
 
+  // Auto-format DD.MM.YYYY — dots inserted automatically
+  const handleDateChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const digits = e.target.value.replace(/\D/g, "").slice(0, 8);
+    let formatted = digits;
+    if (digits.length > 4) formatted = `${digits.slice(0, 2)}.${digits.slice(2, 4)}.${digits.slice(4)}`;
+    else if (digits.length > 2) formatted = `${digits.slice(0, 2)}.${digits.slice(2)}`;
+    setFormData((prev) => ({ ...prev, birthDate: formatted }));
+    if (errors.birthDate) clearError("birthDate");
+  };
+
+  // Auto-format HH:MM — colon inserted automatically
+  const handleTimeChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const digits = e.target.value.replace(/\D/g, "").slice(0, 4);
+    const formatted = digits.length > 2 ? `${digits.slice(0, 2)}:${digits.slice(2)}` : digits;
+    setFormData((prev) => ({ ...prev, birthTime: formatted }));
+    if (errors.birthTime) clearError("birthTime");
+  };
+
   const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
     setLoading(true);
@@ -256,8 +274,9 @@ export default function ChartForm({ onSuccess, onError, onRequest }: ChartFormPr
         <FormField id="birthDate" label={LABELS.birthDate} error={errors.birthDate}>
           <input
             type="text" id="birthDate" name="birthDate"
-            value={formData.birthDate} onChange={handleChange}
+            value={formData.birthDate} onChange={handleDateChange}
             placeholder={PLACEHOLDERS.birthDate} autoComplete="bday"
+            inputMode="numeric" maxLength={10}
             className={inputClass(!!errors.birthDate)}
             style={{ borderColor: errors.birthDate ? undefined : BORDER }}
           />
@@ -270,8 +289,9 @@ export default function ChartForm({ onSuccess, onError, onRequest }: ChartFormPr
             : undefined}>
           <input
             type="text" id="birthTime" name="birthTime"
-            value={formData.birthTime} onChange={handleChange}
+            value={formData.birthTime} onChange={handleTimeChange}
             placeholder={PLACEHOLDERS.birthTime}
+            inputMode="numeric" maxLength={5}
             disabled={formData.birthTimeApproximate}
             className={inputClass(!!errors.birthTime)}
             style={{
