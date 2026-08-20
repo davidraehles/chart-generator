@@ -148,6 +148,8 @@ export function generateAndDownloadPdf(
 
     /* ── SECTION ────────────────────────────────────────────────────────────── */
     .section { margin-bottom: 20px; }
+    .kompass-grid, .legend-row { page-break-inside: avoid; }
+    .basis-row { page-break-inside: avoid; }
     .section-head {
       display: flex;
       align-items: center;
@@ -155,14 +157,15 @@ export function generateAndDownloadPdf(
       margin-bottom: 12px;
       border-bottom: 1px solid #EFEFEF;
       padding-bottom: 6px;
+      page-break-after: avoid;
     }
     .section-chip {
       font-size: 6.5pt;
       text-transform: uppercase;
       letter-spacing: 0.13em;
       font-weight: 700;
-      color: #fff;
-      background: #5F7680;
+      color: #5F7680;
+      border: 0.5px solid #5F7680;
       padding: 2px 7px;
       flex-shrink: 0;
     }
@@ -249,24 +252,25 @@ export function generateAndDownloadPdf(
       grid-template-columns: 1fr 1fr;
       gap: 8px;
       margin-bottom: 8px;
+      page-break-inside: avoid;
     }
     .legend-cell {
-      display: flex;
-      align-items: flex-start;
-      gap: 7px;
       font-size: 8pt;
       color: #374151;
-      padding: 8px 10px;
+      padding: 7px 10px;
       border: 0.5px solid #E8E3DC;
+      border-left: 2px solid #D4CFC8;
     }
-    .legend-cell.def { background: rgba(95,118,128,0.06); }
+    .legend-cell.def { border-left-color: #5F7680; }
     .legend-label {
       font-size: 6.5pt;
       text-transform: uppercase;
       letter-spacing: 0.1em;
       font-weight: 700;
-      display: block;
-      margin-bottom: 2px;
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      margin-bottom: 3px;
     }
     .legend-note {
       font-size: 7.5pt;
@@ -279,12 +283,15 @@ export function generateAndDownloadPdf(
       display: flex;
       gap: 10px;
       align-items: flex-start;
-      padding: 9px 12px 9px 0;
+      padding: 9px 0 9px 12px;
+      border-left: 2px solid #D4CFC8;
       border-bottom: 0.5px solid #F3F4F6;
+      margin-bottom: 2px;
       page-break-inside: avoid;
     }
+    .center-row.defined { border-left-color: #5F7680; }
     .center-row:last-child { border-bottom: none; }
-    .center-icon { flex-shrink: 0; margin-top: 2px; width: 20px; text-align: center; }
+    .center-icon { flex-shrink: 0; margin-top: 2px; width: 18px; text-align: center; }
     .center-body { flex: 1; min-width: 0; }
     .center-top {
       display: flex;
@@ -306,11 +313,10 @@ export function generateAndDownloadPdf(
       font-size: 6.5pt;
       text-transform: uppercase;
       letter-spacing: 0.1em;
-      font-weight: 700;
-      padding: 1px 5px;
+      font-weight: 600;
+      color: #6B7280;
     }
-    .badge-def { background: rgba(95,118,128,0.12); color: #5F7680; }
-    .badge-open { background: #F3F4F6; color: #6B7280; }
+    .badge-def { color: #5F7680; }
     .center-meta { font-size: 7.5pt; color: #9CA3AF; margin-bottom: 3px; }
     .center-desc { font-size: 8.5pt; color: #374151; line-height: 1.55; }
 
@@ -478,7 +484,7 @@ export function generateAndDownloadPdf(
 
     <!-- CTA -->
     <div class="cta-box">
-      <div class="cta-eyebrow">Human Design Business Reading</div>
+      <div class="cta-eyebrow">Business Energy Reading</div>
       <div class="cta-title">Jetzt kennst du die einzelnen Facetten. Im Reading schauen wir auf das Zusammenspiel.</div>
       <div class="cta-text">Wie wirken deine Energie, deine Entscheidungen, deine Kommunikation und deine Führung wirklich zusammen?</div>
       <div class="cta-url">stupperich.de</div>
