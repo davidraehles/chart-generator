@@ -585,14 +585,11 @@ export async function generateAndDownloadPdf(
       </div>
 
       <!-- Business Energy Reading -->
-      <div class="reading-box" style="margin-top:10px;">
-        <div style="flex:1;padding:16px 18px;">
-          <div style="font-size:6.5pt;text-transform:uppercase;letter-spacing:0.13em;font-weight:700;color:#5F7680;margin-bottom:5px;">Business Energy Reading</div>
-          <div style="font-size:10pt;font-weight:700;color:#1A2126;margin-bottom:7px;line-height:1.4;">Jetzt kennst du die einzelnen Facetten. In einem Business Energy Reading siehst du deine ganze Chart und wir schauen auf die Zusammenhänge.</div>
-          <div style="font-size:8.5pt;color:#374151;line-height:1.6;">Wie wirken deine Energie, deine Entscheidungen, deine Kommunikation und deine Führung gemeinsam?</div>
-          <div style="font-size:7.5pt;color:#5F7680;font-weight:600;margin-top:9px;">stupperich.de</div>
-        </div>
-        ${chartImgSrc ? `<div style="width:110px;flex-shrink:0;overflow:hidden;position:relative;"><img src="${chartImgSrc}" style="height:100%;width:auto;object-fit:cover;object-position:center;opacity:0.85;display:block;" /><div style="position:absolute;inset:0;background:linear-gradient(to right,#EEF2F3 10%,transparent 55%);"></div></div>` : ""}
+      <div style="margin-top:10px;background:#EEF2F3;padding:16px 18px;${chartImgSrc ? `background-image:linear-gradient(to right,#EEF2F3 55%,rgba(238,242,243,0.7) 75%,rgba(238,242,243,0) 100%),url('${chartImgSrc}');background-repeat:no-repeat;background-position:right center;background-size:auto 100%;` : ""}page-break-inside:avoid;">
+        <div style="max-width:62%;font-size:6.5pt;text-transform:uppercase;letter-spacing:0.13em;font-weight:700;color:#5F7680;margin-bottom:5px;">Business Energy Reading</div>
+        <div style="max-width:62%;font-size:10pt;font-weight:700;color:#1A2126;margin-bottom:7px;line-height:1.4;">Jetzt kennst du die einzelnen Facetten. In einem Business Energy Reading siehst du deine ganze Chart und wir schauen auf die Zusammenhänge.</div>
+        <div style="max-width:62%;font-size:8.5pt;color:#374151;line-height:1.6;">Wie wirken deine Energie, deine Entscheidungen, deine Kommunikation und deine Führung gemeinsam?</div>
+        <div style="max-width:62%;font-size:7.5pt;color:#5F7680;font-weight:600;margin-top:9px;">stupperich.de</div>
       </div>
 
       <!-- Abschluss -->
