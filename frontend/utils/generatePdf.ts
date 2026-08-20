@@ -56,6 +56,20 @@ export async function generateAndDownloadPdf(
         .filter(Boolean).join(" · ")
     : "";
 
+  // Bild als base64 einbetten (funktioniert server-seitig ohne Netzwerk-Abhängigkeit)
+  let chartImgSrc = "";
+  try {
+    const imgResp = await fetch("/human-design-chart.png");
+    const imgBlob = await imgResp.blob();
+    chartImgSrc = await new Promise<string>((resolve) => {
+      const reader = new FileReader();
+      reader.onloadend = () => resolve(reader.result as string);
+      reader.readAsDataURL(imgBlob);
+    });
+  } catch {
+    // Kein Bild — kein Problem
+  }
+
   // ── Zentren ────────────────────────────────────────────────────────────────
   const centersHtml = data.centers.map((center) => {
     const defType = center.definitionType ?? (center.defined ? "defined" : "open");
@@ -538,20 +552,27 @@ export async function generateAndDownloadPdf(
       ${centersHtml}
     </div>
 
-    <!-- CTA -->
-    <div class="cta-box" style="background: rgba(95,118,128,0.06);">
-      <div class="cta-eyebrow">Business Energy Reading</div>
-      <div class="cta-title">Jetzt kennst du die einzelnen Facetten. Im Reading schauen wir auf das Zusammenspiel.</div>
-      <div class="cta-text">Wie wirken deine Energie, deine Entscheidungen, deine Kommunikation und deine Führung wirklich zusammen?</div>
-      <div class="cta-url">stupperich.de</div>
+    <!-- Business Energy Trigger (zuerst) -->
+    <div class="cta-box" style="background: #3D4A52; border-left-color: #B8956A;">
+      <div class="cta-eyebrow" style="color: #B8956A;">Business Energy Trigger · Kostenlos</div>
+      <div class="cta-title" style="color: #F9F7F4;">6 Monate. 6 persönliche Impulse. Abgestimmt auf deinen Typ.</div>
+      <div class="cta-text" style="color: #C8D0D3;">Kein Newsletter. 6 Mails, danach ist Schluss. Jeden Monat ein Impuls, der dich zum Reflektieren bringt und dir hilft, deine Business-Energie bewusster einzusetzen. Den Trigger Letter kannst du direkt im Calculator anfordern, er ist an deinen Human Design Typ gebunden.</div>
+      <div class="cta-url" style="color: #B8956A;">stupperich.de → Business Energy Calculator</div>
     </div>
 
-    <!-- Business Energy Trigger -->
-    <div class="cta-box" style="margin-top: 10px; border-left-color: #B8956A; background: rgba(184,149,106,0.06);">
-      <div class="cta-eyebrow" style="color: #B8956A;">Business Energy Trigger · Kostenlos</div>
-      <div class="cta-title">6 Monate. 6 persönliche Impulse. Abgestimmt auf deinen Typ.</div>
-      <div class="cta-text">Kein Newsletter. 6 Mails, danach ist Schluss. Jeden Monat ein Impuls, der dich zum Reflektieren bringt und dir hilft, deine Business-Energie bewusster einzusetzen. Den Trigger Letter kannst du direkt im Calculator anfordern, er ist an deinen Human Design Typ gebunden.</div>
-      <div class="cta-url" style="color: #B8956A;">stupperich.de → Business Energy Calculator</div>
+    <!-- Business Energy Reading (danach) -->
+    <div class="cta-box" style="margin-top: 10px; background: rgba(95,118,128,0.06); padding: 0; overflow: hidden; display: flex; align-items: stretch;">
+      <div style="flex: 1; padding: 15px 16px;">
+        <div class="cta-eyebrow">Business Energy Reading</div>
+        <div class="cta-title">Jetzt kennst du die einzelnen Facetten. In einem Business Energy Reading siehst du deine ganze Chart und wir schauen auf die Zusammenhänge.</div>
+        <div class="cta-text">Wie wirken deine Energie, deine Entscheidungen, deine Kommunikation und deine Führung gemeinsam?</div>
+        <div class="cta-url">stupperich.de</div>
+      </div>
+      ${chartImgSrc ? `
+      <div style="width: 90px; flex-shrink: 0; overflow: hidden; position: relative;">
+        <img src="${chartImgSrc}" style="height: 100%; width: auto; object-fit: cover; object-position: center; opacity: 0.85; display: block;" />
+        <div style="position: absolute; inset: 0; background: linear-gradient(to right, rgba(243,241,238,0.5) 0%, transparent 60%);"></div>
+      </div>` : ""}
     </div>
 
     <!-- Abschluss -->
