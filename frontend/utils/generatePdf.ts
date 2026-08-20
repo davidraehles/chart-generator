@@ -178,14 +178,14 @@ export async function generateAndDownloadPdf(
       color: #374151;
     }
 
-    /* Dunkler Kapitel-Header (Kompass, Zentren) */
+    /* Kapitel-Header (Kompass, Zentren) */
     .chapter-head {
-      background: #1A2126;
-      margin: 0 -22mm 14px;
-      padding: 10px 22mm;
       display: flex;
       align-items: center;
-      gap: 10px;
+      gap: 8px;
+      margin-bottom: 12px;
+      border-bottom: 1px solid #EFEFEF;
+      padding-bottom: 6px;
       page-break-after: avoid;
     }
     .chapter-chip {
@@ -193,15 +193,15 @@ export async function generateAndDownloadPdf(
       text-transform: uppercase;
       letter-spacing: 0.15em;
       font-weight: 700;
-      color: #5F7680;
-      border: 0.5px solid #5F7680;
-      padding: 2px 7px;
+      color: #F9F7F4;
+      background: #1A2126;
+      padding: 3px 8px;
       flex-shrink: 0;
     }
     .chapter-title {
-      font-size: 10.5pt;
-      font-weight: 700;
-      color: #F9F7F4;
+      font-size: 10pt;
+      font-weight: 600;
+      color: #374151;
     }
 
     /* ── BASIS ROWS ─────────────────────────────────────────────────────────── */
