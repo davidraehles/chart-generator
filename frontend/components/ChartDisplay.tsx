@@ -163,6 +163,9 @@ export default function ChartDisplay({
             <p className="text-xs font-semibold uppercase tracking-wider mb-1" style={{ color: MUTED }}>
               Deine Geburtsdaten
             </p>
+            <p className="text-sm font-medium mb-0.5" style={{ color: DARK }}>
+              {data.firstName}{inputData.lastName ? ` ${inputData.lastName}` : ""}
+            </p>
             <p className="text-sm" style={{ color: MUTED }}>
               {inputData.birthDate}
               {inputData.birthTime && ` · ${inputData.birthTime} Uhr`}
