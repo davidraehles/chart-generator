@@ -41,7 +41,7 @@ const HD_CENTER_NAMES: Record<string, string> = {
   spleen: "Milz-Zentrum", solar: "Emotions-Zentrum", root: "Wurzel-Zentrum",
 };
 
-export function generateAndDownloadPdf(
+export async function generateAndDownloadPdf(
   data: ChartResponse,
   inputData: ChartRequest | null
 ) {
@@ -99,14 +99,15 @@ export function generateAndDownloadPdf(
 
     /* ── COVER ──────────────────────────────────────────────────────────────── */
     .cover {
-      background: #1A2126;
+      background: #EEF2F3;
       padding: 24mm 18mm 20mm;
       position: relative;
+      border-bottom: 2px solid #5F7680;
     }
     .cover-accent-bar {
       position: absolute;
       top: 0; left: 0; right: 0;
-      height: 3px;
+      height: 4px;
       background: #5F7680;
     }
     .cover-eyebrow {
@@ -114,33 +115,33 @@ export function generateAndDownloadPdf(
       text-transform: uppercase;
       letter-spacing: 0.18em;
       color: #5F7680;
-      font-weight: 600;
+      font-weight: 700;
       margin-bottom: 14px;
     }
     .cover-name {
       font-size: 30pt;
       font-weight: 700;
-      color: #F9F7F4;
+      color: #1A2126;
       letter-spacing: -0.03em;
       line-height: 1.1;
       margin-bottom: 10px;
     }
     .cover-sub {
       font-size: 10pt;
-      color: #A8B4B6;
+      color: #5F7680;
       line-height: 1.5;
       margin-bottom: 22px;
       max-width: 360px;
     }
     .cover-divider {
       width: 40px;
-      height: 1px;
+      height: 2px;
       background: #5F7680;
       margin-bottom: 14px;
     }
     .cover-birth {
       font-size: 8pt;
-      color: #6B7C80;
+      color: #374151;
     }
 
     /* ── BODY ───────────────────────────────────────────────────────────────── */
@@ -430,7 +431,7 @@ export function generateAndDownloadPdf(
 
     <!-- Energie-Kompass -->
     ${typeMeta ? `
-    <div class="section">
+    <div class="section" style="page-break-before: always">
       <div class="section-head">
         <span class="section-chip">Energie-Kompass</span>
         <span class="section-title">Deine zwei Signale</span>
@@ -502,11 +503,34 @@ export function generateAndDownloadPdf(
 </body>
 </html>`;
 
-  const printWindow = window.open("", "_blank");
-  if (!printWindow) {
-    alert("Bitte erlaube Pop-ups für diese Seite, um das PDF zu erstellen.");
-    return;
+  try {
+    const response = await fetch("/api/pdf", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ html }),
+    });
+
+    if (!response.ok) {
+      throw new Error(`PDF-Generierung fehlgeschlagen: ${response.status}`);
+    }
+
+    const blob = await response.blob();
+    const url  = URL.createObjectURL(blob);
+    const a    = document.createElement("a");
+    a.href     = url;
+    a.download = `business-energie-${data.firstName.toLowerCase()}.pdf`;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+
+  } catch (err) {
+    console.error("PDF error:", err);
+    // Fallback: Browser-Druck
+    const printWindow = window.open("", "_blank");
+    if (printWindow) {
+      printWindow.document.write(html);
+      printWindow.document.close();
+    }
   }
-  printWindow.document.write(html);
-  printWindow.document.close();
 }

@@ -20,6 +20,7 @@ from src.services.validation_service import ValidationService, ValidationError
 from src.services.hd_api_client import HDAPIClient
 from src.services.normalization_service import NormalizationService
 from src.api.routes.chart import router as chart_router
+from src.api.routes.pdf import router as pdf_router
 from src.handlers.email_handler import EmailHandler, EmailCaptureError
 from src.database import get_db_session
 from datetime import datetime
@@ -78,6 +79,7 @@ bodygraph_calculator = BodygraphCalculator()
 
 # Include routers
 app.include_router(chart_router)
+app.include_router(pdf_router)
 
 
 @app.get("/health")
