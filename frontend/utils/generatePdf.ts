@@ -460,25 +460,28 @@ export async function generateAndDownloadPdf(
     <!-- Zentren -->
     <div class="section">
       <div class="section-head">
-        <span class="section-chip">9 Energiezentren</span>
-        <span class="section-title">Wie du im Business wirkst</span>
+        <span class="section-chip">Deine Energie im Business</span>
+        <span class="section-title">Deine 9 Energiezentren</span>
+      </div>
+      <div class="section-intro">
+        Jeder Mensch hat im Human Design dieselben neun Energiezentren, jedes steht für ein anderes Thema. Je nach persönlichem Design sind sie definiert oder offen. Im Business zeigen sie, wie du arbeitest, Führungsverantwortung übernimmst, kommunizierst und auf andere wirkst.
       </div>
 
       <div class="legend-row">
         <div class="legend-cell def">
           <div>
             <span class="legend-label" style="color:#5F7680">${ICONS.mic} Definiert</span>
-            Konstante Energie, die du dauerhaft trägst und ausstrahlst.
+            Konstante Energie, die dir verlässlich zur Verfügung steht und die du nach außen ausstrahlst. Stell es dir wie ein Mikrofon vor: Du sendest diese Energie in dein Umfeld.
           </div>
         </div>
         <div class="legend-cell">
           <div>
             <span class="legend-label" style="color:#6B7280">${ICONS.radio} Offen</span>
-            Empfangsbereich — du nimmst die Energie anderer hier besonders auf.
+            Ein Bereich, in dem du besonders empfänglich für die Energie anderer bist. Das funktioniert wie ein Radio: Du empfängst, was in deinem Umfeld sendet, und verstärkst es häufig.
           </div>
         </div>
       </div>
-      <div class="legend-note">Es gibt kein besser oder schlechter, nur anders.</div>
+      <div class="legend-note">Es gibt kein besser oder schlechter, nur anders. Beide Zustände haben ihre eigene Stärke.</div>
 
       ${centersHtml}
     </div>
