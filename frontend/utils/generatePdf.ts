@@ -550,6 +550,12 @@ export async function generateAndDownloadPdf(
       <div class="cta-url" style="color: #B8956A;">stupperich.de → Business Energy Calculator</div>
     </div>
 
+    <!-- Abschluss -->
+    <div style="margin-top: 18px; padding-top: 14px; border-top: 0.5px solid #EFEFEF;">
+      <p style="font-size: 9pt; color: #374151; line-height: 1.6; margin-bottom: 10px;">Das ist deine Energie. Nicht die, die andere von dir erwarten.</p>
+      <p style="font-size: 8.5pt; color: #5F7680; line-height: 1.5;">Herzlichst<br><strong>Silke</strong></p>
+    </div>
+
     <!-- Footer -->
     <div class="footer">
       <span class="footer-text">stupperich.de · Human Design Business Energy Calculator</span>
