@@ -3,6 +3,7 @@
 from fastapi import APIRouter, HTTPException
 from fastapi.responses import Response
 from pydantic import BaseModel
+from typing import Optional
 from playwright.async_api import async_playwright
 
 router = APIRouter()
@@ -10,13 +11,14 @@ router = APIRouter()
 
 class PdfRequest(BaseModel):
     html: str
+    header_html: Optional[str] = None
 
 
 @router.post("/api/pdf")
 async def generate_pdf(request: PdfRequest) -> Response:
     """
     Render HTML to PDF using headless Chromium (Playwright).
-    Accepts raw HTML, returns application/pdf bytes.
+    Accepts raw HTML + optional headerTemplate, returns application/pdf bytes.
     """
     if not request.html or len(request.html) > 2_000_000:
         raise HTTPException(status_code=400, detail="Invalid HTML payload")
@@ -28,12 +30,17 @@ async def generate_pdf(request: PdfRequest) -> Response:
             )
             page = await browser.new_page()
 
-            # Load HTML directly (no network round-trip)
             await page.set_content(request.html, wait_until="networkidle")
 
+            # Use Playwright's native headerTemplate so it repeats on every page.
+            # The @page :first { margin-top: 0 } in the HTML hides it on the cover.
+            use_header = bool(request.header_html)
             pdf_bytes = await page.pdf(
                 format="A4",
-                print_background=True,   # needed for dark cover
+                print_background=True,
+                display_header_footer=use_header,
+                header_template=request.header_html or "<span></span>",
+                footer_template="<span></span>",
                 margin={
                     "top": "0",
                     "bottom": "0",

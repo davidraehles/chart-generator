@@ -87,7 +87,7 @@ export async function generateAndDownloadPdf(
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
-    @page { size: A4; margin: 25mm 0 0 0; }
+    @page { size: A4; margin: 30mm 0 0 0; }
     @page :first { margin: 0; }
 
     body {
@@ -484,8 +484,6 @@ export async function generateAndDownloadPdf(
     <!-- Energie-Kompass -->
     ${typeMeta ? `
     <div class="section new-page">
-      <div class="page-top-eyebrow">${data.firstName} · Business Energy Calculator</div>
-      <div class="page-top-rule"></div>
       <div class="chapter-head">
         <span class="chapter-chip">Energie-Kompass</span>
         <span class="chapter-title">Deine zwei Signale</span>
@@ -512,9 +510,7 @@ export async function generateAndDownloadPdf(
     ` : ""}
 
     <!-- Zentren -->
-    <div class="section new-page">
-      <div class="page-top-eyebrow">${data.firstName} · Business Energy Calculator</div>
-      <div class="page-top-rule"></div>
+    <div class="section">
       <div class="chapter-head">
         <span class="chapter-chip">Deine Energie im Business</span>
         <span class="chapter-title">Deine 9 Energiezentren</span>
@@ -576,11 +572,18 @@ export async function generateAndDownloadPdf(
 </body>
 </html>`;
 
+  // Header repeated on every page (except cover via @page :first { margin: 0 })
+  const headerHtml = `
+    <div style="width:100%;padding:7mm 22mm 0;box-sizing:border-box;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Arial,sans-serif;">
+      <div style="font-size:6.5pt;text-transform:uppercase;letter-spacing:0.13em;color:#C4BEB8;margin-bottom:9mm;">${data.firstName} · Business Energy Calculator</div>
+      <div style="height:0.5px;background:#E8E3DC;"></div>
+    </div>`;
+
   try {
     const response = await fetch("/api/pdf", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ html }),
+      body: JSON.stringify({ html, header_html: headerHtml }),
     });
 
     if (!response.ok) {
