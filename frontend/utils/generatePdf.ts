@@ -87,7 +87,8 @@ export async function generateAndDownloadPdf(
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
-    @page { size: A4; margin: 0; }
+    @page { size: A4; margin: 25mm 0 0 0; }
+    @page :first { margin: 0; }
 
     body {
       font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Helvetica Neue", Arial, sans-serif;
@@ -478,7 +479,6 @@ export async function generateAndDownloadPdf(
     <!-- Energie-Kompass -->
     ${typeMeta ? `
     <div class="section new-page">
-      <div class="page-top-bar"></div>
       <div class="page-top-eyebrow">${data.firstName} · Business Energy Reading</div>
       <div class="chapter-head">
         <span class="chapter-chip">Energie-Kompass</span>
