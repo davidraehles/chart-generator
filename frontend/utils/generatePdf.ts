@@ -191,7 +191,12 @@ export async function generateAndDownloadPdf(
       text-transform: uppercase;
       letter-spacing: 0.13em;
       color: #C4BEB8;
-      margin-bottom: 12px;
+      margin-bottom: 10mm;
+    }
+    .page-top-rule {
+      height: 0.5px;
+      background: #E8E3DC;
+      margin-bottom: 10mm;
     }
 
     /* Kapitel-Header (Kompass, Zentren) */
@@ -479,7 +484,8 @@ export async function generateAndDownloadPdf(
     <!-- Energie-Kompass -->
     ${typeMeta ? `
     <div class="section new-page">
-      <div class="page-top-eyebrow">${data.firstName} · Business Energy Reading</div>
+      <div class="page-top-eyebrow">${data.firstName} · Business Energy Calculator</div>
+      <div class="page-top-rule"></div>
       <div class="chapter-head">
         <span class="chapter-chip">Energie-Kompass</span>
         <span class="chapter-title">Deine zwei Signale</span>
