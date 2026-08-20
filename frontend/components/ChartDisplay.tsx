@@ -369,7 +369,7 @@ export default function ChartDisplay({
           Speichere deine Business-Energie
         </p>
         <p className="text-xs mb-4" style={{ color: "rgba(255,255,255,0.8)" }}>
-          Nimm deine Auswertung mit - als Erinnerung für deinen Alltag.
+          Nimm deine Auswertung als kostenloses PDF mit. Ohne Emailanmeldung. Für den Moment, wo du dich fragst: Warum funktioniert das gerade nicht?
         </p>
         <div className="flex flex-col sm:flex-row gap-3">
           <button onClick={handlePdfDownload}
