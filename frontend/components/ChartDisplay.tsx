@@ -12,6 +12,7 @@ import {
 } from "@/utils/hdTypeMapping";
 import { generateAndDownloadPdf } from "@/utils/generatePdf";
 import EmailCaptureSection from "@/components/EmailCaptureSection";
+import Bodygraph from "@/components/Bodygraph";
 
 // ── Konfigurierbare CTA-URLs ──────────────────────────────────────────────────
 const CTA_AUTORITAET_URL = "https://www.stupperich.de/challenge-page/praxistraining-emotionale-autorit%C3%A4t";
@@ -365,10 +366,10 @@ export default function ChartDisplay({
 
       {/* ── 6. PDF HERUNTERLADEN ── */}
       <div className="px-5 py-5" style={{ background: "#A9806F", border: `0.5px solid #A9806F` }}>
-        <p className="text-sm font-semibold mb-1" style={{ color: "#fff" }}>
+        <p className="text-base font-semibold mb-1" style={{ color: "#fff" }}>
           Speichere deine Business-Energie
         </p>
-        <p className="text-xs mb-4" style={{ color: "rgba(255,255,255,0.8)" }}>
+        <p className="text-sm mb-4" style={{ color: "rgba(255,255,255,0.8)" }}>
           Nimm deine Auswertung als kostenloses PDF mit. Ohne Emailanmeldung. Für den Moment, wo du dich fragst: Warum funktioniert das gerade nicht?
         </p>
         <div className="flex flex-col sm:flex-row gap-3">
@@ -394,23 +395,40 @@ export default function ChartDisplay({
         firstName={data.firstName}
       />
 
-      {/* ── 8. HUMAN DESIGN BUSINESS READING ── */}
-      <div className="px-6 py-8 text-center" style={{ background: "#EEF2F3", border: `1px solid ${BORDER}` }}>
-        <p className="text-xs font-semibold uppercase tracking-widest mb-4" style={{ color: ACCENT }}>
-          Business Energy Reading
-        </p>
-        <p className="text-lg font-semibold mb-3 leading-snug" style={{ color: DARK }}>
-          Jetzt kennst du die einzelnen Facetten. Im Reading schauen wir auf das Zusammenspiel.
-        </p>
-        <p className="text-sm mb-6 leading-relaxed" style={{ color: BODY }}>
-          Wie wirken deine Energie, deine Entscheidungen, deine Kommunikation und deine Führung zusammen?
-        </p>
-        <a href={CTA_READING_URL} target="_blank" rel="noopener noreferrer"
-          className="inline-flex items-center gap-2 text-sm font-medium px-5 py-2.5 transition-opacity hover:opacity-90"
-          style={{ background: ACCENT, color: "#fff" }}>
-          Mein Business Energy Reading entdecken
-          <Icon name="arrowRight" size={14} color="#fff" />
-        </a>
+      {/* ── 8. BUSINESS ENERGY READING ── */}
+      <div className="overflow-hidden" style={{ background: "#EEF2F3", border: `1px solid ${BORDER}` }}>
+        <div className="flex items-stretch">
+          {/* Text */}
+          <div className="flex-1 px-6 py-8">
+            <p className="text-xs font-semibold uppercase tracking-widest mb-4" style={{ color: ACCENT }}>
+              Business Energy Reading
+            </p>
+            <p className="text-lg font-semibold mb-3 leading-snug" style={{ color: DARK }}>
+              Jetzt kennst du die einzelnen Facetten. In einem Business Energy Reading siehst du deine ganze Chart und wir schauen auf die Zusammenhänge.
+            </p>
+            <p className="text-sm mb-6 leading-relaxed" style={{ color: BODY }}>
+              Wie wirken deine Energie, deine Entscheidungen, deine Kommunikation und deine Führung gemeinsam?
+            </p>
+            <a href={CTA_READING_URL} target="_blank" rel="noopener noreferrer"
+              className="inline-flex items-center gap-2 text-sm font-medium px-5 py-2.5 transition-opacity hover:opacity-90"
+              style={{ background: ACCENT, color: "#fff" }}>
+              Mein Business Energy Reading entdecken
+              <Icon name="arrowRight" size={14} color="#fff" />
+            </a>
+          </div>
+          {/* Bodygraph Teaser */}
+          <div className="relative hidden sm:block flex-shrink-0" style={{ width: 160, overflow: "hidden" }}>
+            <div style={{ position: "absolute", inset: 0, transform: "scale(0.52) translate(-43%, -18%)", transformOrigin: "top left", opacity: 0.55, pointerEvents: "none" }}>
+              <Bodygraph
+                centers={data.centers}
+                channels={data.channels}
+                gates={data.gates}
+              />
+            </div>
+            {/* gradient overlay left→right so it fades into the text */}
+            <div style={{ position: "absolute", inset: 0, background: "linear-gradient(to right, #EEF2F3 20%, transparent 70%)" }} />
+          </div>
+        </div>
       </div>
 
       <p className="text-right text-xs" style={{ color: "#C4BEB8" }}>
