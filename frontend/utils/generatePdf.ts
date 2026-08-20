@@ -387,7 +387,23 @@ export async function generateAndDownloadPdf(
     .center-meta { font-size: 7.5pt; color: #9CA3AF; margin-bottom: 3px; }
     .center-desc { font-size: 8.5pt; color: #374151; line-height: 1.55; }
 
-    /* ── CTA ────────────────────────────────────────────────────────────────── */
+    /* ── FINAL SECTION ──────────────────────────────────────────────────────── */
+    .final-section { page-break-before: always; }
+    .final-sep { height: 0.5px; background: #E8E3DC; margin: 10mm 0; }
+    .trigger-box {
+      background: #5F7680;
+      padding: 16px 18px;
+      page-break-inside: avoid;
+    }
+    .reading-box {
+      background: #EEF2F3;
+      display: flex;
+      align-items: stretch;
+      overflow: hidden;
+      page-break-inside: avoid;
+    }
+
+    /* ── CTA (legacy, nicht mehr genutzt) ───────────────────────────────────── */
     .cta-box {
       margin-top: 18px;
       padding: 15px 16px;
@@ -552,33 +568,39 @@ export async function generateAndDownloadPdf(
       ${centersHtml}
     </div>
 
-    <!-- Business Energy Trigger (zuerst) -->
-    <div class="cta-box" style="background: #3D4A52; border-left-color: #B8956A;">
-      <div class="cta-eyebrow" style="color: #B8956A;">Business Energy Trigger · Kostenlos</div>
-      <div class="cta-title" style="color: #F9F7F4;">6 Monate. 6 persönliche Impulse. Abgestimmt auf deinen Typ.</div>
-      <div class="cta-text" style="color: #C8D0D3;">Kein Newsletter. 6 Mails, danach ist Schluss. Jeden Monat ein Impuls, der dich zum Reflektieren bringt und dir hilft, deine Business-Energie bewusster einzusetzen. Den Trigger Letter kannst du direkt im Calculator anfordern, er ist an deinen Human Design Typ gebunden.</div>
-      <div class="cta-url" style="color: #B8956A;">stupperich.de → Business Energy Calculator</div>
-    </div>
+    <!-- ── Letzte Seite ─────────────────────────────────────────────────────── -->
+    <div class="final-section">
 
-    <!-- Business Energy Reading (danach) -->
-    <div class="cta-box" style="margin-top: 10px; background: rgba(95,118,128,0.06); padding: 0; overflow: hidden; display: flex; align-items: stretch;">
-      <div style="flex: 1; padding: 15px 16px;">
-        <div class="cta-eyebrow">Business Energy Reading</div>
-        <div class="cta-title">Jetzt kennst du die einzelnen Facetten. In einem Business Energy Reading siehst du deine ganze Chart und wir schauen auf die Zusammenhänge.</div>
-        <div class="cta-text">Wie wirken deine Energie, deine Entscheidungen, deine Kommunikation und deine Führung gemeinsam?</div>
-        <div class="cta-url">stupperich.de</div>
+      <!-- Trenner -->
+      <div style="height:10mm;"></div>
+      <div class="final-sep"></div>
+      <div style="height:10mm;"></div>
+
+      <!-- Business Energy Trigger -->
+      <div class="trigger-box">
+        <div style="font-size:6.5pt;text-transform:uppercase;letter-spacing:0.13em;font-weight:700;color:rgba(255,255,255,0.65);margin-bottom:5px;">Kostenlos · 6 Impulse über 6 Monate</div>
+        <div style="font-size:11pt;font-weight:700;color:#fff;margin-bottom:7px;">Business Energy Trigger</div>
+        <div style="font-size:8.5pt;color:rgba(255,255,255,0.85);line-height:1.6;">Kein Newsletter. 6 Mails, danach ist Schluss. Jeden Monat ein Impuls, der dich zum Reflektieren bringt und dir hilft, deine Business-Energie bewusster einzusetzen. Den Trigger Letter kannst du direkt im Calculator anfordern, er ist an deinen Human Design Typ gebunden.</div>
+        <div style="font-size:7.5pt;color:rgba(255,255,255,0.6);margin-top:9px;font-weight:600;">stupperich.de → Business Energy Calculator</div>
       </div>
-      ${chartImgSrc ? `
-      <div style="width: 90px; flex-shrink: 0; overflow: hidden; position: relative;">
-        <img src="${chartImgSrc}" style="height: 100%; width: auto; object-fit: cover; object-position: center; opacity: 0.85; display: block;" />
-        <div style="position: absolute; inset: 0; background: linear-gradient(to right, rgba(243,241,238,0.5) 0%, transparent 60%);"></div>
-      </div>` : ""}
-    </div>
 
-    <!-- Abschluss -->
-    <div style="margin-top: 18px; padding-top: 14px; border-top: 0.5px solid #EFEFEF;">
-      <p style="font-size: 9pt; color: #374151; line-height: 1.6; margin-bottom: 10px;">Das ist deine Energie. Nicht die, die andere von dir erwarten.</p>
-      <p style="font-size: 8.5pt; color: #5F7680; line-height: 1.5;">Herzlichst<br><strong>Silke</strong></p>
+      <!-- Business Energy Reading -->
+      <div class="reading-box" style="margin-top:10px;">
+        <div style="flex:1;padding:16px 18px;">
+          <div style="font-size:6.5pt;text-transform:uppercase;letter-spacing:0.13em;font-weight:700;color:#5F7680;margin-bottom:5px;">Business Energy Reading</div>
+          <div style="font-size:10pt;font-weight:700;color:#1A2126;margin-bottom:7px;line-height:1.4;">Jetzt kennst du die einzelnen Facetten. In einem Business Energy Reading siehst du deine ganze Chart und wir schauen auf die Zusammenhänge.</div>
+          <div style="font-size:8.5pt;color:#374151;line-height:1.6;">Wie wirken deine Energie, deine Entscheidungen, deine Kommunikation und deine Führung gemeinsam?</div>
+          <div style="font-size:7.5pt;color:#5F7680;font-weight:600;margin-top:9px;">stupperich.de</div>
+        </div>
+        ${chartImgSrc ? `<div style="width:110px;flex-shrink:0;overflow:hidden;position:relative;"><img src="${chartImgSrc}" style="height:100%;width:auto;object-fit:cover;object-position:center;opacity:0.85;display:block;" /><div style="position:absolute;inset:0;background:linear-gradient(to right,#EEF2F3 10%,transparent 55%);"></div></div>` : ""}
+      </div>
+
+      <!-- Abschluss -->
+      <div style="margin-top:20px;padding-top:14px;border-top:0.5px solid #E8E3DC;">
+        <p style="font-size:9pt;color:#374151;line-height:1.6;margin-bottom:10px;">Das ist deine Energie. Nicht die, die andere von dir erwarten.</p>
+        <p style="font-size:8.5pt;color:#5F7680;line-height:1.5;">Herzlichst<br><strong>Silke</strong></p>
+      </div>
+
     </div>
 
     <!-- Footer -->
