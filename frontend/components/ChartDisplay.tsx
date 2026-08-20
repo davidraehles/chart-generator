@@ -12,7 +12,6 @@ import {
 } from "@/utils/hdTypeMapping";
 import { generateAndDownloadPdf } from "@/utils/generatePdf";
 import EmailCaptureSection from "@/components/EmailCaptureSection";
-import Bodygraph from "@/components/Bodygraph";
 
 // ── Konfigurierbare CTA-URLs ──────────────────────────────────────────────────
 const CTA_AUTORITAET_URL = "https://www.stupperich.de/challenge-page/praxistraining-emotionale-autorit%C3%A4t";
@@ -416,17 +415,16 @@ export default function ChartDisplay({
               <Icon name="arrowRight" size={14} color="#fff" />
             </a>
           </div>
-          {/* Bodygraph Teaser */}
-          <div className="relative hidden sm:block flex-shrink-0" style={{ width: 160, overflow: "hidden" }}>
-            <div style={{ position: "absolute", inset: 0, transform: "scale(0.48)", transformOrigin: "top center", opacity: 0.85, pointerEvents: "none" }}>
-              <Bodygraph
-                centers={data.centers}
-                channels={data.channels}
-                gates={data.gates}
-              />
-            </div>
-            {/* gradient overlay left→right so it fades into the text */}
-            <div style={{ position: "absolute", inset: 0, background: "linear-gradient(to right, #EEF2F3 15%, transparent 55%)" }} />
+          {/* Chart Teaser */}
+          <div className="relative hidden sm:block flex-shrink-0" style={{ width: 180, overflow: "hidden" }}>
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img
+              src="/human-design-chart.png"
+              alt="Human Design Chart"
+              style={{ position: "absolute", top: 0, right: 0, height: "100%", width: "auto", objectFit: "cover", objectPosition: "center", opacity: 0.9 }}
+            />
+            {/* fade left edge into background */}
+            <div style={{ position: "absolute", inset: 0, background: "linear-gradient(to right, #EEF2F3 10%, transparent 50%)" }} />
           </div>
         </div>
       </div>
