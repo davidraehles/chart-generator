@@ -512,7 +512,9 @@ export async function generateAndDownloadPdf(
     ` : ""}
 
     <!-- Zentren -->
-    <div class="section">
+    <div class="section new-page">
+      <div class="page-top-eyebrow">${data.firstName} · Business Energy Calculator</div>
+      <div class="page-top-rule"></div>
       <div class="chapter-head">
         <span class="chapter-chip">Deine Energie im Business</span>
         <span class="chapter-title">Deine 9 Energiezentren</span>
