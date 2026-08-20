@@ -145,12 +145,14 @@ export async function generateAndDownloadPdf(
     }
 
     /* ── BODY ───────────────────────────────────────────────────────────────── */
-    .body { padding: 12mm 18mm 12mm; }
+    .body { padding: 14mm 22mm 14mm; }
 
     /* ── SECTION ────────────────────────────────────────────────────────────── */
-    .section { margin-bottom: 20px; }
+    .section { margin-bottom: 22px; }
     .kompass-grid, .legend-row { page-break-inside: avoid; }
     .basis-row { page-break-inside: avoid; }
+
+    /* Einfacher Section-Header (Business-Basis) */
     .section-head {
       display: flex;
       align-items: center;
@@ -174,6 +176,32 @@ export async function generateAndDownloadPdf(
       font-size: 10pt;
       font-weight: 600;
       color: #374151;
+    }
+
+    /* Dunkler Kapitel-Header (Kompass, Zentren) */
+    .chapter-head {
+      background: #1A2126;
+      margin: 0 -22mm 14px;
+      padding: 10px 22mm;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      page-break-after: avoid;
+    }
+    .chapter-chip {
+      font-size: 6pt;
+      text-transform: uppercase;
+      letter-spacing: 0.15em;
+      font-weight: 700;
+      color: #5F7680;
+      border: 0.5px solid #5F7680;
+      padding: 2px 7px;
+      flex-shrink: 0;
+    }
+    .chapter-title {
+      font-size: 10.5pt;
+      font-weight: 700;
+      color: #F9F7F4;
     }
 
     /* ── BASIS ROWS ─────────────────────────────────────────────────────────── */
@@ -290,7 +318,10 @@ export async function generateAndDownloadPdf(
       margin-bottom: 2px;
       page-break-inside: avoid;
     }
-    .center-row.defined { border-left-color: #5F7680; }
+    .center-row.defined {
+      border-left-color: #5F7680;
+      background: rgba(95,118,128,0.07);
+    }
     .center-row:last-child { border-bottom: none; }
     .center-icon { flex-shrink: 0; margin-top: 2px; width: 18px; text-align: center; }
     .center-body { flex: 1; min-width: 0; }
@@ -432,9 +463,9 @@ export async function generateAndDownloadPdf(
     <!-- Energie-Kompass -->
     ${typeMeta ? `
     <div class="section" style="page-break-before: always">
-      <div class="section-head">
-        <span class="section-chip">Energie-Kompass</span>
-        <span class="section-title">Deine zwei Signale</span>
+      <div class="chapter-head">
+        <span class="chapter-chip">Energie-Kompass</span>
+        <span class="chapter-title">Deine zwei Signale</span>
       </div>
       <div class="kompass-grid">
         <div class="kompass-cell">
@@ -459,9 +490,9 @@ export async function generateAndDownloadPdf(
 
     <!-- Zentren -->
     <div class="section">
-      <div class="section-head">
-        <span class="section-chip">Deine Energie im Business</span>
-        <span class="section-title">Deine 9 Energiezentren</span>
+      <div class="chapter-head">
+        <span class="chapter-chip">Deine Energie im Business</span>
+        <span class="chapter-title">Deine 9 Energiezentren</span>
       </div>
       <div class="section-intro">
         Jeder Mensch hat im Human Design dieselben neun Energiezentren, jedes steht für ein anderes Thema. Je nach persönlichem Design sind sie definiert oder offen. Im Business zeigen sie, wie du arbeitest, Führungsverantwortung übernimmst, kommunizierst und auf andere wirkst.
