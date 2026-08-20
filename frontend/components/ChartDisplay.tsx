@@ -418,7 +418,7 @@ export default function ChartDisplay({
           </div>
           {/* Bodygraph Teaser */}
           <div className="relative hidden sm:block flex-shrink-0" style={{ width: 160, overflow: "hidden" }}>
-            <div style={{ position: "absolute", inset: 0, transform: "scale(0.52) translate(-43%, -18%)", transformOrigin: "top left", opacity: 0.55, pointerEvents: "none" }}>
+            <div style={{ position: "absolute", inset: 0, transform: "scale(0.48)", transformOrigin: "top center", opacity: 0.85, pointerEvents: "none" }}>
               <Bodygraph
                 centers={data.centers}
                 channels={data.channels}
@@ -426,7 +426,7 @@ export default function ChartDisplay({
               />
             </div>
             {/* gradient overlay left→right so it fades into the text */}
-            <div style={{ position: "absolute", inset: 0, background: "linear-gradient(to right, #EEF2F3 20%, transparent 70%)" }} />
+            <div style={{ position: "absolute", inset: 0, background: "linear-gradient(to right, #EEF2F3 15%, transparent 55%)" }} />
           </div>
         </div>
       </div>
