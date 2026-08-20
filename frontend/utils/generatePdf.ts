@@ -178,6 +178,21 @@ export async function generateAndDownloadPdf(
       color: #374151;
     }
 
+    /* Seitenstart (Kompass, Zentren) */
+    .new-page { page-break-before: always; }
+    .page-top-bar {
+      height: 4px;
+      background: #5F7680;
+      margin: 0 -22mm 6mm;
+    }
+    .page-top-eyebrow {
+      font-size: 6.5pt;
+      text-transform: uppercase;
+      letter-spacing: 0.13em;
+      color: #C4BEB8;
+      margin-bottom: 12px;
+    }
+
     /* Kapitel-Header (Kompass, Zentren) */
     .chapter-head {
       display: flex;
@@ -462,7 +477,9 @@ export async function generateAndDownloadPdf(
 
     <!-- Energie-Kompass -->
     ${typeMeta ? `
-    <div class="section" style="page-break-before: always">
+    <div class="section new-page">
+      <div class="page-top-bar"></div>
+      <div class="page-top-eyebrow">${data.firstName} · Business Energy Reading</div>
       <div class="chapter-head">
         <span class="chapter-chip">Energie-Kompass</span>
         <span class="chapter-title">Deine zwei Signale</span>
@@ -489,7 +506,9 @@ export async function generateAndDownloadPdf(
     ` : ""}
 
     <!-- Zentren -->
-    <div class="section">
+    <div class="section new-page">
+      <div class="page-top-bar"></div>
+      <div class="page-top-eyebrow">${data.firstName} · Business Energy Reading</div>
       <div class="chapter-head">
         <span class="chapter-chip">Deine Energie im Business</span>
         <span class="chapter-title">Deine 9 Energiezentren</span>
