@@ -91,7 +91,7 @@ export default function EmailCaptureSection({ hdType, firstName }: EmailCaptureS
           Business Energy Trigger
         </h3>
         <p className="text-sm leading-relaxed" style={{ color: "#A8B4B6" }}>
-          6 Monate, 6 persönliche Business Energy Trigger, abgestimmt auf deinen Human Design Typ. Jeden Monat ein Impuls, der dich zum Reflektieren bringt, Aha-Momente auslöst und dir hilft, deine Business-Energie bewusster einzusetzen. Kein Newsletter. 6 Mails. Danach Schluss.
+          6 Monate, 6 persönliche Business Energy Trigger, abgestimmt auf deinen Human Design Typ. Jeden Monat ein Impuls, der dich zum Reflektieren bringt, Aha-Momente auslöst und dir hilft, deine Business-Energie bewusster einzusetzen. Kein Newsletter. 6 Mails, danach ist Schluss.
         </p>
       </div>
 
@@ -143,7 +143,7 @@ export default function EmailCaptureSection({ hdType, firstName }: EmailCaptureS
       </form>
 
       <p className="mt-3 text-xs" style={{ color: "#6B7280" }}>
-        Kein Spam. Kein Newsletter. Nur 6 Mails. Danach Schluss.
+        Kein Spam. Kein Newsletter. 6 Mails, danach ist Schluss.
       </p>
     </div>
   );

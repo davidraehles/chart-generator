@@ -542,6 +542,14 @@ export async function generateAndDownloadPdf(
       <div class="cta-url">stupperich.de</div>
     </div>
 
+    <!-- Business Energy Trigger -->
+    <div class="cta-box" style="margin-top: 10px; border-left-color: #B8956A;">
+      <div class="cta-eyebrow" style="color: #B8956A;">Business Energy Trigger · Kostenlos</div>
+      <div class="cta-title">6 Monate. 6 persönliche Impulse. Abgestimmt auf deinen Typ.</div>
+      <div class="cta-text">Kein Newsletter. 6 Mails, danach ist Schluss. Jeden Monat ein Impuls, der dich zum Reflektieren bringt und dir hilft, deine Business-Energie bewusster einzusetzen. Den Trigger Letter kannst du direkt im Calculator anfordern — er ist an deinen Human Design Typ gebunden.</div>
+      <div class="cta-url" style="color: #B8956A;">stupperich.de → Business Energy Calculator</div>
+    </div>
+
     <!-- Footer -->
     <div class="footer">
       <span class="footer-text">stupperich.de · Human Design Business Energy Calculator</span>
