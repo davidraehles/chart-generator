@@ -364,18 +364,18 @@ export default function ChartDisplay({
       </div>
 
       {/* ── 6. PDF HERUNTERLADEN ── */}
-      <div className="px-5 py-5" style={{ background: CARD, border: `0.5px solid ${BORDER}` }}>
-        <p className="text-sm font-semibold mb-1" style={{ color: DARK }}>
+      <div className="px-5 py-5" style={{ background: "#A9806F", border: `0.5px solid #A9806F` }}>
+        <p className="text-sm font-semibold mb-1" style={{ color: "#fff" }}>
           Speichere deine Business-Energie
         </p>
-        <p className="text-xs mb-4" style={{ color: MUTED }}>
+        <p className="text-xs mb-4" style={{ color: "rgba(255,255,255,0.8)" }}>
           Nimm deine Auswertung mit - als Erinnerung für deinen Alltag.
         </p>
         <div className="flex flex-col sm:flex-row gap-3">
           <button onClick={handlePdfDownload}
             className="flex items-center justify-center gap-2 text-sm px-4 py-2.5 transition-opacity hover:opacity-80"
-            style={{ border: `0.5px solid ${BORDER}`, color: BODY }}>
-            <Icon name="download" size={14} color={BODY} />
+            style={{ border: `0.5px solid rgba(255,255,255,0.6)`, color: "#fff" }}>
+            <Icon name="download" size={14} color="#fff" />
             PDF herunterladen
           </button>
           {/* E-Mail-Versand vorübergehend ausgeblendet — wird später aktiviert

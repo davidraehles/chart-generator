@@ -506,9 +506,7 @@ export async function generateAndDownloadPdf(
     ` : ""}
 
     <!-- Zentren -->
-    <div class="section new-page">
-      <div class="page-top-bar"></div>
-      <div class="page-top-eyebrow">${data.firstName} · Business Energy Reading</div>
+    <div class="section">
       <div class="chapter-head">
         <span class="chapter-chip">Deine Energie im Business</span>
         <span class="chapter-title">Deine 9 Energiezentren</span>
