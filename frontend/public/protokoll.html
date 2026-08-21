@@ -982,7 +982,7 @@
       const e = u.emotionPerDir[dir];
       return `<div class="befund-row">
         <div class="br-lbl">${dir}</div>
-        <div class="br-val">${u.counts[dir]} Einträge · ${u.daysPerDir[dir]} ${u.daysPerDir[dir] === 1 ? 'Tag' : 'Tage'} · Emotion: ${emoStr(e)}</div>
+        <div class="br-val">${u.counts[dir]} ${u.counts[dir] === 1 ? 'Eintrag' : 'Einträge'} · ${u.daysPerDir[dir]} ${u.daysPerDir[dir] === 1 ? 'Tag' : 'Tage'} · Emotion: ${emoStr(e)}</div>
       </div>`;
     }).join('');
 
