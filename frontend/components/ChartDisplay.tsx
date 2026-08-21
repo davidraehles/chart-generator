@@ -14,7 +14,7 @@ import { generateAndDownloadPdf } from "@/utils/generatePdf";
 import EmailCaptureSection from "@/components/EmailCaptureSection";
 
 // ── Konfigurierbare CTA-URLs ──────────────────────────────────────────────────
-const CTA_AUTORITAET_URL = "https://www.stupperich.de/challenge-page/praxistraining-emotionale-autorit%C3%A4t";
+const CTA_AUTORITAET_URL = "https://www.stupperich.de/praxiskurs-entscheidungsfindung";
 const CTA_READING_URL    = "https://stupperich.de"; // TODO: Business-Reading URL
 
 // ── Design-Tokens ─────────────────────────────────────────────────────────────
@@ -384,18 +384,18 @@ export default function ChartDisplay({
         {/* KURS */}
         <div className="px-5 py-5 mb-3" style={{ background: "#A9806F", border: `0.5px solid #A9806F` }}>
           <p className="text-xs font-semibold uppercase tracking-widest mb-1" style={{ color: "rgba(255,255,255,0.7)" }}>
-            Kurs
+            Online-Praxistraining
           </p>
-          <p className="text-base font-semibold mb-1" style={{ color: "#fff" }}>
-            Deine Entscheidungs-Architektur vertiefen
+          <p className="text-base font-semibold mb-2" style={{ color: "#fff" }}>
+            Du entscheidest täglich. Wann hast du zuletzt nach deiner Autorität entschieden?
           </p>
           <p className="text-sm mb-4" style={{ color: "rgba(255,255,255,0.85)" }}>
-            Du kennst jetzt deine Entscheidungs-Architektur. Erfahre, wie du sie im Führungsalltag aktiv nutzt, auch unter Zeitdruck und Erwartungen von außen.
+            Du kennst jetzt deine Entscheidungsautorität. Im Online-Praxistraining findest du heraus, was sie für deinen Führungsalltag konkret bedeutet und erprobst deine persönliche Entscheidungsfindung an einer Businessentscheidung, die gerade wirklich ansteht.
           </p>
           <a href={CTA_AUTORITAET_URL} target="_blank" rel="noopener noreferrer"
             className="inline-flex items-center gap-2 text-sm font-medium px-4 py-2.5 transition-opacity hover:opacity-80"
             style={{ border: `0.5px solid rgba(255,255,255,0.6)`, color: "#fff" }}>
-            Meine Entscheidungs-Architektur vertiefen
+            Praxistraining entdecken
             <Icon name="arrowRight" size={14} color="#fff" />
           </a>
         </div>
