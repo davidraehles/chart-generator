@@ -372,7 +372,8 @@
       padding: 8px 16px; font-size: 13px; font-weight: 600;
       cursor: pointer; transition: background .15s;
     }
-    .btn-befund-calc:hover { background: var(--sage-dark); }
+    .btn-befund-calc:hover:not(:disabled) { background: var(--sage-dark); }
+    .btn-befund-calc:disabled { background: var(--border); color: var(--muted); cursor: not-allowed; }
     .befund-body { padding: 20px 24px; }
     .befund-placeholder { color: var(--muted); font-size: 14px; }
     .befund-badge {
@@ -467,11 +468,11 @@
 
 <section class="intro-box">
   <div class="inner">
-    <div class="intro-greeting">Toll, dass du dir Zeit nimmst, um deine Entscheidungsarchitektur besser zu verstehen.</div>
-    <p>Dieses Protokoll begleitet dich durch 7 Tage bewusster Selbstbeobachtung. Morgens und abends je ein kurzer Eintrag. Es ist für Menschen gedacht, die ihre Emotionale Autorität besser verstehen möchten: nicht theoretisch, sondern im Alltag, in einer echten Entscheidung.</p>
-    <p>Der Befund am Ende zeigt dir, ob sich in deinen Einträgen eine wiederkehrende Richtung abzeichnet. <strong>Es ist kein Orakel. Es erhebt keinen Anspruch darauf, was die richtige Entscheidung für dich ist!</strong></p>
-    <p>Das kann weder dieses Tool noch ein anderes Tool wissen, und das ist auch gar nicht der Sinn.</p>
-    <p>Die Entscheidung liegt immer bei dir.</p>
+    <div class="intro-greeting">7 Tage beobachten, was wirklich passiert.</div>
+    <p>Dieses Protokoll begleitet dich durch 7 Tage bewusster Selbstbeobachtung. Morgens und abends je ein kurzer Eintrag zu deiner emotionalen Lage, deiner Richtung, dem Druck, den du spürst, und dem, was du körperlich wahrnimmst.</p>
+    <p>An Tag 7 öffnet sich deine persönliche Beobachtungsübersicht. Sie zeigt dir, welche Muster sich in deinen Einträgen zeigen — ohne Bewertung und ohne Empfehlung.</p>
+    <p>Was diese Muster für deine Entscheidung bedeuten, prüfst du gemeinsam mit Silke in Modul 4.</p>
+    <div class="intro-note">Die Entscheidung liegt immer bei dir. Dieses Protokoll sammelt Beobachtungsmaterial — kein Tool und keine Auswertung kann dir sagen, was die richtige Entscheidung für dich ist.</div>
   </div>
 </section>
 
@@ -500,19 +501,19 @@
   <div class="befund-section" id="befund-section">
     <div class="befund-hd">
       <div>
-        <h2>Dein Entscheidungsbefund</h2>
+        <h2>Deine Beobachtungsübersicht</h2>
         <div class="befund-hd-sub">nach 7 Tagen Emotionaler Autorität</div>
       </div>
-      <button class="btn-befund-calc" id="btn-befund">Befund berechnen</button>
+      <button class="btn-befund-calc" id="btn-befund" disabled>Beobachtungsübersicht öffnen</button>
     </div>
     <div class="befund-body" id="befund-body">
-      <p class="befund-placeholder">Fülle mindestens 4 Tage aus, um deinen Befund zu berechnen.</p>
+      <p class="befund-placeholder">Deine Beobachtungsübersicht wird an Tag 7 freigeschaltet. Bis dahin sammelst du weiter.</p>
     </div>
   </div>
 
   <div class="share-box">
     <div class="share-title">Dein persönlicher Link</div>
-    <div class="share-desc">Dieser Link enthält alle deine Einträge. Speichere ihn als Lesezeichen oder schick ihn dir selbst — dann öffnest du dein Protokoll auf jedem Gerät.</div>
+    <div class="share-desc">Dieser Link enthält alle deine Einträge. Behandle ihn vertraulich und teile ihn nur, wenn du das ausdrücklich möchtest.</div>
     <div class="share-row">
       <input class="share-input" id="share-url" type="text" readonly>
       <button class="btn-copy" id="btn-copy">Kopieren</button>
@@ -849,8 +850,25 @@
   });
 
 
-  /* ── ENTSCHEIDUNGSBEFUND ── */
-  function computeBefund() {
+  /* ── BEOBACHTUNGSÜBERSICHT ── */
+
+  function day7HasDirection() {
+    const day7 = state.days[7] || {};
+    return ['morning','evening'].some(sl => (day7[sl] || {}).direction);
+  }
+
+  function updateBefundButton() {
+    const btn = document.getElementById('btn-befund');
+    const body = document.getElementById('befund-body');
+    if (day7HasDirection()) {
+      btn.disabled = false;
+    } else {
+      btn.disabled = true;
+      body.innerHTML = '<p class="befund-placeholder">Deine Beobachtungsübersicht wird an Tag 7 freigeschaltet. Bis dahin sammelst du weiter.</p>';
+    }
+  }
+
+  function computeUebersicht() {
     collectAll();
     const points = [];
     for (let d = 1; d <= 7; d++) {
@@ -869,183 +887,205 @@
         }
       }
     }
+
+    const total = points.length;
+
+    // Verteilung aller drei Richtungen (gleichberechtigt)
     const counts = { 'Ja': 0, 'Nein': 0, 'Noch nicht': 0 };
     points.forEach(p => { if (counts[p.direction] !== undefined) counts[p.direction]++; });
-    const total = points.length;
-    let dominant = null;
-    if (counts['Ja'] > counts['Nein'] && counts['Ja'] > counts['Noch nicht']) dominant = 'Ja';
-    else if (counts['Nein'] > counts['Ja'] && counts['Nein'] > counts['Noch nicht']) dominant = 'Nein';
-    const domPoints = dominant ? points.filter(p => p.direction === dominant) : [];
-    const domEmotions = domPoints.map(p => p.emotion).filter(e => e !== null);
-    const minEmo = domEmotions.length ? Math.min(...domEmotions) : null;
-    const maxEmo = domEmotions.length ? Math.max(...domEmotions) : null;
-    let wendepunkt = null, lastOther = null;
-    if (dominant) {
-      for (const p of points) { if (p.direction !== dominant) lastOther = p; }
-      if (lastOther) {
-        const idx = points.indexOf(lastOther);
-        for (let i = idx + 1; i < points.length; i++) {
-          if (points[i].direction === dominant) { wendepunkt = points[i]; break; }
-        }
-      }
-      if (!wendepunkt && domPoints.length) wendepunkt = domPoints[0];
-    }
-    let keyPerspective = '';
-    if (wendepunkt) keyPerspective = wendepunkt.new_info || wendepunkt.body_sense || '';
-    const recentNonDom = points.filter(p => p.day >= 6 && p.direction !== dominant);
-    let stillOpen = '';
-    for (const p of recentNonDom) { if (p.new_info) { stillOpen = p.new_info; break; } }
-    const consistency = total > 0 && dominant ? counts[dominant] / total : 0;
-    const survivedLow = minEmo !== null && minEmo <= 0;
-    const daysWithDom = dominant ? [...new Set(domPoints.map(p => p.day))].length : 0;
-    let readiness;
-    if (dominant && consistency >= 0.57 && survivedLow && daysWithDom >= 4) readiness = 'entscheidungsreif';
-    else if (dominant && (consistency >= 0.38 || daysWithDom >= 3)) readiness = 'tendenz';
-    else readiness = 'offen';
 
-    // ── Zonen-Analyse: Hoch / Neutral / Tief getrennt ───────────────────────
+    // Häufigste Richtung — alle drei gleichberechtigt, Gleichstand = null
+    const maxCount = Math.max(counts['Ja'], counts['Nein'], counts['Noch nicht']);
+    const leaders = maxCount > 0 ? Object.keys(counts).filter(k => counts[k] === maxCount) : [];
+    const dominant = leaders.length === 1 ? leaders[0] : null;
+
+    // Anzahl unterschiedlicher Tage pro Richtung
+    const daysPerDir = {};
+    ['Ja','Nein','Noch nicht'].forEach(dir => {
+      daysPerDir[dir] = new Set(points.filter(p => p.direction === dir).map(p => p.day)).size;
+    });
+
+    // Emotionale Zustände pro Richtung
+    function emoRangeForDir(dir) {
+      const emos = points.filter(p => p.direction === dir && p.emotion !== null).map(p => p.emotion);
+      if (!emos.length) return null;
+      return { min: Math.min(...emos), max: Math.max(...emos), count: emos.length };
+    }
+    const emotionPerDir = {
+      'Ja': emoRangeForDir('Ja'),
+      'Nein': emoRangeForDir('Nein'),
+      'Noch nicht': emoRangeForDir('Noch nicht'),
+    };
+
+    // Zonen: Hoch / Neutral / Tief getrennt
     function zoneDominant(pts) {
       if (!pts.length) return null;
       const c = { 'Ja': 0, 'Nein': 0, 'Noch nicht': 0 };
       pts.forEach(p => { if (c[p.direction] !== undefined) c[p.direction]++; });
       const max = Math.max(...Object.values(c));
       if (max === 0) return null;
-      const leaders = Object.keys(c).filter(k => c[k] === max);
-      return { dominant: leaders.length === 1 ? leaders[0] : null, tie: leaders.length > 1, counts: c, total: pts.length };
+      const ls = Object.keys(c).filter(k => c[k] === max);
+      return { dominant: ls.length === 1 ? ls[0] : null, tie: ls.length > 1, counts: c, total: pts.length };
     }
     const zoneHoch    = zoneDominant(points.filter(p => p.emotion !== null && p.emotion >= 1));
     const zoneNeutral = zoneDominant(points.filter(p => p.emotion !== null && p.emotion === 0));
     const zoneTief    = zoneDominant(points.filter(p => p.emotion !== null && p.emotion <= -1));
 
-    // ── Druckverteilung: hoch vs. niedrig ────────────────────────────────────
+    // Druckvergleich
     function pressureCount(pts) {
       const c = { 'Ja': 0, 'Nein': 0, 'Noch nicht': 0 };
       pts.forEach(p => { if (c[p.direction] !== undefined) c[p.direction]++; });
       return c;
     }
-    const ptHighPressure  = points.filter(p => p.pressure !== null && p.pressure >= 7);
-    const ptLowPressure   = points.filter(p => p.pressure !== null && p.pressure < 7);
+    const ptHighPressure   = points.filter(p => p.pressure !== null && p.pressure >= 7);
+    const ptLowPressure    = points.filter(p => p.pressure !== null && p.pressure < 7);
     const highPressureDist = pressureCount(ptHighPressure);
     const lowPressureDist  = pressureCount(ptLowPressure);
 
-    return { points, counts, total, dominant, readiness, consistency, daysWithDom, minEmo, maxEmo, wendepunkt, keyPerspective, stillOpen,
-             zoneHoch, zoneNeutral, zoneTief, ptHighPressure, highPressureDist, lowPressureDist };
+    // Letzte 3 Informationen / Folgen / Bedingungen
+    const lastNewInfo   = points.filter(p => p.new_info).slice(-3).reverse();
+    // Letzte 3 körperliche Wahrnehmungen
+    const lastBodySense = points.filter(p => p.body_sense).slice(-3).reverse();
+
+    return { points, total, counts, dominant, daysPerDir, emotionPerDir,
+             zoneHoch, zoneNeutral, zoneTief,
+             ptHighPressure, highPressureDist, lowPressureDist,
+             lastNewInfo, lastBodySense };
   }
 
-  function renderBefund(b) {
+  function renderUebersicht(u) {
     const body = document.getElementById('befund-body');
-    if (b.total < 4) {
-      body.innerHTML = '<p class="befund-placeholder">Fülle mindestens 4 Tage aus, um deinen Befund zu berechnen.</p>';
-      return;
-    }
-    const badgeClass = b.readiness === 'entscheidungsreif' ? 'badge-reif' : b.readiness === 'tendenz' ? 'badge-tendenz' : 'badge-offen';
-    const badgeLabel = b.readiness === 'entscheidungsreif' ? '✓ Entscheidungsreif' : b.readiness === 'tendenz' ? '→ Tendenz erkennbar' : '○ Noch offen';
-    const leadText = b.readiness === 'entscheidungsreif'
-      ? `Nach ${b.total} Einträgen über ${b.daysWithDom} Tage zeigt sich ein klares <strong>${b.dominant}</strong> — und diese Richtung hat auch emotionale Tiefs überlebt.`
-      : b.readiness === 'tendenz'
-      ? `Eine Richtung zeichnet sich ab: <strong>${b.dominant || 'unklar'}</strong>. Die Entscheidung ist noch nicht vollständig gereift.`
-      : 'Deine Einträge zeigen noch keine klare Richtung. Mehr Zeit oder neue Perspektiven können Klarheit bringen.';
 
-    // Pips
+    // ── Pips-Timeline ────────────────────────────────────────────────────────
     const pips = [];
     for (let d = 1; d <= 7; d++) {
       for (const sl of ['morning','evening']) {
-        const p = b.points.find(x => x.day === d && x.slot === sl);
+        const p = u.points.find(x => x.day === d && x.slot === sl);
         if (!p) { pips.push('<span class="pip pip-leer" title="—"></span>'); continue; }
         const cls = p.direction === 'Ja' ? 'pip-ja' : p.direction === 'Nein' ? 'pip-nein' : 'pip-noch';
         const lbl = p.direction === 'Ja' ? 'J' : p.direction === 'Nein' ? 'N' : '?';
-        pips.push(`<span class="pip ${cls}" title="Tag ${d} ${sl === 'morning' ? 'Morgen' : 'Abend'}: ${p.direction}">${lbl}</span>`);
+        pips.push(`<span class="pip ${cls}" title="Tag ${p.day} ${sl === 'morning' ? 'Morgen' : 'Abend'}: ${p.direction}">${lbl}</span>`);
       }
     }
 
-    // Übersichts-Zeilen
-    const rows = [
-      ['Derzeitige Richtung', b.dominant ? `<strong>${b.dominant}</strong>` : '—'],
-      ['Konsistenz', b.dominant ? `${Math.round(b.consistency * 100)} % der Einträge` : '—'],
-      ['Erster stabiler Impuls', b.wendepunkt ? `Tag ${b.wendepunkt.day}, ${b.wendepunkt.slot === 'morning' ? 'Morgen' : 'Abend'}` : '—'],
-      ['Entscheidende Perspektive', b.keyPerspective || '—'],
-    ].map(([lbl, val]) => `<div class="befund-row"><div class="br-lbl">${lbl}</div><div class="br-val">${val}</div></div>`).join('');
+    // ── Verteilung ───────────────────────────────────────────────────────────
+    function emoStr(e) {
+      if (!e) return '—';
+      const sign = v => v > 0 ? `+${v}` : `${v}`;
+      return e.min === e.max ? sign(e.min) : `${sign(e.min)} bis ${sign(e.max)}`;
+    }
+    const dirs = ['Ja','Nein','Noch nicht'];
+    const distRows = dirs.map(dir => {
+      const e = u.emotionPerDir[dir];
+      return `<div class="befund-row">
+        <div class="br-lbl">${dir}</div>
+        <div class="br-val">${u.counts[dir]} Einträge · ${u.daysPerDir[dir]} ${u.daysPerDir[dir] === 1 ? 'Tag' : 'Tage'} · Emotion: ${emoStr(e)}</div>
+      </div>`;
+    }).join('');
 
-    // Zonen-Analyse
+    const dominantNote = u.dominant
+      ? `<p style="font-size:13px;color:var(--stone);margin-top:10px;">Am häufigsten eingetragen: <strong>${u.dominant}</strong></p>`
+      : `<p style="font-size:13px;color:var(--muted);margin-top:10px;font-style:italic;">Mehrere Richtungen wurden gleich häufig eingetragen.</p>`;
+
+    // ── Zonen ────────────────────────────────────────────────────────────────
     function zoneText(z) {
-      if (!z) return '<em style="color:var(--muted)">Keine Einträge in diesem Bereich</em>';
+      if (!z) return '<em style="color:var(--muted)">Keine Einträge in diesem Bereich.</em>';
       if (z.tie) return 'Mehrere Richtungen gleich häufig eingetragen.';
       return `Am häufigsten: <strong>${z.dominant}</strong>`;
     }
-    const zoneHtml = `
-      <div style="margin:20px 0 6px;">
-        <div class="br-lbl" style="margin-bottom:8px;">Richtung nach emotionalem Zustand</div>
-        <div style="display:grid;gap:7px;">
-          <div style="background:#EBF3EB;border-radius:8px;padding:10px 14px;">
-            <div style="font-size:11px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:#2D5040;margin-bottom:3px;">Im emotionalen Hoch (+1 und +2)</div>
-            <div style="font-size:13px;color:var(--stone);">${zoneText(b.zoneHoch)}</div>
-          </div>
-          <div style="background:#F7F8F9;border:1px solid var(--border);border-radius:8px;padding:10px 14px;">
-            <div style="font-size:11px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:var(--muted);margin-bottom:3px;">In neutralen Momenten (0)</div>
-            <div style="font-size:13px;color:var(--stone);">${zoneText(b.zoneNeutral)}</div>
-          </div>
-          <div style="background:#F3EBEB;border-radius:8px;padding:10px 14px;">
-            <div style="font-size:11px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:#5C2D2D;margin-bottom:3px;">Im emotionalen Tief (−1 und −2)</div>
-            <div style="font-size:13px;color:var(--stone);">${zoneText(b.zoneTief)}</div>
-          </div>
-        </div>
-        <p style="font-size:12px;color:var(--muted);margin-top:9px;line-height:1.65;">Damit siehst du, wie sich dein Blick auf dieselbe Entscheidung in unterschiedlichen emotionalen Zuständen verändert hat. Was diese Unterschiede für deine Entscheidung bedeuten, prüfst du in Modul 4.</p>
-      </div>`;
 
-    // Druckverteilung
+    // ── Druckvergleich ───────────────────────────────────────────────────────
     function distStr(c) { return `Ja: ${c['Ja']} · Nein: ${c['Nein']} · Noch nicht: ${c['Noch nicht']}`; }
     let pressureHtml;
-    if (b.ptHighPressure.length === 0) {
+    if (u.ptHighPressure.length === 0) {
       pressureHtml = '<p style="font-size:13px;color:var(--muted);font-style:italic;">Während des Experiments gab es keinen Eintrag mit einem Entscheidungsdruck zwischen 7 und 10.</p>';
     } else {
       pressureHtml = `
         <div style="display:grid;gap:7px;margin-bottom:9px;">
           <div style="background:#EDF2F4;border-radius:8px;padding:10px 14px;">
-            <div style="font-size:11px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:var(--sage);margin-bottom:3px;">Bei hohem Druck (7–10) · ${b.ptHighPressure.length} Einträge</div>
-            <div style="font-size:13px;font-weight:600;color:var(--stone);">${distStr(b.highPressureDist)}</div>
+            <div class="br-lbl" style="margin-bottom:3px;">Bei hohem Druck (7–10) · ${u.ptHighPressure.length} ${u.ptHighPressure.length === 1 ? 'Eintrag' : 'Einträge'}</div>
+            <div style="font-size:13px;font-weight:600;color:var(--stone);">${distStr(u.highPressureDist)}</div>
           </div>
           <div style="background:#F7F8F9;border:1px solid var(--border);border-radius:8px;padding:10px 14px;">
-            <div style="font-size:11px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:var(--muted);margin-bottom:3px;">Bei niedrigem Druck (0–6)</div>
-            <div style="font-size:13px;font-weight:600;color:var(--stone);">${distStr(b.lowPressureDist)}</div>
+            <div class="br-lbl" style="margin-bottom:3px;">Bei niedrigem Druck (0–6)</div>
+            <div style="font-size:13px;font-weight:600;color:var(--stone);">${distStr(u.lowPressureDist)}</div>
           </div>
         </div>
         <p style="font-size:12px;color:var(--muted);line-height:1.65;">Damit kannst du vergleichen, ob du unter hohem Druck häufiger zu einer bestimmten Antwort tendierst. Was hinter dieser Veränderung steckt, prüfst du in Modul 4.</p>`;
     }
-    const pressureSection = `
-      <div style="margin:20px 0 6px;">
-        <div class="br-lbl" style="margin-bottom:8px;">Entscheidungsdruck im Vergleich</div>
-        ${pressureHtml}
-      </div>`;
 
-    const nextStep = b.readiness === 'entscheidungsreif'
-      ? `Deine Einträge zeigen eine deutlich wiederkehrende Richtung. Prüfe jetzt, ob dieser Befund deinem eigenen Entscheidungsstand entspricht.`
-      : b.readiness === 'tendenz'
-      ? `Beobachte noch 2–3 Tage weiter${b.stillOpen ? `, besonders: ${b.stillOpen}` : ''}.`
-      : `Fülle das Protokoll weitere Tage aus. ${b.stillOpen ? `Offene Frage: ${b.stillOpen}` : 'Neue Informationen können die Richtung klären.'}`;
+    // ── Letzte Einträge ───────────────────────────────────────────────────────
+    function slotLabel(p) { return `Tag ${p.day}, ${p.slot === 'morning' ? 'Morgen' : 'Abend'}`; }
+    function entryList(items, field, emptyText) {
+      if (!items.length) return `<p style="font-size:13px;color:var(--muted);font-style:italic;">${emptyText}</p>`;
+      return items.map(p => `<div style="border-left:3px solid var(--border);padding:8px 12px;margin-bottom:7px;background:#F7F8F9;border-radius:0 6px 6px 0;">
+        <div style="font-size:10px;color:var(--muted);margin-bottom:3px;">${slotLabel(p)}</div>
+        <div style="font-size:13px;color:var(--stone);">${p[field]}</div>
+      </div>`).join('');
+    }
 
     body.innerHTML = `
-      <div class="befund-badge ${badgeClass}">${badgeLabel}</div>
-      <div class="befund-lead">${leadText}</div>
-      <div class="dir-pips">${pips.join('')}</div>
-      <div class="befund-rows">${rows}</div>
-      ${zoneHtml}
-      ${pressureSection}
-      <div class="befund-next" style="margin-top:16px;">
+      <p style="font-size:13px;color:var(--muted);margin-bottom:16px;">Alle Einträge auf einen Blick. Keine Bewertung — nur was du beobachtet hast.</p>
+
+      <!-- Timeline -->
+      <div class="br-lbl" style="margin-bottom:6px;">Chronologische Übersicht (J = Ja · N = Nein · ? = Noch nicht)</div>
+      <div class="dir-pips" style="margin-bottom:20px;">${pips.join('')}</div>
+
+      <!-- Verteilung -->
+      <div class="br-lbl" style="margin-bottom:8px;">Verteilung der Richtungen über alle Einträge</div>
+      <div class="befund-rows" style="margin-bottom:4px;">${distRows}</div>
+      ${dominantNote}
+
+      <!-- Zonen -->
+      <div style="margin-top:22px;">
+        <div class="br-lbl" style="margin-bottom:8px;">Richtung nach emotionalem Zustand</div>
+        <div style="display:grid;gap:7px;">
+          <div style="background:#EBF3EB;border-radius:8px;padding:10px 14px;">
+            <div style="font-size:11px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:#2D5040;margin-bottom:3px;">Im emotionalen Hoch (+1 und +2)</div>
+            <div style="font-size:13px;color:var(--stone);">${zoneText(u.zoneHoch)}</div>
+          </div>
+          <div style="background:#F7F8F9;border:1px solid var(--border);border-radius:8px;padding:10px 14px;">
+            <div style="font-size:11px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:var(--muted);margin-bottom:3px;">In neutralen Momenten (0)</div>
+            <div style="font-size:13px;color:var(--stone);">${zoneText(u.zoneNeutral)}</div>
+          </div>
+          <div style="background:#F3EBEB;border-radius:8px;padding:10px 14px;">
+            <div style="font-size:11px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:#5C2D2D;margin-bottom:3px;">Im emotionalen Tief (−1 und −2)</div>
+            <div style="font-size:13px;color:var(--stone);">${zoneText(u.zoneTief)}</div>
+          </div>
+        </div>
+        <p style="font-size:12px;color:var(--muted);margin-top:9px;line-height:1.65;">Damit siehst du, wie sich dein Blick auf dieselbe Entscheidung in unterschiedlichen emotionalen Zuständen verändert hat. Was diese Unterschiede bedeuten, prüfst du in Modul 4.</p>
+      </div>
+
+      <!-- Druckvergleich -->
+      <div style="margin-top:22px;">
+        <div class="br-lbl" style="margin-bottom:8px;">Entscheidungsdruck im Vergleich</div>
+        ${pressureHtml}
+      </div>
+
+      <!-- Letzte Informationen -->
+      <div style="margin-top:22px;">
+        <div class="br-lbl" style="margin-bottom:8px;">Letzte 3 eingetragene Informationen, Folgen oder Bedingungen</div>
+        ${entryList(u.lastNewInfo, 'new_info', 'Keine Einträge in diesem Feld.')}
+      </div>
+
+      <!-- Letzte körperliche Wahrnehmungen -->
+      <div style="margin-top:22px;">
+        <div class="br-lbl" style="margin-bottom:8px;">Letzte 3 körperliche Wahrnehmungen</div>
+        ${entryList(u.lastBodySense, 'body_sense', 'Keine Einträge in diesem Feld.')}
+      </div>
+
+      <!-- Brücke zu Modul 4 -->
+      <div class="befund-next" style="margin-top:22px;">
         <div class="befund-next-lbl">Dein nächster Schritt</div>
-        <div class="befund-next-val">${nextStep}</div>
+        <div class="befund-next-val">Diese Übersicht ist dein Ausgangsmaterial für Modul 4. Dort prüfst du gemeinsam mit Silke, was deine Beobachtungen für diese konkrete Entscheidung bedeuten — und was du wirklich brauchst, bevor du ein verbindliches Ja oder Nein gibst.</div>
       </div>`;
   }
 
   document.getElementById('btn-befund').addEventListener('click', () => {
     save(false);
-    // Wenn Tag 7 mindestens eine Richtung hat → Abschluss-Dialog zeigen
-    const day7 = state.days[7] || {};
-    const day7HasDirection = ['morning','evening'].some(sl => (day7[sl] || {}).direction);
-    if (day7HasDirection) {
-      document.getElementById('befund-modal').style.display = 'flex';
-    } else {
-      renderBefund(computeBefund());
-    }
+    // Nur ausführen wenn Tag 7 eine Richtung hat (Button sonst disabled)
+    if (!day7HasDirection()) return;
+    document.getElementById('befund-modal').style.display = 'flex';
   });
 
   document.getElementById('modal-continue').addEventListener('click', () => {
@@ -1053,14 +1093,9 @@
   });
   document.getElementById('modal-finish').addEventListener('click', () => {
     document.getElementById('befund-modal').style.display = 'none';
-    renderBefund(computeBefund());
+    renderUebersicht(computeUebersicht());
     document.getElementById('befund-section').scrollIntoView({ behavior: 'smooth' });
   });
-
-  setTimeout(() => {
-    const b = computeBefund();
-    if (b.total >= 6) renderBefund(b);
-  }, 200);
 
 })();
 </script>
