@@ -229,22 +229,6 @@ export default function ChartDisplay({
         </div>
       </div>
 
-      {/* ── 3. ENTSCHEIDUNGS-ARCHITEKTUR CTA ── */}
-      <div className="px-5 py-6" style={{ background: CARD, border: `0.5px solid ${BORDER}` }}>
-        <p className="text-xs font-semibold uppercase tracking-widest mb-3" style={{ color: ACCENT }}>
-          Deine Entscheidungs-Architektur vertiefen
-        </p>
-        <p className="text-sm mb-5 leading-relaxed" style={{ color: BODY }}>
-          Du kennst jetzt deine Entscheidungs-Architektur. Erfahre, wie du sie im Führungsalltag aktiv nutzt, auch unter Zeitdruck und Erwartungen von außen.
-        </p>
-        <a href={CTA_AUTORITAET_URL} target="_blank" rel="noopener noreferrer"
-          className="inline-flex items-center gap-2 text-sm font-medium px-4 py-2.5 transition-opacity hover:opacity-80"
-          style={{ background: ACCENT, color: "#fff" }}>
-          Meine Entscheidungs-Architektur vertiefen
-          <Icon name="arrowRight" size={14} color="#fff" />
-        </a>
-      </div>
-
       {/* ── 4. ENERGIE-KOMPASS ── */}
       {typeMeta && (
         <div>
@@ -367,7 +351,7 @@ export default function ChartDisplay({
       </div>
 
       {/* ── 6. PDF HERUNTERLADEN ── */}
-      <div className="px-5 py-5" style={{ background: "#A9806F", border: `0.5px solid #A9806F` }}>
+      <div className="px-5 py-5" style={{ background: "#a6a6a6", border: `0.5px solid #a6a6a6` }}>
         <p className="text-base font-semibold mb-1" style={{ color: "#fff" }}>
           Speichere deine Business-Energie
         </p>
@@ -391,7 +375,33 @@ export default function ChartDisplay({
         </div>
       </div>
 
-      {/* ── 7. TRIGGER-LETTERS ── */}
+      {/* ── 7. NÄCHSTE SCHRITTE ── */}
+      <div>
+        <h2 className="text-base font-bold mb-4" style={{ color: DARK }}>
+          Deine möglichen nächsten Schritte:
+        </h2>
+
+        {/* KURS */}
+        <div className="px-5 py-5 mb-3" style={{ background: "#A9806F", border: `0.5px solid #A9806F` }}>
+          <p className="text-xs font-semibold uppercase tracking-widest mb-1" style={{ color: "rgba(255,255,255,0.7)" }}>
+            Kurs
+          </p>
+          <p className="text-base font-semibold mb-1" style={{ color: "#fff" }}>
+            Deine Entscheidungs-Architektur vertiefen
+          </p>
+          <p className="text-sm mb-4" style={{ color: "rgba(255,255,255,0.85)" }}>
+            Du kennst jetzt deine Entscheidungs-Architektur. Erfahre, wie du sie im Führungsalltag aktiv nutzt, auch unter Zeitdruck und Erwartungen von außen.
+          </p>
+          <a href={CTA_AUTORITAET_URL} target="_blank" rel="noopener noreferrer"
+            className="inline-flex items-center gap-2 text-sm font-medium px-4 py-2.5 transition-opacity hover:opacity-80"
+            style={{ border: `0.5px solid rgba(255,255,255,0.6)`, color: "#fff" }}>
+            Meine Entscheidungs-Architektur vertiefen
+            <Icon name="arrowRight" size={14} color="#fff" />
+          </a>
+        </div>
+      </div>
+
+      {/* TRIGGER-LETTERS */}
       <EmailCaptureSection
         hdType={data.type.code}
         firstName={data.firstName}
