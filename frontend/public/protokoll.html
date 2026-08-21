@@ -1003,22 +1003,28 @@
     // ── Druckvergleich ───────────────────────────────────────────────────────
     function distStr(c) { return `Ja: ${c['Ja']} · Nein: ${c['Nein']} · Noch nicht: ${c['Noch nicht']}`; }
     let pressureHtml;
-    if (u.ptHighPressure.length === 0) {
-      pressureHtml = '<p style="font-size:13px;color:var(--muted);font-style:italic;">Während des Experiments gab es keinen Eintrag mit einem Entscheidungsdruck zwischen 7 und 10.</p>';
+    const allPressures = u.points.filter(p => p.pressure !== null).map(p => p.pressure);
+    if (allPressures.length === 0) {
+      pressureHtml = '<p style="font-size:13px;color:var(--muted);font-style:italic;">Keine Druckwerte eingetragen.</p>';
     } else {
-      const allPressures = u.points.filter(p => p.pressure !== null).map(p => p.pressure);
       const pMin = Math.min(...allPressures);
       const pMax = Math.max(...allPressures);
       const pAvg = (allPressures.reduce((s,v) => s+v, 0) / allPressures.length).toFixed(1);
-      pressureHtml = `
-        <div style="font-size:12px;color:var(--muted);margin-bottom:10px;">Niedrigster Wert: <strong>${pMin}</strong> · Höchster Wert: <strong>${pMax}</strong> · Durchschnitt: <strong>${pAvg}</strong></div>
-        <div style="display:grid;gap:7px;margin-bottom:9px;">
+      const noHighNote = u.ptHighPressure.length === 0
+        ? `<p style="font-size:12px;color:var(--muted);font-style:italic;margin-bottom:8px;">Während des Experiments gab es keinen Eintrag mit einem Entscheidungsdruck von 7 bis 10.</p>`
+        : '';
+      const highBlock = u.ptHighPressure.length > 0 ? `
           <div style="background:#EDF2F4;border-radius:8px;padding:10px 14px;">
             <div class="br-lbl" style="margin-bottom:3px;">Bei hohem Druck (7–10) · ${u.ptHighPressure.length} ${u.ptHighPressure.length === 1 ? 'Eintrag' : 'Einträge'}</div>
             <div style="font-size:13px;font-weight:600;color:var(--stone);">${distStr(u.highPressureDist)}</div>
-          </div>
+          </div>` : '';
+      pressureHtml = `
+        <div style="font-size:12px;color:var(--muted);margin-bottom:10px;">Niedrigster Wert: <strong>${pMin}</strong> · Höchster Wert: <strong>${pMax}</strong> · Durchschnitt: <strong>${pAvg}</strong></div>
+        ${noHighNote}
+        <div style="display:grid;gap:7px;margin-bottom:9px;">
+          ${highBlock}
           <div style="background:#F7F8F9;border:1px solid var(--border);border-radius:8px;padding:10px 14px;">
-            <div class="br-lbl" style="margin-bottom:3px;">Bei einem Druck von 0–6</div>
+            <div class="br-lbl" style="margin-bottom:3px;">Bei einem Druck von 0–6 · ${u.ptLowPressure.length} ${u.ptLowPressure.length === 1 ? 'Eintrag' : 'Einträge'}</div>
             <div style="font-size:13px;font-weight:600;color:var(--stone);">${distStr(u.lowPressureDist)}</div>
           </div>
         </div>
