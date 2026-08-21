@@ -502,7 +502,7 @@
     <div class="befund-hd">
       <div>
         <h2>Deine Beobachtungsübersicht</h2>
-        <div class="befund-hd-sub">nach 7 Tagen Emotionaler Autorität</div>
+        <div class="befund-hd-sub">Deine sieben Tage im Überblick</div>
       </div>
       <button class="btn-befund-calc" id="btn-befund" disabled>Beobachtungsübersicht öffnen</button>
     </div>
@@ -761,6 +761,7 @@
     history.replaceState(null, '', url);
     document.getElementById('share-url').value = window.location.href;
     updateTabs();
+    updateBefundButton();
     if (showMsg) {
       const m = document.getElementById('save-msg');
       m.textContent = 'Gespeichert ✓';
@@ -821,6 +822,7 @@
   buildTabs();
   buildEntries();
   load();
+  updateBefundButton();
   goDay(1);
 
   document.getElementById('btn-save').addEventListener('click', () => save(true));
@@ -909,7 +911,7 @@
     function emoRangeForDir(dir) {
       const emos = points.filter(p => p.direction === dir && p.emotion !== null).map(p => p.emotion);
       if (!emos.length) return null;
-      return { min: Math.min(...emos), max: Math.max(...emos), count: emos.length };
+      return { min: Math.min(...emos), max: Math.max(...emos), count: emos.length, values: emos };
     }
     const emotionPerDir = {
       'Ja': emoRangeForDir('Ja'),
@@ -972,7 +974,11 @@
     function emoStr(e) {
       if (!e) return '—';
       const sign = v => v > 0 ? `+${v}` : `${v}`;
-      return e.min === e.max ? sign(e.min) : `${sign(e.min)} bis ${sign(e.max)}`;
+      if (e.values && e.values.length) {
+        const unique = [...new Set(e.values)].sort((a,b) => a-b);
+        return unique.map(sign).join(', ');
+      }
+      return e.min === e.max ? sign(e.min) : `${sign(e.min)}, ${sign(e.max)}`;
     }
     const dirs = ['Ja','Nein','Noch nicht'];
     const distRows = dirs.map(dir => {
@@ -1000,14 +1006,19 @@
     if (u.ptHighPressure.length === 0) {
       pressureHtml = '<p style="font-size:13px;color:var(--muted);font-style:italic;">Während des Experiments gab es keinen Eintrag mit einem Entscheidungsdruck zwischen 7 und 10.</p>';
     } else {
+      const allPressures = u.points.filter(p => p.pressure !== null).map(p => p.pressure);
+      const pMin = Math.min(...allPressures);
+      const pMax = Math.max(...allPressures);
+      const pAvg = (allPressures.reduce((s,v) => s+v, 0) / allPressures.length).toFixed(1);
       pressureHtml = `
+        <div style="font-size:12px;color:var(--muted);margin-bottom:10px;">Niedrigster Wert: <strong>${pMin}</strong> · Höchster Wert: <strong>${pMax}</strong> · Durchschnitt: <strong>${pAvg}</strong></div>
         <div style="display:grid;gap:7px;margin-bottom:9px;">
           <div style="background:#EDF2F4;border-radius:8px;padding:10px 14px;">
             <div class="br-lbl" style="margin-bottom:3px;">Bei hohem Druck (7–10) · ${u.ptHighPressure.length} ${u.ptHighPressure.length === 1 ? 'Eintrag' : 'Einträge'}</div>
             <div style="font-size:13px;font-weight:600;color:var(--stone);">${distStr(u.highPressureDist)}</div>
           </div>
           <div style="background:#F7F8F9;border:1px solid var(--border);border-radius:8px;padding:10px 14px;">
-            <div class="br-lbl" style="margin-bottom:3px;">Bei niedrigem Druck (0–6)</div>
+            <div class="br-lbl" style="margin-bottom:3px;">Bei einem Druck von 0–6</div>
             <div style="font-size:13px;font-weight:600;color:var(--stone);">${distStr(u.lowPressureDist)}</div>
           </div>
         </div>
