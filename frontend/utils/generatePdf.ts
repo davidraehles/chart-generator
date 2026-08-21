@@ -571,10 +571,17 @@ export async function generateAndDownloadPdf(
     <!-- ── Letzte Seite ─────────────────────────────────────────────────────── -->
     <div class="final-section">
 
-      <!-- Trenner -->
-      <div style="height:10mm;"></div>
-      <div class="final-sep"></div>
-      <div style="height:10mm;"></div>
+      <!-- Überschrift -->
+      <div style="height:8mm;"></div>
+      <div style="font-size:11pt;font-weight:700;color:#1A2126;margin-bottom:10mm;">Deine möglichen nächsten Schritte:</div>
+
+      <!-- Online-Praxistraining -->
+      <div style="background:#A9806F;padding:14px 16px;margin-bottom:8px;page-break-inside:avoid;">
+        <div style="font-size:6.5pt;text-transform:uppercase;letter-spacing:0.13em;font-weight:700;color:rgba(255,255,255,0.65);margin-bottom:4px;">Online-Praxistraining</div>
+        <div style="font-size:10pt;font-weight:700;color:#fff;margin-bottom:6px;line-height:1.35;">Du entscheidest täglich. Wann hast du zuletzt nach deiner Autorität entschieden?</div>
+        <div style="font-size:8.5pt;color:rgba(255,255,255,0.85);line-height:1.55;">Du kennst jetzt deine Entscheidungsautorität. Im Online-Praxistraining findest du heraus, was sie für deinen Führungsalltag konkret bedeutet und erprobst deine persönliche Entscheidungsfindung an einer Businessentscheidung, die gerade wirklich ansteht.</div>
+        <div style="font-size:7.5pt;color:rgba(255,255,255,0.6);margin-top:8px;font-weight:600;">stupperich.de/praxiskurs-entscheidungsfindung</div>
+      </div>
 
       <!-- Business Energy Trigger -->
       <div class="trigger-box">
