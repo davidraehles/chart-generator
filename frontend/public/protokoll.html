@@ -522,6 +522,18 @@
 
 </main>
 
+<!-- ── Abschluss-Modal (Tag 7) ── -->
+<div id="befund-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.45);z-index:200;align-items:center;justify-content:center;">
+  <div style="background:#fff;border-radius:14px;padding:30px 26px;max-width:400px;margin:16px;box-shadow:0 12px 40px rgba(0,0,0,0.18);">
+    <h3 style="font-size:17px;font-weight:700;color:#2F3437;margin-bottom:10px;line-height:1.35;">Hast du deinen letzten Eintrag für Tag 7 gemacht?</h3>
+    <p style="font-size:13px;color:#7A8B90;line-height:1.65;margin-bottom:22px;">Ein fehlender Eintrag verhindert den Abschluss nicht — du entscheidest selbst, wann dein letzter Eintrag erfolgt ist.</p>
+    <div style="display:flex;flex-direction:column;gap:10px;">
+      <button id="modal-finish" class="btn-sage">Experiment abschliessen und Übersicht öffnen</button>
+      <button id="modal-continue" class="btn-outline">Ich beobachte weiter</button>
+    </div>
+  </div>
+</div>
+
 <script>
 (() => {
   'use strict';
@@ -849,6 +861,7 @@
             day: d, slot: sl,
             direction: s.direction,
             emotion: s.emotion !== undefined ? parseFloat(s.emotion) : null,
+            pressure: s.pressure !== undefined ? parseFloat(s.pressure) : null,
             new_info: (s.new_info || '').trim(),
             pressure_src: (s.pressure_src || '').trim(),
             body_sense: (s.body_sense || '').trim(),
@@ -879,12 +892,6 @@
     }
     let keyPerspective = '';
     if (wendepunkt) keyPerspective = wendepunkt.new_info || wendepunkt.body_sense || '';
-    const nochNichtPts = points.filter(p => p.direction === 'Noch nicht');
-    let condition = '';
-    for (let i = nochNichtPts.length - 1; i >= 0; i--) {
-      const c = nochNichtPts[i].new_info || nochNichtPts[i].pressure_src;
-      if (c) { condition = c; break; }
-    }
     const recentNonDom = points.filter(p => p.day >= 6 && p.direction !== dominant);
     let stillOpen = '';
     for (const p of recentNonDom) { if (p.new_info) { stillOpen = p.new_info; break; } }
@@ -895,7 +902,34 @@
     if (dominant && consistency >= 0.57 && survivedLow && daysWithDom >= 4) readiness = 'entscheidungsreif';
     else if (dominant && (consistency >= 0.38 || daysWithDom >= 3)) readiness = 'tendenz';
     else readiness = 'offen';
-    return { points, counts, total, dominant, readiness, consistency, daysWithDom, minEmo, maxEmo, wendepunkt, keyPerspective, condition, stillOpen };
+
+    // ── Zonen-Analyse: Hoch / Neutral / Tief getrennt ───────────────────────
+    function zoneDominant(pts) {
+      if (!pts.length) return null;
+      const c = { 'Ja': 0, 'Nein': 0, 'Noch nicht': 0 };
+      pts.forEach(p => { if (c[p.direction] !== undefined) c[p.direction]++; });
+      const max = Math.max(...Object.values(c));
+      if (max === 0) return null;
+      const leaders = Object.keys(c).filter(k => c[k] === max);
+      return { dominant: leaders.length === 1 ? leaders[0] : null, tie: leaders.length > 1, counts: c, total: pts.length };
+    }
+    const zoneHoch    = zoneDominant(points.filter(p => p.emotion !== null && p.emotion >= 1));
+    const zoneNeutral = zoneDominant(points.filter(p => p.emotion !== null && p.emotion === 0));
+    const zoneTief    = zoneDominant(points.filter(p => p.emotion !== null && p.emotion <= -1));
+
+    // ── Druckverteilung: hoch vs. niedrig ────────────────────────────────────
+    function pressureCount(pts) {
+      const c = { 'Ja': 0, 'Nein': 0, 'Noch nicht': 0 };
+      pts.forEach(p => { if (c[p.direction] !== undefined) c[p.direction]++; });
+      return c;
+    }
+    const ptHighPressure  = points.filter(p => p.pressure !== null && p.pressure >= 7);
+    const ptLowPressure   = points.filter(p => p.pressure !== null && p.pressure < 7);
+    const highPressureDist = pressureCount(ptHighPressure);
+    const lowPressureDist  = pressureCount(ptLowPressure);
+
+    return { points, counts, total, dominant, readiness, consistency, daysWithDom, minEmo, maxEmo, wendepunkt, keyPerspective, stillOpen,
+             zoneHoch, zoneNeutral, zoneTief, ptHighPressure, highPressureDist, lowPressureDist };
   }
 
   function renderBefund(b) {
@@ -911,6 +945,8 @@
       : b.readiness === 'tendenz'
       ? `Eine Richtung zeichnet sich ab: <strong>${b.dominant || 'unklar'}</strong>. Die Entscheidung ist noch nicht vollständig gereift.`
       : 'Deine Einträge zeigen noch keine klare Richtung. Mehr Zeit oder neue Perspektiven können Klarheit bringen.';
+
+    // Pips
     const pips = [];
     for (let d = 1; d <= 7; d++) {
       for (const sl of ['morning','evening']) {
@@ -921,26 +957,80 @@
         pips.push(`<span class="pip ${cls}" title="Tag ${d} ${sl === 'morning' ? 'Morgen' : 'Abend'}: ${p.direction}">${lbl}</span>`);
       }
     }
-    const emoStr = b.minEmo !== null ? `${b.minEmo >= 0 ? '+' : ''}${b.minEmo} bis +${b.maxEmo}` : '—';
+
+    // Übersichts-Zeilen
     const rows = [
       ['Derzeitige Richtung', b.dominant ? `<strong>${b.dominant}</strong>` : '—'],
       ['Konsistenz', b.dominant ? `${Math.round(b.consistency * 100)} % der Einträge` : '—'],
-      ['Emotionale Bandbreite', emoStr],
       ['Erster stabiler Impuls', b.wendepunkt ? `Tag ${b.wendepunkt.day}, ${b.wendepunkt.slot === 'morning' ? 'Morgen' : 'Abend'}` : '—'],
       ['Entscheidende Perspektive', b.keyPerspective || '—'],
-      ['Wesentliche Bedingung', b.condition || '—'],
     ].map(([lbl, val]) => `<div class="befund-row"><div class="br-lbl">${lbl}</div><div class="br-val">${val}</div></div>`).join('');
+
+    // Zonen-Analyse
+    function zoneText(z) {
+      if (!z) return '<em style="color:var(--muted)">Keine Einträge in diesem Bereich</em>';
+      if (z.tie) return 'Mehrere Richtungen gleich häufig eingetragen.';
+      return `Am häufigsten: <strong>${z.dominant}</strong>`;
+    }
+    const zoneHtml = `
+      <div style="margin:20px 0 6px;">
+        <div class="br-lbl" style="margin-bottom:8px;">Richtung nach emotionalem Zustand</div>
+        <div style="display:grid;gap:7px;">
+          <div style="background:#EBF3EB;border-radius:8px;padding:10px 14px;">
+            <div style="font-size:11px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:#2D5040;margin-bottom:3px;">Im emotionalen Hoch (+1 und +2)</div>
+            <div style="font-size:13px;color:var(--stone);">${zoneText(b.zoneHoch)}</div>
+          </div>
+          <div style="background:#F7F8F9;border:1px solid var(--border);border-radius:8px;padding:10px 14px;">
+            <div style="font-size:11px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:var(--muted);margin-bottom:3px;">In neutralen Momenten (0)</div>
+            <div style="font-size:13px;color:var(--stone);">${zoneText(b.zoneNeutral)}</div>
+          </div>
+          <div style="background:#F3EBEB;border-radius:8px;padding:10px 14px;">
+            <div style="font-size:11px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:#5C2D2D;margin-bottom:3px;">Im emotionalen Tief (−1 und −2)</div>
+            <div style="font-size:13px;color:var(--stone);">${zoneText(b.zoneTief)}</div>
+          </div>
+        </div>
+        <p style="font-size:12px;color:var(--muted);margin-top:9px;line-height:1.65;">Damit siehst du, wie sich dein Blick auf dieselbe Entscheidung in unterschiedlichen emotionalen Zuständen verändert hat. Was diese Unterschiede für deine Entscheidung bedeuten, prüfst du in Modul 4.</p>
+      </div>`;
+
+    // Druckverteilung
+    function distStr(c) { return `Ja: ${c['Ja']} · Nein: ${c['Nein']} · Noch nicht: ${c['Noch nicht']}`; }
+    let pressureHtml;
+    if (b.ptHighPressure.length === 0) {
+      pressureHtml = '<p style="font-size:13px;color:var(--muted);font-style:italic;">Während des Experiments gab es keinen Eintrag mit einem Entscheidungsdruck zwischen 7 und 10.</p>';
+    } else {
+      pressureHtml = `
+        <div style="display:grid;gap:7px;margin-bottom:9px;">
+          <div style="background:#EDF2F4;border-radius:8px;padding:10px 14px;">
+            <div style="font-size:11px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:var(--sage);margin-bottom:3px;">Bei hohem Druck (7–10) · ${b.ptHighPressure.length} Einträge</div>
+            <div style="font-size:13px;font-weight:600;color:var(--stone);">${distStr(b.highPressureDist)}</div>
+          </div>
+          <div style="background:#F7F8F9;border:1px solid var(--border);border-radius:8px;padding:10px 14px;">
+            <div style="font-size:11px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:var(--muted);margin-bottom:3px;">Bei niedrigem Druck (0–6)</div>
+            <div style="font-size:13px;font-weight:600;color:var(--stone);">${distStr(b.lowPressureDist)}</div>
+          </div>
+        </div>
+        <p style="font-size:12px;color:var(--muted);line-height:1.65;">Damit kannst du vergleichen, ob du unter hohem Druck häufiger zu einer bestimmten Antwort tendierst. Was hinter dieser Veränderung steckt, prüfst du in Modul 4.</p>`;
+    }
+    const pressureSection = `
+      <div style="margin:20px 0 6px;">
+        <div class="br-lbl" style="margin-bottom:8px;">Entscheidungsdruck im Vergleich</div>
+        ${pressureHtml}
+      </div>`;
+
     const nextStep = b.readiness === 'entscheidungsreif'
       ? `Deine Einträge zeigen eine deutlich wiederkehrende Richtung. Prüfe jetzt, ob dieser Befund deinem eigenen Entscheidungsstand entspricht.`
       : b.readiness === 'tendenz'
       ? `Beobachte noch 2–3 Tage weiter${b.stillOpen ? `, besonders: ${b.stillOpen}` : ''}.`
       : `Fülle das Protokoll weitere Tage aus. ${b.stillOpen ? `Offene Frage: ${b.stillOpen}` : 'Neue Informationen können die Richtung klären.'}`;
+
     body.innerHTML = `
       <div class="befund-badge ${badgeClass}">${badgeLabel}</div>
       <div class="befund-lead">${leadText}</div>
       <div class="dir-pips">${pips.join('')}</div>
       <div class="befund-rows">${rows}</div>
-      <div class="befund-next">
+      ${zoneHtml}
+      ${pressureSection}
+      <div class="befund-next" style="margin-top:16px;">
         <div class="befund-next-lbl">Dein nächster Schritt</div>
         <div class="befund-next-val">${nextStep}</div>
       </div>`;
@@ -948,7 +1038,23 @@
 
   document.getElementById('btn-befund').addEventListener('click', () => {
     save(false);
+    // Wenn Tag 7 mindestens eine Richtung hat → Abschluss-Dialog zeigen
+    const day7 = state.days[7] || {};
+    const day7HasDirection = ['morning','evening'].some(sl => (day7[sl] || {}).direction);
+    if (day7HasDirection) {
+      document.getElementById('befund-modal').style.display = 'flex';
+    } else {
+      renderBefund(computeBefund());
+    }
+  });
+
+  document.getElementById('modal-continue').addEventListener('click', () => {
+    document.getElementById('befund-modal').style.display = 'none';
+  });
+  document.getElementById('modal-finish').addEventListener('click', () => {
+    document.getElementById('befund-modal').style.display = 'none';
     renderBefund(computeBefund());
+    document.getElementById('befund-section').scrollIntoView({ behavior: 'smooth' });
   });
 
   setTimeout(() => {
