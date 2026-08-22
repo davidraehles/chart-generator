@@ -88,6 +88,50 @@ async def health_check():
     return {"status": "healthy", "service": "hd-chart-generator"}
 
 
+@app.get("/api/debug-stefano")
+async def debug_stefano():
+    """Debug endpoint: computes raw Sun longitude for Stefano 21.10.1963 04:50 Grosseto"""
+    import swisseph as swe
+    import os
+    tz = pytz.timezone("Europe/Rome")
+    birth_local = tz.localize(datetime(1963, 10, 21, 4, 50))
+    birth_utc = birth_local.astimezone(pytz.UTC)
+    jd = swe.julday(birth_utc.year, birth_utc.month, birth_utc.day,
+                    birth_utc.hour + birth_utc.minute / 60.0)
+    ephe_path = os.path.normpath(
+        os.path.join(os.path.dirname(os.path.abspath(__file__)), "../../data/ephemeris")
+    )
+    ephe_exists = os.path.isdir(ephe_path)
+    swe.set_ephe_path(ephe_path if ephe_exists else "")
+    res_plain = swe.calc_ut(jd, swe.SUN)
+    res_moshier = swe.calc_ut(jd, swe.SUN, swe.FLG_MOSEPH)
+    sun_plain = res_plain[0][0]
+    sun_moshier = res_moshier[0][0]
+    # gate/line
+    adj = (sun_plain + 58.0) % 360.0
+    gn = int(adj / 5.625)
+    pig = adj % 5.625
+    ln = int(pig / 0.9375) + 1
+    wheel = [41,19,13,49,30,55,37,63,22,36,25,17,21,51,42,3,
+             27,24,2,23,8,20,16,35,45,12,15,52,39,53,62,56,
+             31,33,7,4,29,59,40,64,47,6,46,18,48,57,32,50,
+             28,44,1,43,14,34,9,5,26,11,10,58,38,54,61,60]
+    gate = wheel[gn] if 0 <= gn < 64 else -1
+    return {
+        "birth_utc": str(birth_utc),
+        "julian_day": jd,
+        "ephe_path": ephe_path,
+        "ephe_exists": ephe_exists,
+        "sun_plain": sun_plain,
+        "sun_moshier": sun_moshier,
+        "gate": gate,
+        "line": ln,
+        "expected_sun": 207.028,
+        "expected_gate": 50,
+        "expected_line": 1,
+    }
+
+
 @app.post("/api/hd-chart", response_model=ChartResponse)
 @limiter.limit("10/minute")  # 10 requests per minute for expensive calculation
 async def generate_chart(request: Request, chart_request: ChartRequest):
