@@ -573,30 +573,37 @@ export async function generateAndDownloadPdf(
 
       <!-- Überschrift -->
       <div style="height:8mm;"></div>
-      <div style="font-size:11pt;font-weight:700;color:#1A2126;margin-bottom:10mm;">Deine möglichen nächsten Schritte:</div>
+      <div style="font-size:14pt;font-weight:700;color:#1A2126;margin-bottom:3mm;">So kannst du weitermachen.</div>
+      <div style="font-size:9.5pt;color:#6B7280;margin-bottom:8mm;">Deine möglichen nächsten Schritte:</div>
 
-      <!-- Online-Praxistraining -->
+      <!-- Block 1: Online-Praxistraining -->
       <div style="background:#A9806F;padding:14px 16px;margin-bottom:8px;page-break-inside:avoid;">
-        <div style="font-size:6.5pt;text-transform:uppercase;letter-spacing:0.13em;font-weight:700;color:rgba(255,255,255,0.65);margin-bottom:4px;">Online-Praxistraining</div>
-        <div style="font-size:10pt;font-weight:700;color:#fff;margin-bottom:6px;line-height:1.35;">Du entscheidest täglich. Wann hast du zuletzt nach deiner Autorität entschieden?</div>
-        <div style="font-size:8.5pt;color:rgba(255,255,255,0.85);line-height:1.55;">Du kennst jetzt deine Entscheidungsautorität. Im Online-Praxistraining findest du heraus, was sie für deinen Führungsalltag konkret bedeutet und erprobst deine persönliche Entscheidungsfindung an einer Businessentscheidung, die gerade wirklich ansteht.</div>
-        <div style="font-size:7.5pt;color:rgba(255,255,255,0.6);margin-top:8px;font-weight:600;">stupperich.de/praxiskurs-entscheidungsfindung</div>
+        <div style="font-size:6.5pt;text-transform:uppercase;letter-spacing:0.13em;font-weight:700;color:rgba(255,255,255,0.6);margin-bottom:5px;">Online-Praxistraining</div>
+        <div style="font-size:8pt;text-transform:uppercase;letter-spacing:0.05em;font-weight:700;color:#fff;margin-bottom:3px;">1. Online für dich weitermachen</div>
+        <div style="font-size:10pt;font-weight:700;color:#fff;margin-bottom:6px;line-height:1.35;">Verstehe, wie du entscheidest!</div>
+        <div style="font-size:8.5pt;color:rgba(255,255,255,0.85);line-height:1.55;margin-bottom:7px;">Du kennst jetzt deine Entscheidungsautorität. Im Online-Praxistraining lernst du sie umfassend kennen, verstehst, wie sie konkret funktioniert, und erprobst deinen persönlichen Entscheidungsprozess an einer echten Businessentscheidung. Daraus entwickelst du Arbeitsinstrumente, die du in deinem Führungsalltag direkt einsetzen kannst.</div>
+        <div style="font-size:7pt;color:rgba(255,255,255,0.5);font-weight:700;letter-spacing:0.1em;margin-bottom:8px;">ONLINE | SELBSTGESTEUERT | DAUERHAFTER ZUGRIFF</div>
+        <a href="https://www.stupperich.de/praxiskurs-entscheidungsfindung" style="font-size:7.5pt;color:rgba(255,255,255,0.6);font-weight:600;">stupperich.de/praxiskurs-entscheidungsfindung →</a>
       </div>
 
-      <!-- Business Energy Trigger -->
-      <div class="trigger-box">
-        <div style="font-size:6.5pt;text-transform:uppercase;letter-spacing:0.13em;font-weight:700;color:rgba(255,255,255,0.65);margin-bottom:5px;">Kostenlos · 6 Impulse über 6 Monate</div>
-        <div style="font-size:11pt;font-weight:700;color:#fff;margin-bottom:7px;">Business Energy Trigger</div>
-        <div style="font-size:8.5pt;color:rgba(255,255,255,0.85);line-height:1.6;">Kein Newsletter. 6 Mails, danach ist Schluss. Jeden Monat ein Impuls, der dich zum Reflektieren bringt und dir hilft, deine Business-Energie bewusster einzusetzen. Den Trigger Letter kannst du direkt im Calculator anfordern, er ist an deinen Human Design Typ gebunden.</div>
-        <div style="font-size:7.5pt;color:rgba(255,255,255,0.6);margin-top:9px;font-weight:600;">stupperich.de → Business Energy Calculator</div>
-      </div>
-
-      <!-- Business Energy Reading -->
-      <div style="margin-top:10px;background:#EEF2F3;padding:16px 18px;${chartImgSrc ? `background-image:linear-gradient(to right,#EEF2F3 55%,rgba(238,242,243,0.7) 75%,rgba(238,242,243,0) 100%),url('${chartImgSrc}');background-repeat:no-repeat;background-position:right center;background-size:auto 100%;` : ""}page-break-inside:avoid;">
+      <!-- Block 2: Business Energy Reading -->
+      <div style="margin-bottom:8px;background:#EEF2F3;padding:14px 16px;${chartImgSrc ? `background-image:linear-gradient(to right,#EEF2F3 55%,rgba(238,242,243,0.7) 75%,rgba(238,242,243,0) 100%),url('${chartImgSrc}');background-repeat:no-repeat;background-position:right center;background-size:auto 100%;` : ""}page-break-inside:avoid;">
         <div style="max-width:62%;font-size:6.5pt;text-transform:uppercase;letter-spacing:0.13em;font-weight:700;color:#5F7680;margin-bottom:5px;">Business Energy Reading</div>
-        <div style="max-width:62%;font-size:10pt;font-weight:700;color:#1A2126;margin-bottom:7px;line-height:1.4;">Jetzt kennst du die einzelnen Facetten. In einem Business Energy Reading siehst du deine ganze Chart und wir schauen auf die Zusammenhänge.</div>
-        <div style="max-width:62%;font-size:8.5pt;color:#374151;line-height:1.6;">Wie wirken deine Energie, deine Entscheidungen, deine Kommunikation und deine Führung gemeinsam?</div>
-        <div style="max-width:62%;font-size:7.5pt;color:#5F7680;font-weight:600;margin-top:9px;">stupperich.de</div>
+        <div style="max-width:62%;font-size:8pt;text-transform:uppercase;letter-spacing:0.05em;font-weight:700;color:#1A2126;margin-bottom:3px;">2. Deine gesamte Chart verstehen</div>
+        <div style="max-width:62%;font-size:10pt;font-weight:700;color:#1A2126;margin-bottom:6px;line-height:1.35;">Dein persönliches Human Design Business Reading</div>
+        <div style="max-width:62%;font-size:8.5pt;color:#374151;line-height:1.55;margin-bottom:7px;">In deinem persönlichen Reading betrachten wir gemeinsam die Zusammenhänge in deiner gesamten Chart. Du erfährst, wie deine Entscheidungsautorität, deine Energie, deine Kommunikation und deine natürliche Arbeitsweise zusammenspielen und was das für deinen Businessalltag bedeutet.</div>
+        <div style="max-width:62%;font-size:7pt;color:#6B7280;font-weight:700;letter-spacing:0.1em;margin-bottom:8px;">PERSÖNLICH | 90 MINUTEN | KONKRETER BUSINESSBEZUG</div>
+        <a href="https://stupperich.de" style="max-width:62%;font-size:7.5pt;color:#5F7680;font-weight:600;">stupperich.de →</a>
+      </div>
+
+      <!-- Block 3: Business Energy Trigger -->
+      <div class="trigger-box" style="page-break-inside:avoid;">
+        <div style="font-size:6.5pt;text-transform:uppercase;letter-spacing:0.13em;font-weight:700;color:rgba(255,255,255,0.6);margin-bottom:5px;">Business Energy Trigger</div>
+        <div style="font-size:8pt;text-transform:uppercase;letter-spacing:0.05em;font-weight:700;color:#fff;margin-bottom:3px;">3. Kostenlose Impulse erhalten</div>
+        <div style="font-size:10pt;font-weight:700;color:#fff;margin-bottom:6px;line-height:1.35;">Deine Business Energy Trigger</div>
+        <div style="font-size:8.5pt;color:rgba(255,255,255,0.85);line-height:1.6;margin-bottom:7px;">Du erhältst sechs Monate lang einmal im Monat eine persönliche E-Mail von mir, abgestimmt auf deinen Human Design Typ. Jeder Impuls gibt dir einen konkreten Gedanken, eine Reflexionsfrage oder einen neuen Blick auf deine Business-Energie.</div>
+        <div style="font-size:7pt;color:rgba(255,255,255,0.5);font-weight:700;letter-spacing:0.1em;margin-bottom:8px;">KOSTENLOS | 6 E-MAILS | 6 MONATE</div>
+        <div style="font-size:7.5pt;color:rgba(255,255,255,0.6);font-weight:600;">stupperich.de → Business Energy Calculator</div>
       </div>
 
       <!-- Abschluss -->

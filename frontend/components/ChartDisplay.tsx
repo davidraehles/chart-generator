@@ -375,71 +375,101 @@ export default function ChartDisplay({
         </div>
       </div>
 
-      {/* ── 7. NÄCHSTE SCHRITTE ── */}
+      {/* ── NÄCHSTE SCHRITTE ── */}
       <div>
-        <h2 className="text-base font-bold mb-4" style={{ color: DARK }}>
-          Deine möglichen nächsten Schritte:
+        <h2 className="text-xl font-bold mb-1" style={{ color: DARK }}>
+          So kannst du weitermachen.
         </h2>
+        <p className="text-sm mb-6" style={{ color: MUTED }}>
+          Deine möglichen nächsten Schritte:
+        </p>
 
-        {/* KURS */}
-        <div className="px-5 py-5 mb-3" style={{ background: "#A9806F", border: `0.5px solid #A9806F` }}>
-          <p className="text-xs font-semibold uppercase tracking-widest mb-1" style={{ color: "rgba(255,255,255,0.7)" }}>
+        {/* Block 1 — Online-Praxistraining */}
+        <div className="px-5 py-5 mb-3" style={{ background: "#A9806F" }}>
+          <p className="text-xs font-semibold uppercase tracking-widest mb-3" style={{ color: "rgba(255,255,255,0.6)", letterSpacing: "0.13em" }}>
             Online-Praxistraining
           </p>
-          <p className="text-base font-semibold mb-2" style={{ color: "#fff" }}>
-            Du entscheidest täglich. Wann hast du zuletzt nach deiner Autorität entschieden?
+          <p className="text-sm font-bold uppercase mb-1" style={{ color: "#fff", letterSpacing: "0.05em" }}>
+            1. Online für dich weitermachen
           </p>
-          <p className="text-sm mb-4" style={{ color: "rgba(255,255,255,0.85)" }}>
-            Du kennst jetzt deine Entscheidungsautorität. Im Online-Praxistraining findest du heraus, was sie für deinen Führungsalltag konkret bedeutet und erprobst deine persönliche Entscheidungsfindung an einer Businessentscheidung, die gerade wirklich ansteht.
+          <p className="text-base font-bold mb-3 leading-snug" style={{ color: "#fff" }}>
+            Verstehe, wie du entscheidest!
+          </p>
+          <p className="text-sm mb-3 leading-relaxed" style={{ color: "rgba(255,255,255,0.85)" }}>
+            Du kennst jetzt deine Entscheidungsautorität. Im Online-Praxistraining lernst du sie umfassend kennen, verstehst, wie sie konkret funktioniert, und erprobst deinen persönlichen Entscheidungsprozess an einer echten Businessentscheidung. Daraus entwickelst du Arbeitsinstrumente, die du in deinem Führungsalltag direkt einsetzen kannst.
+          </p>
+          <p className="text-xs font-semibold mb-4" style={{ color: "rgba(255,255,255,0.5)", letterSpacing: "0.1em" }}>
+            ONLINE | SELBSTGESTEUERT | DAUERHAFTER ZUGRIFF
           </p>
           <a href={CTA_AUTORITAET_URL} target="_blank" rel="noopener noreferrer"
             className="inline-flex items-center gap-2 text-sm font-medium px-4 py-2.5 transition-opacity hover:opacity-80"
-            style={{ border: `0.5px solid rgba(255,255,255,0.6)`, color: "#fff" }}>
-            Praxistraining entdecken
+            style={{ border: "0.5px solid rgba(255,255,255,0.6)", color: "#fff" }}>
+            Online-Praxistraining ansehen
             <Icon name="arrowRight" size={14} color="#fff" />
           </a>
         </div>
-      </div>
 
-      {/* TRIGGER-LETTERS */}
-      <EmailCaptureSection
-        hdType={data.type.code}
-        firstName={data.firstName}
-      />
-
-      {/* ── 8. BUSINESS ENERGY READING ── */}
-      <div className="overflow-hidden" style={{ background: "#EEF2F3", border: `1px solid ${BORDER}` }}>
-        <div className="flex items-stretch">
-          {/* Text */}
-          <div className="flex-1 px-6 py-8">
-            <p className="text-xs font-semibold uppercase tracking-widest mb-4" style={{ color: ACCENT }}>
-              Business Energy Reading
-            </p>
-            <p className="text-lg font-semibold mb-3 leading-snug" style={{ color: DARK }}>
-              Jetzt kennst du die einzelnen Facetten. In einem Business Energy Reading siehst du deine ganze Chart und wir schauen auf die Zusammenhänge.
-            </p>
-            <p className="text-sm mb-6 leading-relaxed" style={{ color: BODY }}>
-              Wie wirken deine Energie, deine Entscheidungen, deine Kommunikation und deine Führung gemeinsam?
-            </p>
-            <a href={CTA_READING_URL} target="_blank" rel="noopener noreferrer"
-              className="inline-flex items-center gap-2 text-sm font-medium px-5 py-2.5 transition-opacity hover:opacity-90"
-              style={{ background: ACCENT, color: "#fff" }}>
-              Mein Business Energy Reading entdecken
-              <Icon name="arrowRight" size={14} color="#fff" />
-            </a>
-          </div>
-          {/* Chart Teaser */}
-          <div className="relative hidden sm:block flex-shrink-0" style={{ width: 180, overflow: "hidden" }}>
-            {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img
-              src="/human-design-chart.png"
-              alt="Human Design Chart"
-              style={{ position: "absolute", top: 0, right: 0, height: "100%", width: "auto", objectFit: "cover", objectPosition: "center", opacity: 0.9 }}
-            />
-            {/* fade left edge into background */}
-            <div style={{ position: "absolute", inset: 0, background: "linear-gradient(to right, #EEF2F3 10%, transparent 50%)" }} />
+        {/* Block 2 — Business Reading */}
+        <div className="mb-3 overflow-hidden" style={{ background: "#EEF2F3", border: `1px solid ${BORDER}` }}>
+          <div className="flex items-stretch">
+            <div className="flex-1 px-5 py-5">
+              <p className="text-xs font-semibold uppercase tracking-widest mb-3" style={{ color: ACCENT, letterSpacing: "0.13em" }}>
+                Business Energy Reading
+              </p>
+              <p className="text-sm font-bold uppercase mb-1" style={{ color: DARK, letterSpacing: "0.05em" }}>
+                2. Deine gesamte Chart verstehen
+              </p>
+              <p className="text-base font-bold mb-3 leading-snug" style={{ color: DARK }}>
+                Dein persönliches Human Design Business Reading
+              </p>
+              <p className="text-sm mb-3 leading-relaxed" style={{ color: BODY }}>
+                In deinem persönlichen Reading betrachten wir gemeinsam die Zusammenhänge in deiner gesamten Chart. Du erfährst, wie deine Entscheidungsautorität, deine Energie, deine Kommunikation und deine natürliche Arbeitsweise zusammenspielen und was das für deinen Businessalltag bedeutet.
+              </p>
+              <p className="text-xs font-semibold mb-4" style={{ color: MUTED, letterSpacing: "0.1em" }}>
+                PERSÖNLICH | 90 MINUTEN | KONKRETER BUSINESSBEZUG
+              </p>
+              <a href={CTA_READING_URL} target="_blank" rel="noopener noreferrer"
+                className="inline-flex items-center gap-2 text-sm font-medium px-4 py-2.5 transition-opacity hover:opacity-90"
+                style={{ background: ACCENT, color: "#fff" }}>
+                Business Reading ansehen
+                <Icon name="arrowRight" size={14} color="#fff" />
+              </a>
+            </div>
+            {/* Chart Teaser */}
+            <div className="relative hidden sm:block flex-shrink-0" style={{ width: 160, overflow: "hidden" }}>
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img
+                src="/human-design-chart.png"
+                alt="Human Design Chart"
+                style={{ position: "absolute", top: 0, right: 0, height: "100%", width: "auto", objectFit: "cover", objectPosition: "center", opacity: 0.9 }}
+              />
+              <div style={{ position: "absolute", inset: 0, background: "linear-gradient(to right, #EEF2F3 10%, transparent 50%)" }} />
+            </div>
           </div>
         </div>
+
+        {/* Block 3 — Business Energy Trigger */}
+        <div className="px-5 pt-5 pb-0" style={{ background: DARK }}>
+          <p className="text-xs font-semibold uppercase tracking-widest mb-3" style={{ color: ACCENT, letterSpacing: "0.13em" }}>
+            Business Energy Trigger
+          </p>
+          <p className="text-sm font-bold uppercase mb-1" style={{ color: "#F9F7F4", letterSpacing: "0.05em" }}>
+            3. Kostenlose Impulse erhalten
+          </p>
+          <p className="text-base font-bold mb-3 leading-snug" style={{ color: "#F9F7F4" }}>
+            Deine Business Energy Trigger
+          </p>
+          <p className="text-sm mb-3 leading-relaxed" style={{ color: "#A8B4B6" }}>
+            Du erhältst sechs Monate lang einmal im Monat eine persönliche E-Mail von mir, abgestimmt auf deinen Human Design Typ. Jeder Impuls gibt dir einen konkreten Gedanken, eine Reflexionsfrage oder einen neuen Blick auf deine Business-Energie.
+          </p>
+          <p className="text-xs font-semibold mb-5" style={{ color: "#6B7280", letterSpacing: "0.1em" }}>
+            KOSTENLOS | 6 E-MAILS | 6 MONATE
+          </p>
+        </div>
+        <EmailCaptureSection
+          hdType={data.type.code}
+          firstName={data.firstName}
+        />
       </div>
 
       <p className="text-right text-xs" style={{ color: "#C4BEB8" }}>

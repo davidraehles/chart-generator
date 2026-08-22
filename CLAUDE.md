@@ -1,13 +1,14 @@
 # chart-generator Development Guidelines
 
-Last updated: 2026-06-22
+Last updated: 2026-08-22
 
 ## Was ist das?
 
 Ein Human-Design-Chart-Generator. Nutzer geben Name, Geburtsdatum, -zeit und -ort ein und erhalten ein vollständiges HD-Chart (Typ, Autorität, Profil, Zentren, Gates, Kanäle, Inkarnationskreuz).
 
 **Frontend:** Next.js auf Vercel → `https://chart-generator.vercel.app` (o.ä.)
-**Backend:** FastAPI auf Railway → `https://chart-generator-production-64fd.up.railway.app`
+**Backend:** FastAPI auf Railway → `https://chart-generator-production.up.railway.app`
+⚠️ **WICHTIG:** Die URL `chart-generator-production-64fd.up.railway.app` (mit "-64fd") ist VERALTET und liefert falsche Ergebnisse. Immer die URL OHNE "-64fd" verwenden.
 
 ---
 
@@ -192,6 +193,15 @@ User-Input (Ortsname)
 ## Deployment
 
 - **Frontend**: Vercel, auto-deploy bei Push auf `main`
-- **Backend**: Railway — `https://chart-generator-production-64fd.up.railway.app`
+- **Backend**: Railway — `https://chart-generator-production.up.railway.app`
+  - ⚠️ NICHT die alte URL `...-64fd.up.railway.app` verwenden — liefert veralteten, falschen Code
+  - Die korrekte URL ist in `frontend/next.config.js` als Fallback fest eingebaut
   - Konfiguration: `railway.json`, `Procfile`, `Dockerfile`
   - Ephemeris-Datendateien müssen im Deploy enthalten sein (`backend/data/ephemeris/`)
+
+## Bekannte Fehler & Lösungen
+
+**Falsches HD-Chart (z.B. MG statt Generator) — 2026-08-22**
+- **Ursache:** `NEXT_PUBLIC_API_URL` in Vercel zeigte auf alte Railway-URL `...production-64fd.up.railway.app` (veraltetes Deployment mit falschem Ephemeris-Code)
+- **Lösung:** Richtige Railway-URL `...production.up.railway.app` (ohne "-64fd") als Fallback direkt in `frontend/next.config.js` eingebaut
+- **Merke:** Railway kann mehrere Deployment-URLs haben. Die aktive URL im Railway-Dashboard (Deployments-Tab, Domain-Feld) ist die richtige — NICHT notwendigerweise die in CLAUDE.md gespeicherte.
