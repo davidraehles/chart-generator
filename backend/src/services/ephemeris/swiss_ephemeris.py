@@ -122,10 +122,15 @@ class SwissEphemerisSource:
             # Try direct calculation first
             result = swe.calc_ut(jd, swe_body, swe.FLG_SWIEPH | swe.FLG_SPEED)
             longitude = result[0][0]
+            # DEBUG: log Sun position to diagnose gate/line errors
+            if swe_body == swe.SUN:
+                print(f"[DEBUG] Sun lon={longitude:.6f}° jd={jd:.6f} path_exists={os.path.isdir(_EPHE_PATH)} path={_EPHE_PATH}", flush=True)
             return longitude
         except Exception as exc:
             # Check if this is a signal-in-thread error
             exc_str = str(exc).lower()
+            if swe_body == swe.SUN:
+                print(f"[DEBUG] Sun calc exception: {exc}", flush=True)
             if "signal only works" in exc_str or "signal only works in main thread" in exc_str:
                 # Fall back to subprocess calculation
                 return self._calc_in_subprocess(swe_body, jd)

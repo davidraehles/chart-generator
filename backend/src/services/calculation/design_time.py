@@ -26,8 +26,10 @@ def calculate_design_datetime(
     design_dt = birth_dt_utc - timedelta(days=88)
 
     # Get Sun position at birth
+    print(f"[DEBUG] birth_dt_utc={birth_dt_utc} (tzinfo={birth_dt_utc.tzinfo})", flush=True)
     birth_jd = ephemeris_source.datetime_to_julian_day(birth_dt_utc)
     birth_sun_lon = ephemeris_source.get_ecliptic_longitude("Sun", birth_jd)
+    print(f"[DEBUG] birth_jd={birth_jd:.6f} birth_sun_lon={birth_sun_lon:.6f}°", flush=True)
 
     # Iteratively refine to find exact 88° arc
     max_iterations = 10
@@ -49,4 +51,5 @@ def calculate_design_datetime(
         days_adjustment = (arc - target_arc)
         design_dt = design_dt + timedelta(days=days_adjustment)
 
+    print(f"[DEBUG] design_dt_utc={design_dt} arc_final={arc:.6f}°", flush=True)
     return design_dt
