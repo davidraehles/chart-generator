@@ -1,10 +1,16 @@
 """Swiss Ephemeris implementation for planetary calculations"""
 
+import os
 import swisseph as swe
 import multiprocessing
 import traceback
 from datetime import datetime
 from src.models.celestial import CelestialBody
+
+# Ephemeris data is at backend/data/ephemeris/ (locally) or /app/data/ephemeris/ (Docker/Railway)
+_EPHE_PATH = os.path.normpath(
+    os.path.join(os.path.dirname(os.path.abspath(__file__)), "../../../data/ephemeris")
+)
 
 
 class SwissEphemerisSource:
@@ -28,10 +34,12 @@ class SwissEphemerisSource:
     }
 
     def __init__(self):
-        """Initialize Swiss Ephemeris source"""
-        # Set ephemeris path (optional, uses built-in data by default)
-        # swe.set_ephe_path('/path/to/ephemeris/data')
-        pass
+        """Initialize Swiss Ephemeris source and set ephemeris data path."""
+        # Point pyswisseph at the bundled .se1 data files for accurate calculations.
+        # Without this, the library silently falls back to the less accurate Moshier
+        # approximation which can produce wrong gate assignments for some dates.
+        if os.path.isdir(_EPHE_PATH):
+            swe.set_ephe_path(_EPHE_PATH)
 
     def get_source_name(self) -> str:
         """Get the name of this ephemeris source"""
