@@ -145,3 +145,14 @@ frontend/frontend/
 test-results/
 playwright-report/
 playwright/.cache/
+
+# Personal content — not part of the codebase
+content/
+
+# Root-level scratch files
+debug_chart.py
+deploy.sh
+test.db
+*.db
+.DS_Store
+tmp/
