@@ -12,7 +12,7 @@ const nextConfig = {
   },
   async rewrites() {
     // Ensure API URL has protocol
-    let apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5001';
+    let apiUrl = process.env.NEXT_PUBLIC_API_URL || 'https://chart-generator-production.up.railway.app';
 
     // Add https:// if no protocol is present
     if (apiUrl && !apiUrl.startsWith('http://') && !apiUrl.startsWith('https://')) {
