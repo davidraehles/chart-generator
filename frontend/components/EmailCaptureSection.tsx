@@ -22,9 +22,10 @@ const TYPE_LABELS: Record<string, string> = {
 interface EmailCaptureSectionProps {
   hdType?: string;      // type code: "1" | "2" | "3" | "4" | "5"
   firstName?: string;
+  headless?: boolean;   // wenn true: kein Container/Header, nur das Formular
 }
 
-export default function EmailCaptureSection({ hdType, firstName }: EmailCaptureSectionProps) {
+export default function EmailCaptureSection({ hdType, firstName, headless }: EmailCaptureSectionProps) {
   const [email, setEmail]       = useState("");
   const [consent, setConsent]   = useState(false);
   const [loading, setLoading]   = useState(false);
@@ -65,37 +66,9 @@ export default function EmailCaptureSection({ hdType, firstName }: EmailCaptureS
     }
   };
 
-  if (success) {
-    return (
-      <div className="mt-6 px-5 py-5"
-        style={{ background: DARK, border: "1px solid rgba(255,255,255,0.08)", borderLeft: `3px solid ${ACCENT}` }}>
-        <p className="text-sm font-semibold mb-1" style={{ color: ACCENT }}>
-          Du bist dabei.
-        </p>
-        <p className="text-sm leading-relaxed" style={{ color: "#A8B4B6" }}>
-          Dein erster Business Energy Trigger ist auf dem Weg zu dir.
-          {typeLabel ? ` Speziell für deinen Typ als ${typeLabel}.` : ""}
-        </p>
-      </div>
-    );
-  }
-
-  return (
-    <div className="mt-6" style={{ background: DARK, border: "1px solid rgba(255,255,255,0.08)", padding: "24px" }}>
-      {/* Headline */}
-      <div className="mb-4" style={{ borderLeft: `3px solid ${ACCENT}`, paddingLeft: "14px" }}>
-        <p className="text-xs font-semibold uppercase tracking-widest mb-1" style={{ color: ACCENT }}>
-          Kostenlos · 6 Impulse über 6 Monate
-        </p>
-        <h3 className="text-base font-semibold mb-1" style={{ color: "#F9F7F4" }}>
-          Business Energy Trigger
-        </h3>
-        <p className="text-sm leading-relaxed" style={{ color: "#A8B4B6" }}>
-          6 Monate, 6 persönliche Business Energy Trigger, abgestimmt auf deinen Human Design Typ. Jeden Monat ein Impuls, der dich zum Reflektieren bringt, Aha-Momente auslöst und dir hilft, deine Business-Energie bewusster einzusetzen. Kein Newsletter. 6 Mails, danach ist Schluss.
-        </p>
-      </div>
-
-      {/* Form */}
+  // Formular-Inhalt (wird in beiden Modi verwendet)
+  const formContent = (
+    <>
       <form onSubmit={handleSubmit}>
         <div className="flex gap-3 items-start mb-3">
           <div className="flex-1">
@@ -114,7 +87,7 @@ export default function EmailCaptureSection({ hdType, firstName }: EmailCaptureS
             disabled={loading || !email || !consent}
             className="px-5 py-2.5 text-sm font-medium text-white whitespace-nowrap transition-opacity hover:opacity-90 disabled:opacity-50 disabled:cursor-not-allowed"
             style={{ background: ACCENT }}>
-            {loading ? "…" : "Business Energy Trigger kostenlos anfordern"}
+            {loading ? "…" : "Kostenlos anfordern"}
           </button>
         </div>
 
@@ -145,6 +118,56 @@ export default function EmailCaptureSection({ hdType, firstName }: EmailCaptureS
       <p className="mt-3 text-xs" style={{ color: "#6B7280" }}>
         Kein Spam. Kein Newsletter. 6 Mails, danach ist Schluss.
       </p>
+    </>
+  );
+
+  // Headless-Modus: kein eigener Container, nur Formular
+  if (headless) {
+    if (success) {
+      return (
+        <div style={{ borderLeft: `3px solid ${ACCENT}`, paddingLeft: "14px" }}>
+          <p className="text-sm font-semibold mb-1" style={{ color: ACCENT }}>Du bist dabei.</p>
+          <p className="text-sm leading-relaxed" style={{ color: "#A8B4B6" }}>
+            Dein erster Business Energy Trigger ist auf dem Weg zu dir.
+            {typeLabel ? ` Speziell für deinen Typ als ${typeLabel}.` : ""}
+          </p>
+        </div>
+      );
+    }
+    return <>{formContent}</>;
+  }
+
+  if (success) {
+    return (
+      <div className="mt-6 px-5 py-5"
+        style={{ background: DARK, border: "1px solid rgba(255,255,255,0.08)", borderLeft: `3px solid ${ACCENT}` }}>
+        <p className="text-sm font-semibold mb-1" style={{ color: ACCENT }}>
+          Du bist dabei.
+        </p>
+        <p className="text-sm leading-relaxed" style={{ color: "#A8B4B6" }}>
+          Dein erster Business Energy Trigger ist auf dem Weg zu dir.
+          {typeLabel ? ` Speziell für deinen Typ als ${typeLabel}.` : ""}
+        </p>
+      </div>
+    );
+  }
+
+  return (
+    <div className="mt-6" style={{ background: DARK, border: "1px solid rgba(255,255,255,0.08)", padding: "24px" }}>
+      {/* Headline */}
+      <div className="mb-4" style={{ borderLeft: `3px solid ${ACCENT}`, paddingLeft: "14px" }}>
+        <p className="text-xs font-semibold uppercase tracking-widest mb-1" style={{ color: ACCENT }}>
+          Kostenlos · 6 Impulse über 6 Monate
+        </p>
+        <h3 className="text-base font-semibold mb-1" style={{ color: "#F9F7F4" }}>
+          Business Energy Trigger
+        </h3>
+        <p className="text-sm leading-relaxed" style={{ color: "#A8B4B6" }}>
+          6 Monate, 6 persönliche Business Energy Trigger, abgestimmt auf deinen Human Design Typ. Jeden Monat ein Impuls, der dich zum Reflektieren bringt, Aha-Momente auslöst und dir hilft, deine Business-Energie bewusster einzusetzen. Kein Newsletter. 6 Mails, danach ist Schluss.
+        </p>
+      </div>
+
+      {formContent}
     </div>
   );
 }

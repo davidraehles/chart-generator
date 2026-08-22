@@ -448,28 +448,32 @@ export default function ChartDisplay({
           </div>
         </div>
 
-        {/* Block 3 — Business Energy Trigger */}
-        <div className="px-5 pt-5 pb-0" style={{ background: DARK }}>
-          <p className="text-xs font-semibold uppercase tracking-widest mb-3" style={{ color: ACCENT, letterSpacing: "0.13em" }}>
-            Business Energy Trigger
-          </p>
-          <p className="text-sm font-bold uppercase mb-1" style={{ color: "#F9F7F4", letterSpacing: "0.05em" }}>
-            3. Kostenlose Impulse erhalten
-          </p>
-          <p className="text-base font-bold mb-3 leading-snug" style={{ color: "#F9F7F4" }}>
-            Deine Business Energy Trigger
-          </p>
-          <p className="text-sm mb-3 leading-relaxed" style={{ color: "#A8B4B6" }}>
-            Du erhältst sechs Monate lang einmal im Monat eine persönliche E-Mail von mir, abgestimmt auf deinen Human Design Typ. Jeder Impuls gibt dir einen konkreten Gedanken, eine Reflexionsfrage oder einen neuen Blick auf deine Business-Energie.
-          </p>
-          <p className="text-xs font-semibold mb-5" style={{ color: "#6B7280", letterSpacing: "0.1em" }}>
-            KOSTENLOS | 6 E-MAILS | 6 MONATE
-          </p>
+        {/* Block 3 — Business Energy Trigger (eine Box) */}
+        <div style={{ background: DARK, border: "1px solid rgba(255,255,255,0.08)" }}>
+          <div className="px-6 pt-6 pb-5">
+            <p className="text-xs font-semibold uppercase tracking-widest mb-3" style={{ color: ACCENT, letterSpacing: "0.13em" }}>
+              Business Energy Trigger
+            </p>
+            <p className="text-sm font-bold uppercase mb-1" style={{ color: "#F9F7F4", letterSpacing: "0.05em" }}>
+              3. Kostenlose Impulse erhalten
+            </p>
+            <p className="text-base font-bold mb-3 leading-snug" style={{ color: "#F9F7F4" }}>
+              Deine Business Energy Trigger
+            </p>
+            <p className="text-sm mb-3 leading-relaxed" style={{ color: "#A8B4B6" }}>
+              Du erhältst sechs Monate lang einmal im Monat eine persönliche E-Mail von mir, abgestimmt auf deinen Human Design Typ. Jeder Impuls gibt dir einen konkreten Gedanken, eine Reflexionsfrage oder einen neuen Blick auf deine Business-Energie.
+            </p>
+            <p className="text-xs font-semibold mb-5" style={{ color: "#6B7280", letterSpacing: "0.1em" }}>
+              KOSTENLOS | 6 E-MAILS | 6 MONATE
+            </p>
+            <div style={{ borderTop: "0.5px solid rgba(255,255,255,0.1)", marginBottom: "20px" }} />
+            <EmailCaptureSection
+              hdType={data.type.code}
+              firstName={data.firstName}
+              headless
+            />
+          </div>
         </div>
-        <EmailCaptureSection
-          hdType={data.type.code}
-          firstName={data.firstName}
-        />
       </div>
 
       <p className="text-right text-xs" style={{ color: "#C4BEB8" }}>
