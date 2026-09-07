@@ -143,6 +143,8 @@ class EmailHandler:
             payload: dict = {
                 "email": email,
                 "groups": [group_id],
+                "status": "unconfirmed",
+                "resubscribe": True,
             }
             if first_name:
                 payload["fields"] = {"name": first_name}
