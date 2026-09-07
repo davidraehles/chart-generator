@@ -22,7 +22,7 @@ from src.services.normalization_service import NormalizationService
 from src.api.routes.chart import router as chart_router
 from src.api.routes.pdf import router as pdf_router
 from src.handlers.email_handler import EmailHandler, EmailCaptureError
-from src.database import get_db_session
+from src.database import get_db_session, init_db
 from datetime import datetime
 import pytz
 from src.services.geocoding_service import GeocodingService
@@ -46,6 +46,11 @@ app = FastAPI(
 
 # Add rate limiter to app state
 app.state.limiter = limiter
+
+# Initialize database tables on startup
+@app.on_event("startup")
+async def startup_event():
+    init_db()
 
 # Add HTTPS enforcement middleware in production
 environment = os.getenv("ENVIRONMENT", "development")
