@@ -14,7 +14,7 @@ class EmailCaptureRequest(BaseModel):
 class EmailCaptureResponse(BaseModel):
     """Email capture response"""
     success: bool
-    id: int
+    id: Optional[str] = None
     message: str
 
 
