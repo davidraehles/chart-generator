@@ -36,4 +36,8 @@ def get_db_session() -> Session:
 
 def init_db():
     """Initialize database tables"""
+    # Import all models so their metadata is registered before create_all
+    from src.models.lead_email_db import LeadEmailDB  # noqa: F401
+    from src.models.ephemeris_storage import Base as EphemerisBase
+    EphemerisBase.metadata.create_all(bind=engine)
     Base.metadata.create_all(bind=engine)
