@@ -2,8 +2,8 @@ import type { Metadata } from "next";
 import "@/styles/globals.css";
 
 export const metadata: Metadata = {
-  title: "Human Design Chart Generator",
-  description: "Erstelle dein persönliches Human Design Chart",
+  title: "Human Design Business-Energie | Silke Stupperich",
+  description: "Entdecke deine Human Design Business-Energie: wie du arbeitest, entscheidest und auf andere wirkst.",
 };
 
 export default function RootLayout({

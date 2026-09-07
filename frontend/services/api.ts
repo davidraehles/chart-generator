@@ -94,14 +94,18 @@ export async function calculateChart(
 /**
  * Submit email for Business Reading interest
  */
-export async function submitEmail(email: string): Promise<EmailCaptureResponse> {
+export async function submitEmail(
+  email: string,
+  firstName?: string,
+  hdType?: string
+): Promise<EmailCaptureResponse> {
   try {
     const response = await fetch(`${API_BASE_URL}/email-capture`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
       },
-      body: JSON.stringify({ email }),
+      body: JSON.stringify({ email, first_name: firstName, hd_type: hdType }),
     });
 
     if (!response.ok) {

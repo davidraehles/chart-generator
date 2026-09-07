@@ -2,6 +2,17 @@
 @tailwind components;
 @tailwind utilities;
 
+/* Bodygraph SVG color utilities (matches codesoflife.com architecture) */
+.fill-col_design      { fill: #d8cefd; }
+.fill-col_personality { fill: #000000; }
+.fill-secondary       { fill: #f1f1f1; }
+.fill-white           { fill: #ffffff; }
+.fill-col_cta         { fill: #ff706e; }
+.stroke-col_cta       { stroke: #ff706e; }
+.stroke-col_personality { stroke: #000000; }
+.stroke-col_design    { stroke: #d8cefd; }
+.stroke-secondary     { stroke: #c8c8c8; }
+
 :root {
   --primary: #2c3e50;
   --secondary: #8b95a5;
@@ -13,6 +24,17 @@ body {
   font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen,
     Ubuntu, Cantarell, "Open Sans", "Helvetica Neue", sans-serif;
   color: var(--primary);
+}
+
+/* Business-Basis 2×2 Raster auf Desktop */
+@media (min-width: 768px) {
+  .basis-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+  }
+  .basis-grid .basis-cell-bl {
+    border-bottom: none !important;
+  }
 }
 
 @media print {

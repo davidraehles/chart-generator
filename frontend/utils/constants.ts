@@ -5,11 +5,12 @@
 export const LABELS = {
   // Form labels
   firstName: "Vorname",
+  lastName: "Nachname",
   birthDate: "Geburtsdatum",
   birthTime: "Geburtszeit",
   birthPlace: "Geburtsort",
-  birthTimeApproximate: "Geburtszeit ungefähr / unbekannt",
-  generateChart: "Chart Generieren",
+  birthTimeApproximate: "Meine genaue Geburtszeit ist nicht bekannt",
+  generateChart: "Meine Business-Energie entdecken",
 
   // Section titles
   yourType: "Dein Human Design Typ",
@@ -25,6 +26,7 @@ export const LABELS = {
   // Center labels
   defined: "Definiert",
   open: "Offen",
+  unconsciouslyDefined: "Unbewusst definiert",
 
   // Gate labels
   conscious: "Bewusst",
@@ -37,7 +39,7 @@ export const LABELS = {
 
   // Actions
   retry: "Erneut versuchen",
-  newChart: "Neues Chart",
+  newChart: "Neue Berechnung",
 };
 
 export const ERROR_MESSAGES = {
@@ -54,8 +56,9 @@ export const ERROR_MESSAGES = {
 };
 
 export const PLACEHOLDERS = {
-  firstName: "Marie",
-  birthDate: "23.11.1992",
-  birthTime: "14:30",
-  birthPlace: "Berlin, Germany",
+  firstName: "Dein Vorname",
+  lastName: "Dein Nachname",
+  birthDate: "TT.MM.JJJJ",
+  birthTime: "HH:MM",
+  birthPlace: "Dein Geburtsort",
 };

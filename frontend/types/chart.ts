@@ -4,10 +4,13 @@
 
 export interface ChartRequest {
   firstName: string;
+  lastName?: string;
   birthDate: string; // Format: TT.MM.JJJJ
   birthTime: string; // Format: HH:MM
   birthTimeApproximate: boolean;
   birthPlace: string;
+  latitude?: number;
+  longitude?: number;
 }
 
 export interface TypeInfo {
@@ -27,10 +30,13 @@ export interface ProfileInfo {
   shortDescription: string;
 }
 
+export type CenterDefinitionType = "open" | "defined" | "unconscious";
+
 export interface Center {
   name: string;
   code: string;
   defined: boolean;
+  definitionType: CenterDefinitionType;
 }
 
 export interface Channel {
@@ -57,10 +63,13 @@ export interface ChartResponse {
   incarnationCross: IncarnationCross;
   shortImpulse: string;
   calculationSource?: string;
+  variableCode?: string; // e.g. "LRRR"
 }
 
 export interface EmailCaptureRequest {
   email: string;
+  first_name?: string;
+  hd_type?: string;
 }
 
 export interface EmailCaptureResponse {

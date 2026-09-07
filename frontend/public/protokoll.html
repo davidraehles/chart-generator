@@ -1,0 +1,1117 @@
+<!doctype html>
+<html lang="de">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>7-Tage-Entscheidungsprotokoll · Drop the Mask</title>
+  <style>
+    :root {
+      --sage:       #5D7682;
+      --sage-dark:  #3D5560;
+      --stone:      #2F3437;
+      --cloud:      #F7F8F9;
+      --gold:       #B8A97C;
+      --gold-light: #F0EAD8;
+      --white:      #FFFFFF;
+      --border:     #D4DADC;
+      --muted:      #7A8B90;
+      --green-bg:   #EBF3EB;
+      --green-fg:   #2D5040;
+      --red-bg:     #F3EBEB;
+      --red-fg:     #5C2D2D;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      background: var(--cloud);
+      color: var(--stone);
+      font-family: 'Century Gothic', 'Gill Sans MT', 'Trebuchet MS', sans-serif;
+      line-height: 1.55;
+      font-size: 15px;
+    }
+
+    /* ── HEADER ── */
+    .site-header {
+      background: var(--sage);
+      color: #fff;
+      padding: 28px 24px 24px;
+    }
+    .site-header .inner { max-width: 820px; margin: 0 auto; }
+    .brand-tag {
+      font-size: 11px;
+      letter-spacing: 2.5px;
+      text-transform: uppercase;
+      color: rgba(255,255,255,.55);
+      margin-bottom: 8px;
+    }
+    .site-header h1 {
+      font-size: clamp(22px, 5vw, 34px);
+      font-weight: 700;
+      line-height: 1.15;
+      margin-bottom: 8px;
+    }
+    .site-header .subtitle {
+      font-size: 14px;
+      color: rgba(255,255,255,.75);
+      max-width: 560px;
+    }
+
+    /* ── DAY TABS ── */
+    .day-bar {
+      background: var(--white);
+      border-bottom: 1px solid var(--border);
+      position: sticky;
+      top: 0;
+      z-index: 10;
+    }
+    .day-bar .inner {
+      max-width: 820px;
+      margin: 0 auto;
+      display: flex;
+    }
+    .day-tab {
+      flex: 1;
+      padding: 13px 6px;
+      border: none;
+      border-bottom: 3px solid transparent;
+      background: none;
+      font: inherit;
+      font-size: 13px;
+      font-weight: 700;
+      color: var(--muted);
+      cursor: pointer;
+      transition: color .12s, border-color .12s;
+      text-align: center;
+      position: relative;
+    }
+    .day-tab:hover { color: var(--sage); }
+    .day-tab.active { color: var(--sage); border-bottom-color: var(--sage); }
+    .day-tab.has-data::after {
+      content: '';
+      display: block;
+      width: 5px; height: 5px;
+      border-radius: 50%;
+      background: var(--gold);
+      margin: 3px auto 0;
+    }
+
+    /* ── MAIN ── */
+    .main { max-width: 820px; margin: 0 auto; padding: 28px 16px 80px; }
+
+    /* ── SETUP CARD ── */
+    .setup-card {
+      background: var(--white);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 22px;
+      margin-bottom: 24px;
+    }
+    .card-label {
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      color: var(--sage);
+      margin-bottom: 10px;
+    }
+    .q-input {
+      width: 100%;
+      padding: 11px 14px;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      background: var(--cloud);
+      font: inherit;
+      font-size: 15px;
+      color: var(--stone);
+      resize: vertical;
+      min-height: 72px;
+    }
+    .q-input:focus { outline: none; border-color: var(--sage); background: #fff; }
+
+    /* ── DAY ENTRY ── */
+    .day-entry { display: none; }
+    .day-entry.active { display: block; }
+
+    .day-nav {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 18px;
+    }
+    .day-heading { font-size: 20px; font-weight: 700; }
+
+    /* ── SLOT CARD ── */
+    .slot-card {
+      background: var(--white);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      overflow: hidden;
+      margin-bottom: 16px;
+    }
+    .slot-head {
+      background: var(--sage);
+      color: #fff;
+      padding: 14px 20px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .slot-icon { font-size: 20px; line-height: 1; }
+    .slot-title { font-size: 16px; font-weight: 700; }
+    .slot-sub { font-size: 12px; color: rgba(255,255,255,.65); margin-left: auto; }
+    .slot-body { padding: 20px; }
+
+    /* ── FIELDS ── */
+    .f-group { margin-bottom: 18px; }
+    .f-group:last-child { margin-bottom: 0; }
+    .f-label {
+      display: block;
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 1.5px;
+      text-transform: uppercase;
+      color: var(--muted);
+      margin-bottom: 9px;
+    }
+    .f-rule {
+      height: 1px;
+      background: var(--border);
+      margin: 18px -20px;
+    }
+
+    /* Emotion buttons */
+    .emo-row {
+      display: flex;
+      gap: 7px;
+    }
+    .emo-btn {
+      flex: 1;
+      padding: 10px 4px;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      background: var(--cloud);
+      font: inherit;
+      font-size: 14px;
+      font-weight: 700;
+      color: var(--muted);
+      cursor: pointer;
+      text-align: center;
+      transition: all .1s;
+    }
+    .emo-btn:hover { border-color: var(--sage); color: var(--sage); }
+    .emo-btn.sel { background: var(--sage); border-color: var(--sage); color: #fff; }
+
+    /* Direction buttons */
+    .dir-row { display: flex; gap: 8px; }
+    .dir-btn {
+      flex: 1;
+      padding: 12px 6px;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      background: var(--cloud);
+      font: inherit;
+      font-size: 14px;
+      font-weight: 700;
+      color: var(--muted);
+      cursor: pointer;
+      text-align: center;
+      transition: all .1s;
+    }
+    .dir-btn:hover { border-color: var(--sage); }
+    .dir-btn.sel.ja    { background: var(--green-bg); border-color: #4A7C5E; color: var(--green-fg); }
+    .dir-btn.sel.nein  { background: var(--red-bg);   border-color: #8B4A4A; color: var(--red-fg); }
+    .dir-btn.sel.noch  { background: var(--gold-light); border-color: var(--gold); color: #5C4020; }
+
+    /* Pressure */
+    .pressure-wrap { display: flex; align-items: center; gap: 10px; margin-bottom: 10px; }
+    .p-lim { font-size: 12px; color: var(--muted); min-width: 14px; text-align: center; }
+    input[type=range] { flex: 1; accent-color: var(--sage); cursor: pointer; }
+    .p-val { font-size: 20px; font-weight: 700; color: var(--sage); min-width: 28px; text-align: center; }
+
+    /* Text inputs */
+    .t-input {
+      width: 100%;
+      padding: 10px 12px;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      background: var(--cloud);
+      font: inherit;
+      font-size: 14px;
+      color: var(--stone);
+      resize: vertical;
+      min-height: 58px;
+    }
+    .t-input:focus { outline: none; border-color: var(--sage); background: #fff; }
+
+    /* ── ACTIONS ── */
+    .action-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      align-items: center;
+      margin-top: 26px;
+    }
+    .btn-sage {
+      padding: 12px 26px;
+      background: var(--sage);
+      color: #fff;
+      border: none;
+      border-radius: 8px;
+      font: inherit;
+      font-size: 15px;
+      font-weight: 700;
+      cursor: pointer;
+    }
+    .btn-sage:hover { background: var(--sage-dark); }
+    .btn-outline {
+      padding: 11px 20px;
+      background: #fff;
+      color: var(--stone);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      font: inherit;
+      font-size: 14px;
+      cursor: pointer;
+    }
+    .btn-outline:hover { border-color: var(--sage); color: var(--sage); }
+    .btn-reset {
+      padding: 11px 16px;
+      background: none;
+      color: var(--muted);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      font: inherit;
+      font-size: 13px;
+      cursor: pointer;
+    }
+    .btn-reset:hover { color: var(--red-fg); border-color: var(--red-fg); }
+    .save-msg { font-size: 14px; font-weight: 700; color: #3A6B4A; }
+
+    /* ── SHARE BOX ── */
+    .share-box {
+      margin-top: 22px;
+      background: var(--gold-light);
+      border: 1px solid var(--gold);
+      border-radius: 10px;
+      padding: 18px 20px;
+    }
+    .share-title {
+      font-size: 13px;
+      font-weight: 700;
+      color: #5C4020;
+      margin-bottom: 4px;
+    }
+    .share-desc {
+      font-size: 12px;
+      color: #8A6840;
+      margin-bottom: 10px;
+    }
+    .share-row { display: flex; gap: 8px; }
+    .share-input {
+      flex: 1;
+      padding: 9px 12px;
+      border: 1px solid var(--gold);
+      border-radius: 6px;
+      background: #fff;
+      font: inherit;
+      font-size: 12px;
+      color: var(--stone);
+    }
+    .btn-copy {
+      padding: 9px 18px;
+      background: var(--gold);
+      color: #2D1800;
+      border: none;
+      border-radius: 6px;
+      font: inherit;
+      font-size: 13px;
+      font-weight: 700;
+      cursor: pointer;
+      white-space: nowrap;
+    }
+    .btn-mail {
+      padding: 9px 14px;
+      background: #fff;
+      color: #5C4020;
+      border: 1px solid var(--gold);
+      border-radius: 6px;
+      font: inherit;
+      font-size: 13px;
+      cursor: pointer;
+      white-space: nowrap;
+    }
+
+    /* ── RESPONSIVE ── */
+    @media (max-width: 580px) {
+      .emo-row { gap: 4px; }
+      .emo-btn { font-size: 13px; padding: 9px 2px; }
+      .dir-row { gap: 5px; }
+      .day-tab { font-size: 11px; padding: 10px 2px; }
+    }
+
+    /* ── ENTSCHEIDUNGSBEFUND ── */
+    .befund-section {
+      margin-top: 28px;
+      background: #fff;
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      overflow: hidden;
+    }
+    .befund-hd {
+      display: flex; align-items: flex-start; justify-content: space-between; gap: 16px;
+      padding: 20px 24px 16px;
+      border-bottom: 1px solid var(--border);
+    }
+    .befund-hd h2 { font-size: 17px; font-weight: 700; color: var(--stone); }
+    .befund-hd-sub { font-size: 12px; color: var(--muted); margin-top: 2px; letter-spacing: .3px; }
+    .btn-befund-calc {
+      flex-shrink: 0;
+      background: var(--sage); color: #fff;
+      border: none; border-radius: 6px;
+      padding: 8px 16px; font-size: 13px; font-weight: 600;
+      cursor: pointer; transition: background .15s;
+    }
+    .btn-befund-calc:hover:not(:disabled) { background: var(--sage-dark); }
+    .btn-befund-calc:disabled { background: var(--border); color: var(--muted); cursor: not-allowed; }
+    .befund-body { padding: 20px 24px; }
+    .befund-placeholder { color: var(--muted); font-size: 14px; }
+    .befund-badge {
+      display: inline-block;
+      padding: 5px 14px; border-radius: 20px;
+      font-size: 13px; font-weight: 700; letter-spacing: .4px;
+      margin-bottom: 14px;
+    }
+    .badge-reif  { background: #DFF0E8; color: #2D5040; }
+    .badge-tendenz { background: #FFF3D6; color: #6B4F10; }
+    .badge-offen { background: #F3EBEB; color: #5C2D2D; }
+    .befund-lead { font-size: 15px; margin-bottom: 18px; line-height: 1.5; }
+    .befund-rows { display: grid; grid-template-columns: 1fr 1fr; gap: 10px 20px; margin-bottom: 18px; }
+    @media (max-width: 560px) { .befund-rows { grid-template-columns: 1fr; } }
+    .befund-row { }
+    .br-lbl { font-size: 11px; letter-spacing: 1.5px; text-transform: uppercase; color: var(--muted); margin-bottom: 3px; }
+    .br-val { font-size: 14px; font-weight: 600; color: var(--stone); }
+    .dir-pips { display: flex; gap: 5px; flex-wrap: wrap; margin-top: 6px; margin-bottom: 14px; }
+    .pip {
+      width: 20px; height: 20px; border-radius: 50%;
+      font-size: 9px; display: flex; align-items: center; justify-content: center;
+      font-weight: 700; color: #fff;
+    }
+    .pip-ja     { background: #4A7C5E; }
+    .pip-nein   { background: #8B4A4A; }
+    .pip-noch   { background: var(--gold); }
+    .pip-leer   { background: transparent; border: 1.5px solid var(--border); }
+    .befund-next {
+      background: #EDF2F4; border-radius: 8px;
+      padding: 14px 16px;
+    }
+    .befund-next-lbl { font-size: 11px; letter-spacing: 1.5px; text-transform: uppercase; color: var(--muted); margin-bottom: 5px; }
+    .befund-next-val { font-size: 14px; font-weight: 600; color: var(--stone); }
+
+    /* ── INTRO ── */
+    .intro-box {
+      background: var(--gold-light);
+      border-bottom: 1px solid var(--border);
+      padding: 28px 24px;
+    }
+    .intro-box .inner { max-width: 820px; margin: 0 auto; }
+    .intro-greeting {
+      font-size: 18px;
+      font-weight: 700;
+      color: var(--stone);
+      margin-bottom: 12px;
+    }
+    .intro-box p {
+      font-size: 13.5px;
+      line-height: 1.75;
+      color: var(--stone);
+      margin: 0 0 10px;
+      max-width: 680px;
+    }
+    .intro-box p:last-of-type { margin-bottom: 0; }
+    .intro-note {
+      margin-top: 16px;
+      padding: 11px 15px;
+      background: rgba(255,255,255,.65);
+      border-left: 3px solid var(--gold);
+      border-radius: 4px;
+      font-size: 12.5px;
+      color: var(--muted);
+      line-height: 1.65;
+      max-width: 640px;
+    }
+
+    /* ── PRINT ── */
+    @media print {
+      .day-bar, .action-row, .share-box, .day-nav button { display: none !important; }
+      .day-entry { display: block !important; page-break-before: always; }
+      .day-entry:first-of-type { page-break-before: auto; }
+      body { background: #fff; font-size: 11pt; }
+      .site-header { background: var(--sage) !important; print-color-adjust: exact; -webkit-print-color-adjust: exact; }
+      .slot-head { background: var(--sage) !important; print-color-adjust: exact; -webkit-print-color-adjust: exact; }
+      .emo-btn.sel { background: #666 !important; color: #fff !important; print-color-adjust: exact; -webkit-print-color-adjust: exact; }
+      .dir-btn.sel { font-weight: 900; border-width: 2px; }
+      .slot-card { border: 1px solid #ccc; }
+      .t-input { border: none; border-bottom: 1px solid #ccc; border-radius: 0; background: none; }
+    }
+  </style>
+</head>
+<body>
+
+<header class="site-header">
+  <div class="inner">
+    <div class="brand-tag">Drop the Mask · stupperich.de</div>
+    <h1>Dein 7-Tage-Entscheidungsprotokoll</h1>
+    <p class="subtitle">Morgens und abends je fünf Felder. Kein schöner Bericht — ehrliches Beobachtungsmaterial.</p>
+  </div>
+</header>
+
+<section class="intro-box">
+  <div class="inner">
+    <div class="intro-greeting">7 Tage beobachten, was wirklich passiert.</div>
+    <p>Dieses Protokoll begleitet dich durch 7 Tage bewusster Selbstbeobachtung. Morgens und abends je ein kurzer Eintrag zu deiner emotionalen Lage, deiner Richtung, dem Druck, den du spürst, und dem, was du körperlich wahrnimmst.</p>
+    <p>An Tag 7 öffnet sich deine persönliche Beobachtungsübersicht. Sie zeigt dir, welche Muster sich in deinen Einträgen zeigen — ohne Bewertung und ohne Empfehlung.</p>
+    <p>Was diese Muster für deine Entscheidung bedeuten, prüfst du gemeinsam mit Silke in Modul 4.</p>
+    <div class="intro-note">Die Entscheidung liegt immer bei dir. Dieses Protokoll sammelt Beobachtungsmaterial — kein Tool und keine Auswertung kann dir sagen, was die richtige Entscheidung für dich ist.</div>
+  </div>
+</section>
+
+<nav class="day-bar">
+  <div class="inner" id="day-tabs"></div>
+</nav>
+
+<main class="main">
+
+  <div class="setup-card">
+    <div class="card-label">Deine Ausgangsfrage</div>
+    <textarea class="q-input" id="q-input" placeholder="Schreibe hier … (welche Entscheidung du in diesen 7 Tagen beobachtest)"></textarea>
+    <div style="margin-top:10px; text-align:right;">
+      <button class="btn-reset" id="btn-reset">Protokoll zurücksetzen</button>
+    </div>
+  </div>
+
+  <div id="entries"></div>
+
+  <div class="action-row">
+    <button class="btn-sage" id="btn-save">Speichern</button>
+    <button class="btn-outline" id="btn-print">Drucken / PDF</button>
+    <span class="save-msg" id="save-msg"></span>
+  </div>
+
+  <div class="befund-section" id="befund-section">
+    <div class="befund-hd">
+      <div>
+        <h2>Deine Beobachtungsübersicht</h2>
+        <div class="befund-hd-sub">Deine sieben Tage im Überblick</div>
+      </div>
+      <button class="btn-befund-calc" id="btn-befund" disabled>Beobachtungsübersicht öffnen</button>
+    </div>
+    <div class="befund-body" id="befund-body">
+      <p class="befund-placeholder">Deine Beobachtungsübersicht wird an Tag 7 freigeschaltet. Bis dahin sammelst du weiter.</p>
+    </div>
+  </div>
+
+  <div class="share-box">
+    <div class="share-title">Dein persönlicher Link</div>
+    <div class="share-desc">Dieser Link enthält alle deine Einträge. Behandle ihn vertraulich und teile ihn nur, wenn du das ausdrücklich möchtest.</div>
+    <div class="share-row">
+      <input class="share-input" id="share-url" type="text" readonly>
+      <button class="btn-copy" id="btn-copy">Kopieren</button>
+      <button class="btn-mail" id="btn-mail">Per Mail</button>
+    </div>
+  </div>
+
+</main>
+
+<!-- ── Abschluss-Modal (Tag 7) ── -->
+<div id="befund-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.45);z-index:200;align-items:center;justify-content:center;">
+  <div style="background:#fff;border-radius:14px;padding:30px 26px;max-width:400px;margin:16px;box-shadow:0 12px 40px rgba(0,0,0,0.18);">
+    <h3 style="font-size:17px;font-weight:700;color:#2F3437;margin-bottom:10px;line-height:1.35;">Hast du deinen letzten Eintrag für Tag 7 gemacht?</h3>
+    <p style="font-size:13px;color:#7A8B90;line-height:1.65;margin-bottom:22px;">Ein fehlender Eintrag verhindert den Abschluss nicht — du entscheidest selbst, wann dein letzter Eintrag erfolgt ist.</p>
+    <div style="display:flex;flex-direction:column;gap:10px;">
+      <button id="modal-finish" class="btn-sage">Experiment abschliessen und Übersicht öffnen</button>
+      <button id="modal-continue" class="btn-outline">Ich beobachte weiter</button>
+    </div>
+  </div>
+</div>
+
+<script>
+(() => {
+  'use strict';
+
+  const STORE = 'dtm-ep-v2';
+
+  let state = { q: '', days: {} };
+  let currentDay = 1;
+  let saveTimer;
+
+  // ── slot field definitions ──────────────────────────────────────────────────
+  const EMOTIONS = [
+    { v: '-2', l: '−2' }, { v: '-1', l: '−1' },
+    { v: '0',  l: '0'  }, { v: '+1', l: '+1' }, { v: '+2', l: '+2' }
+  ];
+
+  // ── build UI ────────────────────────────────────────────────────────────────
+
+  function el(tag, cls, html) {
+    const e = document.createElement(tag);
+    if (cls) e.className = cls;
+    if (html !== undefined) e.innerHTML = html;
+    return e;
+  }
+
+  function buildTabs() {
+    const container = document.getElementById('day-tabs');
+    for (let d = 1; d <= 7; d++) {
+      const btn = el('button', 'day-tab', `Tag&nbsp;${d}`);
+      btn.dataset.d = d;
+      btn.addEventListener('click', () => goDay(d));
+      container.appendChild(btn);
+    }
+  }
+
+  function buildEntries() {
+    const wrap = document.getElementById('entries');
+    for (let d = 1; d <= 7; d++) {
+      const div = el('div', 'day-entry');
+      div.id = `day-${d}`;
+      div.appendChild(buildDayNav(d));
+      div.appendChild(buildSlot(d, 'morning', '🌤', 'Morgens', 'Vor dem ersten Meeting'));
+      div.appendChild(buildSlot(d, 'evening', '🌙', 'Abends', 'Am Ende des Arbeitstages'));
+      wrap.appendChild(div);
+    }
+  }
+
+  function buildDayNav(d) {
+    const nav = el('div', 'day-nav');
+    nav.appendChild(el('div', 'day-heading', `Tag ${d}`));
+    const right = el('div', '', '');
+    right.style.display = 'flex'; right.style.gap = '8px';
+    if (d > 1) {
+      const b = el('button', 'btn-outline', `← Tag ${d-1}`);
+      b.addEventListener('click', () => goDay(d-1));
+      right.appendChild(b);
+    }
+    if (d < 7) {
+      const b = el('button', 'btn-outline', `Tag ${d+1} →`);
+      b.addEventListener('click', () => goDay(d+1));
+      right.appendChild(b);
+    }
+    nav.appendChild(right);
+    return nav;
+  }
+
+  function buildSlot(d, slot, icon, title, sub) {
+    const card = el('div', 'slot-card');
+    const head = el('div', 'slot-head');
+    head.innerHTML = `<span class="slot-icon">${icon}</span><span class="slot-title">${title}</span><span class="slot-sub">${sub}</span>`;
+    card.appendChild(head);
+
+    const body = el('div', 'slot-body');
+    body.appendChild(buildEmotionField(d, slot));
+    body.appendChild(el('div', 'f-rule'));
+    body.appendChild(buildDirectionField(d, slot));
+    body.appendChild(el('div', 'f-rule'));
+    body.appendChild(buildPressureField(d, slot));
+    body.appendChild(el('div', 'f-rule'));
+    body.appendChild(buildTextField(d, slot, 'body_sense', '4 · Körperliche Wahrnehmung', 'Schreibe hier … (was du körperlich wahrnimmst – Schultern, Atem, Bauch, Kehle …)'));
+    body.appendChild(el('div', 'f-rule'));
+    body.appendChild(buildTextField(d, slot, 'new_info', '5 · Neue Information, Folge oder Bedingung', 'Schreibe hier … (was heute neu aufgetaucht ist)'));
+    card.appendChild(body);
+    return card;
+  }
+
+  function buildEmotionField(d, slot) {
+    const g = el('div', 'f-group');
+    g.appendChild(el('label', 'f-label', '1 · Emotionaler Zustand (−2 bis +2)'));
+    const row = el('div', 'emo-row');
+    EMOTIONS.forEach(em => {
+      const btn = el('button', 'emo-btn', em.l);
+      btn.type = 'button';
+      btn.dataset.d = d; btn.dataset.slot = slot;
+      btn.dataset.field = 'emotion'; btn.dataset.val = em.v;
+      btn.addEventListener('click', () => handleChoice(btn));
+      row.appendChild(btn);
+    });
+    g.appendChild(row);
+    return g;
+  }
+
+  function buildDirectionField(d, slot) {
+    const g = el('div', 'f-group');
+    g.appendChild(el('label', 'f-label', '2 · Meine Richtung'));
+    const row = el('div', 'dir-row');
+    [['Ja','ja'], ['Nein','nein'], ['Noch nicht','noch']].forEach(([lbl, cls]) => {
+      const btn = el('button', `dir-btn ${cls}`, lbl);
+      btn.type = 'button';
+      btn.dataset.d = d; btn.dataset.slot = slot;
+      btn.dataset.field = 'direction'; btn.dataset.val = lbl;
+      btn.addEventListener('click', () => handleChoice(btn));
+      row.appendChild(btn);
+    });
+    g.appendChild(row);
+    return g;
+  }
+
+  function buildPressureField(d, slot) {
+    const g = el('div', 'f-group');
+    g.appendChild(el('label', 'f-label', '3 · Entscheidungsdruck (0 – 10)'));
+    const pw = el('div', 'pressure-wrap');
+    pw.innerHTML = `<span class="p-lim">0</span>`;
+    const slider = document.createElement('input');
+    slider.type = 'range'; slider.min = 0; slider.max = 10; slider.step = 1; slider.value = 0;
+    slider.dataset.d = d; slider.dataset.slot = slot; slider.dataset.field = 'pressure';
+    const display = el('span', 'p-val', '0');
+    slider.addEventListener('input', () => {
+      display.textContent = slider.value;
+      debouncedSave();
+    });
+    pw.appendChild(slider);
+    pw.appendChild(display);
+    pw.appendChild(el('span', 'p-lim', '10'));
+    g.appendChild(pw);
+    const src = buildTA(d, slot, 'pressure_src', 'Schreibe hier … (woher der Druck kommt)');
+    g.appendChild(src);
+    return g;
+  }
+
+  function buildTextField(d, slot, field, labelText, ph) {
+    const g = el('div', 'f-group');
+    g.appendChild(el('label', 'f-label', labelText));
+    g.appendChild(buildTA(d, slot, field, ph));
+    return g;
+  }
+
+  function buildTA(d, slot, field, ph) {
+    const ta = document.createElement('textarea');
+    ta.className = 't-input';
+    ta.placeholder = ph;
+    ta.rows = 2;
+    ta.dataset.d = d; ta.dataset.slot = slot; ta.dataset.field = field;
+    ta.addEventListener('input', debouncedSave);
+    return ta;
+  }
+
+  // ── state helpers ───────────────────────────────────────────────────────────
+
+  function getSlot(d, slot) {
+    if (!state.days[d]) state.days[d] = {};
+    if (!state.days[d][slot]) state.days[d][slot] = {};
+    return state.days[d][slot];
+  }
+
+  function collectAll() {
+    state.q = document.getElementById('q-input').value;
+    document.querySelectorAll('[data-d][data-slot][data-field]').forEach(el => {
+      const { d, slot, field } = el.dataset;
+      const s = getSlot(d, slot);
+      if (el.tagName === 'TEXTAREA') s[field] = el.value;
+      else if (el.type === 'range') s[field] = el.value;
+    });
+    document.querySelectorAll('.emo-btn.sel, .dir-btn.sel').forEach(btn => {
+      const { d, slot, field, val } = btn.dataset;
+      getSlot(d, slot)[field] = val;
+    });
+  }
+
+  function applyAll() {
+    document.getElementById('q-input').value = state.q || '';
+    document.querySelectorAll('[data-d][data-slot][data-field]').forEach(el => {
+      const { d, slot, field } = el.dataset;
+      const s = getSlot(d, slot);
+      const v = s[field];
+      if (v === undefined) return;
+      if (el.tagName === 'TEXTAREA') el.value = v;
+      else if (el.type === 'range') {
+        el.value = v;
+        const disp = el.nextElementSibling;
+        if (disp && disp.classList.contains('p-val')) disp.textContent = v;
+      }
+    });
+    document.querySelectorAll('.emo-btn').forEach(btn => {
+      const { d, slot } = btn.dataset;
+      const v = getSlot(d, slot)['emotion'];
+      btn.classList.toggle('sel', btn.dataset.val === v);
+    });
+    document.querySelectorAll('.dir-btn').forEach(btn => {
+      const { d, slot } = btn.dataset;
+      const v = getSlot(d, slot)['direction'];
+      btn.classList.toggle('sel', btn.dataset.val === v);
+    });
+    updateTabs();
+  }
+
+  // ── persistence ─────────────────────────────────────────────────────────────
+
+  function encode(obj) {
+    return btoa(encodeURIComponent(JSON.stringify(obj)));
+  }
+  function decode(str) {
+    return JSON.parse(decodeURIComponent(atob(str)));
+  }
+
+  function save(showMsg) {
+    collectAll();
+    const enc = encode(state);
+    try { localStorage.setItem(STORE, enc); } catch(e) {}
+    const url = window.location.pathname + window.location.search + '#data=' + enc;
+    history.replaceState(null, '', url);
+    document.getElementById('share-url').value = window.location.href;
+    updateTabs();
+    updateBefundButton();
+    if (showMsg) {
+      const m = document.getElementById('save-msg');
+      m.textContent = 'Gespeichert ✓';
+      setTimeout(() => { m.textContent = ''; }, 2500);
+    }
+  }
+
+  function load() {
+    let enc = null;
+    const hash = window.location.hash;
+    if (hash.startsWith('#data=')) { enc = hash.slice(6); window._loadedFromHash = true; }
+    if (!enc) { try { enc = localStorage.getItem(STORE); } catch(e) {} }
+    if (enc) { try { state = decode(enc); } catch(e) {} }
+    applyAll();
+    document.getElementById('share-url').value = window.location.href;
+  }
+
+  function debouncedSave() {
+    clearTimeout(saveTimer);
+    saveTimer = setTimeout(() => save(false), 700);
+  }
+
+  // ── navigation ───────────────────────────────────────────────────────────────
+
+  function goDay(d) {
+    currentDay = d;
+    document.querySelectorAll('.day-entry').forEach(e => e.classList.toggle('active', e.id === `day-${d}`));
+    document.querySelectorAll('.day-tab').forEach(t => t.classList.toggle('active', t.dataset.d == d));
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }
+
+  function updateTabs() {
+    for (let d = 1; d <= 7; d++) {
+      const tab = document.querySelector(`.day-tab[data-d="${d}"]`);
+      if (!tab) continue;
+      const dd = state.days[d] || {};
+      const hasData = ['morning','evening'].some(sl => {
+        const s = dd[sl] || {};
+        return s.emotion || s.direction || s.body_sense || s.new_info;
+      });
+      tab.classList.toggle('has-data', hasData);
+    }
+  }
+
+  // ── button clicks ────────────────────────────────────────────────────────────
+
+  function handleChoice(btn) {
+    const { d, slot, field } = btn.dataset;
+    const isEmo = btn.classList.contains('emo-btn');
+    const siblings = btn.parentElement.querySelectorAll(isEmo ? '.emo-btn' : '.dir-btn');
+    siblings.forEach(b => b.classList.remove('sel'));
+    btn.classList.add('sel');
+    debouncedSave();
+  }
+
+  // ── init ─────────────────────────────────────────────────────────────────────
+
+  buildTabs();
+  buildEntries();
+  load();
+  updateBefundButton();
+  goDay(1);
+
+  document.getElementById('btn-save').addEventListener('click', () => save(true));
+  document.getElementById('btn-print').addEventListener('click', () => { save(false); window.print(); });
+
+  document.getElementById('btn-reset').addEventListener('click', () => {
+    if (!confirm('Protokoll wirklich zurücksetzen? Alle eingetragenen Daten werden gelöscht.')) return;
+    try { localStorage.removeItem(STORE); } catch(e) {}
+    window.location.href = window.location.pathname;
+  });
+
+  document.getElementById('q-input').addEventListener('input', debouncedSave);
+
+  document.getElementById('btn-copy').addEventListener('click', () => {
+    save(false);
+    navigator.clipboard.writeText(document.getElementById('share-url').value).then(() => {
+      const b = document.getElementById('btn-copy');
+      b.textContent = 'Kopiert ✓';
+      setTimeout(() => { b.textContent = 'Kopieren'; }, 2000);
+    });
+  });
+
+  document.getElementById('btn-mail').addEventListener('click', () => {
+    save(false);
+    const url = encodeURIComponent(document.getElementById('share-url').value);
+    window.location.href = `mailto:?subject=Mein%207-Tage-Entscheidungsprotokoll&body=Hier%20ist%20mein%20pers%C3%B6nlicher%20Link%3A%0A%0A${url}`;
+  });
+
+
+  /* ── BEOBACHTUNGSÜBERSICHT ── */
+
+  function day7HasDirection() {
+    const day7 = state.days[7] || {};
+    return ['morning','evening'].some(sl => (day7[sl] || {}).direction);
+  }
+
+  function updateBefundButton() {
+    const btn = document.getElementById('btn-befund');
+    const body = document.getElementById('befund-body');
+    if (day7HasDirection()) {
+      btn.disabled = false;
+    } else {
+      btn.disabled = true;
+      body.innerHTML = '<p class="befund-placeholder">Deine Beobachtungsübersicht wird an Tag 7 freigeschaltet. Bis dahin sammelst du weiter.</p>';
+    }
+  }
+
+  function computeUebersicht() {
+    collectAll();
+    const points = [];
+    for (let d = 1; d <= 7; d++) {
+      for (const sl of ['morning','evening']) {
+        const s = ((state.days[d] || {})[sl]) || {};
+        if (s.direction) {
+          points.push({
+            day: d, slot: sl,
+            direction: s.direction,
+            emotion: s.emotion !== undefined ? parseFloat(s.emotion) : null,
+            pressure: s.pressure !== undefined ? parseFloat(s.pressure) : null,
+            new_info: (s.new_info || '').trim(),
+            pressure_src: (s.pressure_src || '').trim(),
+            body_sense: (s.body_sense || '').trim(),
+          });
+        }
+      }
+    }
+
+    const total = points.length;
+
+    // Verteilung aller drei Richtungen (gleichberechtigt)
+    const counts = { 'Ja': 0, 'Nein': 0, 'Noch nicht': 0 };
+    points.forEach(p => { if (counts[p.direction] !== undefined) counts[p.direction]++; });
+
+    // Häufigste Richtung — alle drei gleichberechtigt, Gleichstand = null
+    const maxCount = Math.max(counts['Ja'], counts['Nein'], counts['Noch nicht']);
+    const leaders = maxCount > 0 ? Object.keys(counts).filter(k => counts[k] === maxCount) : [];
+    const dominant = leaders.length === 1 ? leaders[0] : null;
+
+    // Anzahl unterschiedlicher Tage pro Richtung
+    const daysPerDir = {};
+    ['Ja','Nein','Noch nicht'].forEach(dir => {
+      daysPerDir[dir] = new Set(points.filter(p => p.direction === dir).map(p => p.day)).size;
+    });
+
+    // Emotionale Zustände pro Richtung
+    function emoRangeForDir(dir) {
+      const emos = points.filter(p => p.direction === dir && p.emotion !== null).map(p => p.emotion);
+      if (!emos.length) return null;
+      return { min: Math.min(...emos), max: Math.max(...emos), count: emos.length, values: emos };
+    }
+    const emotionPerDir = {
+      'Ja': emoRangeForDir('Ja'),
+      'Nein': emoRangeForDir('Nein'),
+      'Noch nicht': emoRangeForDir('Noch nicht'),
+    };
+
+    // Zonen: Hoch / Neutral / Tief getrennt
+    function zoneDominant(pts) {
+      if (!pts.length) return null;
+      const c = { 'Ja': 0, 'Nein': 0, 'Noch nicht': 0 };
+      pts.forEach(p => { if (c[p.direction] !== undefined) c[p.direction]++; });
+      const max = Math.max(...Object.values(c));
+      if (max === 0) return null;
+      const ls = Object.keys(c).filter(k => c[k] === max);
+      return { dominant: ls.length === 1 ? ls[0] : null, tie: ls.length > 1, counts: c, total: pts.length };
+    }
+    const zoneHoch    = zoneDominant(points.filter(p => p.emotion !== null && p.emotion >= 1));
+    const zoneNeutral = zoneDominant(points.filter(p => p.emotion !== null && p.emotion === 0));
+    const zoneTief    = zoneDominant(points.filter(p => p.emotion !== null && p.emotion <= -1));
+
+    // Druckvergleich
+    function pressureCount(pts) {
+      const c = { 'Ja': 0, 'Nein': 0, 'Noch nicht': 0 };
+      pts.forEach(p => { if (c[p.direction] !== undefined) c[p.direction]++; });
+      return c;
+    }
+    const ptHighPressure   = points.filter(p => p.pressure !== null && p.pressure >= 7);
+    const ptLowPressure    = points.filter(p => p.pressure !== null && p.pressure < 7);
+    const highPressureDist = pressureCount(ptHighPressure);
+    const lowPressureDist  = pressureCount(ptLowPressure);
+
+    // Letzte 3 Informationen / Folgen / Bedingungen
+    const lastNewInfo   = points.filter(p => p.new_info).slice(-3).reverse();
+    // Letzte 3 körperliche Wahrnehmungen
+    const lastBodySense = points.filter(p => p.body_sense).slice(-3).reverse();
+
+    return { points, total, counts, dominant, daysPerDir, emotionPerDir,
+             zoneHoch, zoneNeutral, zoneTief,
+             ptHighPressure, ptLowPressure, highPressureDist, lowPressureDist,
+             lastNewInfo, lastBodySense };
+  }
+
+  function renderUebersicht(u) {
+    const body = document.getElementById('befund-body');
+
+    // ── Pips-Timeline ────────────────────────────────────────────────────────
+    const pips = [];
+    for (let d = 1; d <= 7; d++) {
+      for (const sl of ['morning','evening']) {
+        const p = u.points.find(x => x.day === d && x.slot === sl);
+        if (!p) { pips.push('<span class="pip pip-leer" title="—"></span>'); continue; }
+        const cls = p.direction === 'Ja' ? 'pip-ja' : p.direction === 'Nein' ? 'pip-nein' : 'pip-noch';
+        const lbl = p.direction === 'Ja' ? 'J' : p.direction === 'Nein' ? 'N' : '?';
+        pips.push(`<span class="pip ${cls}" title="Tag ${p.day} ${sl === 'morning' ? 'Morgen' : 'Abend'}: ${p.direction}">${lbl}</span>`);
+      }
+    }
+
+    // ── Verteilung ───────────────────────────────────────────────────────────
+    function emoStr(e) {
+      if (!e) return '—';
+      const sign = v => v > 0 ? `+${v}` : `${v}`;
+      if (e.values && e.values.length) {
+        const unique = [...new Set(e.values)].sort((a,b) => a-b);
+        return unique.map(sign).join(', ');
+      }
+      return e.min === e.max ? sign(e.min) : `${sign(e.min)}, ${sign(e.max)}`;
+    }
+    const dirs = ['Ja','Nein','Noch nicht'];
+    const distRows = dirs.map(dir => {
+      const e = u.emotionPerDir[dir];
+      return `<div class="befund-row">
+        <div class="br-lbl">${dir}</div>
+        <div class="br-val">${u.counts[dir]} ${u.counts[dir] === 1 ? 'Eintrag' : 'Einträge'} · ${u.daysPerDir[dir]} ${u.daysPerDir[dir] === 1 ? 'Tag' : 'Tage'} · Emotion: ${emoStr(e)}</div>
+      </div>`;
+    }).join('');
+
+    const dominantNote = u.dominant
+      ? `<p style="font-size:13px;color:var(--stone);margin-top:10px;">Am häufigsten eingetragen: <strong>${u.dominant}</strong></p>`
+      : `<p style="font-size:13px;color:var(--muted);margin-top:10px;font-style:italic;">Mehrere Richtungen wurden gleich häufig eingetragen.</p>`;
+
+    // ── Zonen ────────────────────────────────────────────────────────────────
+    function zoneText(z) {
+      if (!z) return '<em style="color:var(--muted)">Keine Einträge in diesem Bereich.</em>';
+      if (z.tie) return 'Mehrere Richtungen gleich häufig eingetragen.';
+      return `Am häufigsten: <strong>${z.dominant}</strong>`;
+    }
+
+    // ── Druckvergleich ───────────────────────────────────────────────────────
+    function distStr(c) { return `Ja: ${c['Ja']} · Nein: ${c['Nein']} · Noch nicht: ${c['Noch nicht']}`; }
+    let pressureHtml;
+    const allPressures = u.points.filter(p => p.pressure !== null).map(p => p.pressure);
+    if (allPressures.length === 0) {
+      pressureHtml = '<p style="font-size:13px;color:var(--muted);font-style:italic;">Keine Druckwerte eingetragen.</p>';
+    } else {
+      const pMin = Math.min(...allPressures);
+      const pMax = Math.max(...allPressures);
+      const pAvg = (allPressures.reduce((s,v) => s+v, 0) / allPressures.length).toFixed(1);
+      const noHighNote = u.ptHighPressure.length === 0
+        ? `<p style="font-size:12px;color:var(--muted);font-style:italic;margin-bottom:8px;">Während des Experiments gab es keinen Eintrag mit einem Entscheidungsdruck von 7 bis 10.</p>`
+        : '';
+      const highBlock = u.ptHighPressure.length > 0 ? `
+          <div style="background:#EDF2F4;border-radius:8px;padding:10px 14px;">
+            <div class="br-lbl" style="margin-bottom:3px;">Bei hohem Druck (7–10) · ${u.ptHighPressure.length} ${u.ptHighPressure.length === 1 ? 'Eintrag' : 'Einträge'}</div>
+            <div style="font-size:13px;font-weight:600;color:var(--stone);">${distStr(u.highPressureDist)}</div>
+          </div>` : '';
+      pressureHtml = `
+        <div style="font-size:12px;color:var(--muted);margin-bottom:10px;">Niedrigster Wert: <strong>${pMin}</strong> · Höchster Wert: <strong>${pMax}</strong> · Durchschnitt: <strong>${pAvg}</strong></div>
+        ${noHighNote}
+        <div style="display:grid;gap:7px;margin-bottom:9px;">
+          ${highBlock}
+          <div style="background:#F7F8F9;border:1px solid var(--border);border-radius:8px;padding:10px 14px;">
+            <div class="br-lbl" style="margin-bottom:3px;">Bei einem Druck von 0–6 · ${u.ptLowPressure.length} ${u.ptLowPressure.length === 1 ? 'Eintrag' : 'Einträge'}</div>
+            <div style="font-size:13px;font-weight:600;color:var(--stone);">${distStr(u.lowPressureDist)}</div>
+          </div>
+        </div>
+        <p style="font-size:12px;color:var(--muted);line-height:1.65;">Damit kannst du vergleichen, ob du unter hohem Druck häufiger zu einer bestimmten Antwort tendierst. Was hinter dieser Veränderung steckt, prüfst du in Modul 4.</p>`;
+    }
+
+    // ── Letzte Einträge ───────────────────────────────────────────────────────
+    function slotLabel(p) { return `Tag ${p.day}, ${p.slot === 'morning' ? 'Morgen' : 'Abend'}`; }
+    function entryList(items, field, emptyText) {
+      if (!items.length) return `<p style="font-size:13px;color:var(--muted);font-style:italic;">${emptyText}</p>`;
+      return items.map(p => `<div style="border-left:3px solid var(--border);padding:8px 12px;margin-bottom:7px;background:#F7F8F9;border-radius:0 6px 6px 0;">
+        <div style="font-size:10px;color:var(--muted);margin-bottom:3px;">${slotLabel(p)}</div>
+        <div style="font-size:13px;color:var(--stone);">${p[field]}</div>
+      </div>`).join('');
+    }
+
+    body.innerHTML = `
+      <p style="font-size:13px;color:var(--muted);margin-bottom:16px;">Alle Einträge auf einen Blick. Keine Bewertung — nur was du beobachtet hast.</p>
+
+      <!-- Timeline -->
+      <div class="br-lbl" style="margin-bottom:6px;">Chronologische Übersicht (J = Ja · N = Nein · ? = Noch nicht)</div>
+      <div class="dir-pips" style="margin-bottom:20px;">${pips.join('')}</div>
+
+      <!-- Verteilung -->
+      <div class="br-lbl" style="margin-bottom:8px;">Verteilung der Richtungen über alle Einträge</div>
+      <div class="befund-rows" style="margin-bottom:4px;">${distRows}</div>
+      ${dominantNote}
+
+      <!-- Zonen -->
+      <div style="margin-top:22px;">
+        <div class="br-lbl" style="margin-bottom:8px;">Richtung nach emotionalem Zustand</div>
+        <div style="display:grid;gap:7px;">
+          <div style="background:#EBF3EB;border-radius:8px;padding:10px 14px;">
+            <div style="font-size:11px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:#2D5040;margin-bottom:3px;">Im emotionalen Hoch (+1 und +2)</div>
+            <div style="font-size:13px;color:var(--stone);">${zoneText(u.zoneHoch)}</div>
+          </div>
+          <div style="background:#F7F8F9;border:1px solid var(--border);border-radius:8px;padding:10px 14px;">
+            <div style="font-size:11px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:var(--muted);margin-bottom:3px;">In neutralen Momenten (0)</div>
+            <div style="font-size:13px;color:var(--stone);">${zoneText(u.zoneNeutral)}</div>
+          </div>
+          <div style="background:#F3EBEB;border-radius:8px;padding:10px 14px;">
+            <div style="font-size:11px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:#5C2D2D;margin-bottom:3px;">Im emotionalen Tief (−1 und −2)</div>
+            <div style="font-size:13px;color:var(--stone);">${zoneText(u.zoneTief)}</div>
+          </div>
+        </div>
+        <p style="font-size:12px;color:var(--muted);margin-top:9px;line-height:1.65;">Damit siehst du, wie sich dein Blick auf dieselbe Entscheidung in unterschiedlichen emotionalen Zuständen verändert hat. Was diese Unterschiede bedeuten, prüfst du in Modul 4.</p>
+      </div>
+
+      <!-- Druckvergleich -->
+      <div style="margin-top:22px;">
+        <div class="br-lbl" style="margin-bottom:8px;">Entscheidungsdruck im Vergleich</div>
+        ${pressureHtml}
+      </div>
+
+      <!-- Letzte Informationen -->
+      <div style="margin-top:22px;">
+        <div class="br-lbl" style="margin-bottom:8px;">Letzte 3 eingetragene Informationen, Folgen oder Bedingungen</div>
+        ${entryList(u.lastNewInfo, 'new_info', 'Keine Einträge in diesem Feld.')}
+      </div>
+
+      <!-- Letzte körperliche Wahrnehmungen -->
+      <div style="margin-top:22px;">
+        <div class="br-lbl" style="margin-bottom:8px;">Letzte 3 körperliche Wahrnehmungen</div>
+        ${entryList(u.lastBodySense, 'body_sense', 'Keine Einträge in diesem Feld.')}
+      </div>
+
+      <!-- Brücke zu Modul 4 -->
+      <div class="befund-next" style="margin-top:22px;">
+        <div class="befund-next-lbl">Dein nächster Schritt</div>
+        <div class="befund-next-val">Diese Übersicht ist dein Ausgangsmaterial für Modul 4. Dort prüfst du gemeinsam mit Silke, was deine Beobachtungen für diese konkrete Entscheidung bedeuten — und was du wirklich brauchst, bevor du ein verbindliches Ja oder Nein gibst.</div>
+      </div>`;
+  }
+
+  document.getElementById('btn-befund').addEventListener('click', () => {
+    save(false);
+    // Nur ausführen wenn Tag 7 eine Richtung hat (Button sonst disabled)
+    if (!day7HasDirection()) return;
+    document.getElementById('befund-modal').style.display = 'flex';
+  });
+
+  document.getElementById('modal-continue').addEventListener('click', () => {
+    document.getElementById('befund-modal').style.display = 'none';
+  });
+  document.getElementById('modal-finish').addEventListener('click', () => {
+    document.getElementById('befund-modal').style.display = 'none';
+    renderUebersicht(computeUebersicht());
+    document.getElementById('befund-section').scrollIntoView({ behavior: 'smooth' });
+  });
+
+})();
+</script>
+</body>
+</html>

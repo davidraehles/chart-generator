@@ -136,3 +136,41 @@ class TestChartEndpoint:
         response = client.post("/api/hd-chart", json=payload)
         # Should fail - geocoding service can't find the location
         assert response.status_code == 400, f"Expected geocoding error (400), got {response.status_code}"
+
+    def test_calculation_accuracy_stefano(self):
+        """
+        Regression test: verified HD chart for Stefano Grosseto (21.10.1963, 04:50).
+
+        Correct values confirmed via Codes of Life reference chart.
+        This test catches ephemeris path / accuracy regressions — e.g. when
+        pyswisseph silently falls back to Moshier and produces wrong gate assignments.
+        """
+        payload = {
+            "firstName": "Stefano",
+            "birthDate": "21.10.1963",
+            "birthTime": "04:50",
+            "birthTimeApproximate": False,
+            "birthPlace": "Grosseto",
+            "latitude": 42.7667,
+            "longitude": 11.1167,
+        }
+
+        response = client.post("/api/hd-chart", json=payload)
+        assert response.status_code == 200, f"Chart calculation failed: {response.text}"
+
+        data = response.json()
+        assert data["type"]["code"] == "1", (
+            f"Expected Generator (code 1), got '{data['type']['label']}'"
+        )
+        assert data["profile"]["code"] == "1/3", (
+            f"Expected profile 1/3, got '{data['profile']['code']}'"
+        )
+        assert data["authority"]["code"] == "emotional", (
+            f"Expected Emotional authority, got '{data['authority']['code']}'"
+        )
+
+        # Channels 13-33, 3-60, 6-59 must be defined
+        channel_codes = {ch["code"] for ch in data["channels"]}
+        assert "13-33" in channel_codes, f"Channel 13-33 missing. Found: {channel_codes}"
+        assert "3-60" in channel_codes, f"Channel 3-60 missing. Found: {channel_codes}"
+        assert "6-59" in channel_codes, f"Channel 6-59 missing. Found: {channel_codes}"

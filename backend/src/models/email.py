@@ -7,12 +7,14 @@ from uuid import UUID
 class EmailCaptureRequest(BaseModel):
     """Email capture request"""
     email: EmailStr
+    first_name: Optional[str] = None
+    hd_type: Optional[str] = None
 
 
 class EmailCaptureResponse(BaseModel):
     """Email capture response"""
     success: bool
-    id: int
+    id: Optional[str] = None
     message: str
 
 

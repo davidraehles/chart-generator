@@ -4,9 +4,8 @@ Database model for lead email storage.
 SQLAlchemy ORM model for storing email captures with soft-delete support.
 """
 
-from datetime import datetime, UTC
+from datetime import datetime, timezone
 from sqlalchemy import Column, String, DateTime, Boolean, Text
-from sqlalchemy.dialects.postgresql import UUID
 import uuid
 
 from src.models.ephemeris_storage import Base
@@ -21,12 +20,14 @@ class LeadEmailDB(Base):
 
     __tablename__ = "lead_emails"
 
-    id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
+    id = Column(String(36), primary_key=True, default=lambda: str(uuid.uuid4()))
     email = Column(String(255), nullable=False, index=True)
+    first_name = Column(String(100), nullable=True)
+    hd_type = Column(String(20), nullable=True, index=True)
     status = Column(String(50), nullable=False, default="pending")
     source = Column(String(100), nullable=True)
-    created_at = Column(DateTime, nullable=False, default=lambda: datetime.now(UTC))
-    updated_at = Column(DateTime, nullable=False, default=lambda: datetime.now(UTC), onupdate=lambda: datetime.now(UTC))
+    created_at = Column(DateTime, nullable=False, default=lambda: datetime.now(timezone.utc))
+    updated_at = Column(DateTime, nullable=False, default=lambda: datetime.now(timezone.utc), onupdate=lambda: datetime.now(timezone.utc))
     deleted_at = Column(DateTime, nullable=True, index=True)
     notes = Column(Text, nullable=True)
     consent_given = Column(Boolean, nullable=False, default=False)

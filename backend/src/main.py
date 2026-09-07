@@ -2,7 +2,9 @@
 
 from fastapi import FastAPI, HTTPException, Request
 from fastapi.middleware.cors import CORSMiddleware
-from fastapi.responses import JSONResponse
+from fastapi.responses import JSONResponse, StreamingResponse
+import csv
+import io
 import os
 from dotenv import load_dotenv
 import html
@@ -18,8 +20,9 @@ from src.services.validation_service import ValidationService, ValidationError
 from src.services.hd_api_client import HDAPIClient
 from src.services.normalization_service import NormalizationService
 from src.api.routes.chart import router as chart_router
+from src.api.routes.pdf import router as pdf_router
 from src.handlers.email_handler import EmailHandler, EmailCaptureError
-from src.database import get_db_session
+from src.database import get_db_session, init_db
 from datetime import datetime
 import pytz
 from src.services.geocoding_service import GeocodingService
@@ -43,6 +46,11 @@ app = FastAPI(
 
 # Add rate limiter to app state
 app.state.limiter = limiter
+
+# Initialize database tables on startup
+@app.on_event("startup")
+async def startup_event():
+    init_db()
 
 # Add HTTPS enforcement middleware in production
 environment = os.getenv("ENVIRONMENT", "development")
@@ -76,12 +84,49 @@ bodygraph_calculator = BodygraphCalculator()
 
 # Include routers
 app.include_router(chart_router)
+app.include_router(pdf_router)
 
 
 @app.get("/health")
 async def health_check():
     """Health check endpoint"""
     return {"status": "healthy", "service": "hd-chart-generator"}
+
+
+@app.get("/api/debug-stefano")
+async def debug_stefano():
+    """Debug endpoint: computes raw Sun longitude for Stefano 21.10.1963 04:50 Grosseto"""
+    try:
+        import swisseph as swe
+        tz = pytz.timezone("Europe/Rome")
+        birth_local = tz.localize(datetime(1963, 10, 21, 4, 50))
+        birth_utc = birth_local.astimezone(pytz.UTC)
+        jd = swe.julday(birth_utc.year, birth_utc.month, birth_utc.day,
+                        birth_utc.hour + birth_utc.minute / 60.0)
+        res = swe.calc_ut(jd, swe.SUN)
+        sun_lon = float(res[0][0])
+        adj = (sun_lon + 58.0) % 360.0
+        gn = int(adj / 5.625)
+        pig = adj % 5.625
+        ln = int(pig / 0.9375) + 1
+        wheel = [41,19,13,49,30,55,37,63,22,36,25,17,21,51,42,3,
+                 27,24,2,23,8,20,16,35,45,12,15,52,39,53,62,56,
+                 31,33,7,4,29,59,40,64,47,6,46,18,48,57,32,50,
+                 28,44,1,43,14,34,9,5,26,11,10,58,38,54,61,60]
+        gate = wheel[gn] if 0 <= gn < 64 else -1
+        return {
+            "ok": True,
+            "birth_utc": str(birth_utc),
+            "jd": jd,
+            "sun_lon": sun_lon,
+            "gate": gate,
+            "line": ln,
+            "expected_sun": 207.028,
+            "expected_gate": 50,
+            "expected_line": 1,
+        }
+    except Exception as e:
+        return {"ok": False, "error": str(e), "type": type(e).__name__}
 
 
 @app.post("/api/hd-chart", response_model=ChartResponse)
@@ -138,16 +183,29 @@ async def generate_chart(request: Request, chart_request: ChartRequest):
         if not is_valid:
             raise ValidationError("birthTime", error_msg)
 
-        # 1. Geocode birth place
-        lat, lng, tz_str = geocoding_service.get_location_data(chart_request.birthPlace)
-        if not lat or not lng or not tz_str:
-            raise HTTPException(
-                status_code=400,
-                detail={
-                    "field": "birthPlace",
-                    "error": "Ort nicht gefunden. Bitte prüfen Sie die Eingabe.",
-                },
-            )
+        # 1. Resolve coordinates and timezone
+        if chart_request.latitude is not None and chart_request.longitude is not None:
+            lat = chart_request.latitude
+            lng = chart_request.longitude
+            tz_str = geocoding_service.get_timezone_from_coords(lat, lng)
+            if not tz_str:
+                raise HTTPException(
+                    status_code=400,
+                    detail={
+                        "field": "birthPlace",
+                        "error": "Zeitzone für den angegebenen Ort nicht gefunden.",
+                    },
+                )
+        else:
+            lat, lng, tz_str = geocoding_service.get_location_data(chart_request.birthPlace)
+            if not lat or not lng or not tz_str:
+                raise HTTPException(
+                    status_code=400,
+                    detail={
+                        "field": "birthPlace",
+                        "error": "Ort nicht gefunden. Bitte prüfen Sie die Eingabe.",
+                    },
+                )
 
         # 2. Parse datetime
         try:
@@ -282,6 +340,8 @@ async def capture_email(request: Request, email_request: EmailCaptureRequest):
             db_session=db_session,
             ip_address=None,
             user_agent=None,
+            first_name=email_request.first_name,
+            hd_type=email_request.hd_type,
         )
 
         return EmailCaptureResponse(
@@ -301,6 +361,47 @@ async def capture_email(request: Request, email_request: EmailCaptureRequest):
                 "field": "email",
                 "error": "Ein unerwarteter Fehler ist aufgetreten. Bitte versuche es später noch einmal."
             },
+        )
+    finally:
+        if db_session:
+            db_session.close()
+
+
+@app.get("/api/admin/leads")
+async def export_leads(token: str = ""):
+    """
+    Export all email leads as CSV.
+    Protected by ADMIN_TOKEN env var.
+    """
+    admin_token = os.getenv("ADMIN_TOKEN", "")
+    if not admin_token or token != admin_token:
+        raise HTTPException(status_code=403, detail="Forbidden")
+
+    from src.models.lead_email_db import LeadEmailDB
+    db_session = None
+    try:
+        db_session = get_db_session()
+        leads = db_session.query(LeadEmailDB).filter(
+            LeadEmailDB.deleted_at.is_(None)
+        ).order_by(LeadEmailDB.created_at.desc()).all()
+
+        output = io.StringIO()
+        writer = csv.writer(output)
+        writer.writerow(["email", "first_name", "hd_type", "status", "created_at"])
+        for lead in leads:
+            writer.writerow([
+                lead.email,
+                lead.first_name or "",
+                lead.hd_type or "",
+                lead.status,
+                lead.created_at.strftime("%Y-%m-%d %H:%M") if lead.created_at else "",
+            ])
+
+        output.seek(0)
+        return StreamingResponse(
+            iter([output.getvalue()]),
+            media_type="text/csv",
+            headers={"Content-Disposition": "attachment; filename=leads.csv"},
         )
     finally:
         if db_session:
