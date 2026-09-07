@@ -600,10 +600,10 @@ export async function generateAndDownloadPdf(
       <div class="trigger-box" style="page-break-inside:avoid;">
         <div style="font-size:6.5pt;text-transform:uppercase;letter-spacing:0.13em;font-weight:700;color:rgba(255,255,255,0.6);margin-bottom:5px;">Business Energy Trigger</div>
         <div style="font-size:8pt;text-transform:uppercase;letter-spacing:0.05em;font-weight:700;color:#fff;margin-bottom:3px;">3. Kostenlose Impulse erhalten</div>
-        <div style="font-size:10pt;font-weight:700;color:#fff;margin-bottom:6px;line-height:1.35;">Deine Business Energy Trigger</div>
+        <div style="font-size:10pt;font-weight:700;color:#fff;margin-bottom:6px;line-height:1.35;">Business Energy Trigger</div>
         <div style="font-size:8.5pt;color:rgba(255,255,255,0.85);line-height:1.6;margin-bottom:7px;">Du erhältst sechs Monate lang einmal im Monat eine persönliche E-Mail von mir, abgestimmt auf deinen Human Design Typ. Jeder Impuls gibt dir einen konkreten Gedanken, eine Reflexionsfrage oder einen neuen Blick auf deine Business-Energie.</div>
-        <div style="font-size:7pt;color:rgba(255,255,255,0.5);font-weight:700;letter-spacing:0.1em;margin-bottom:8px;">KOSTENLOS | 6 E-MAILS | 6 MONATE</div>
-        <div style="font-size:7.5pt;color:rgba(255,255,255,0.6);font-weight:600;">stupperich.de → Business Energy Calculator</div>
+        <div style="font-size:7pt;color:rgba(255,255,255,0.5);font-weight:700;letter-spacing:0.1em;margin-bottom:10px;">KOSTENLOS | 6 E-MAILS | 6 MONATE</div>
+        <a href="https://energie.stupperich.de" style="display:inline-block;background:#fff;color:#1A2126;font-size:8pt;font-weight:700;padding:7px 14px;text-decoration:none;letter-spacing:0.03em;">Business Energy Trigger erhalten →</a>
       </div>
 
       <!-- Abschluss -->
