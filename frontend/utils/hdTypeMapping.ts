@@ -1,6 +1,6 @@
 /**
  * Human Design Mappings — Quelle: content/Bezeichnungen-Texte.xlsx
- * Letzte Aktualisierung: 19.08.26
+ * Letzte Aktualisierung: 08.09.26
  */
 
 export interface TypeMetadata {
@@ -22,7 +22,7 @@ const HD_TYPE_MAPPING: Record<string, TypeMetadata> = {
     strategieBusinessText:
       "Du musst nicht alles selbst anstoßen. Deine stärkste Energie entsteht, wenn du auf konkrete Chancen, Anforderungen oder Impulse reagierst, die etwas in dir auslösen. Genau dort lohnt es sich, deine Energie und Priorität einzusetzen.",
     typeBusinessText:
-      "Du bist stark, wenn du dich auf Arbeit einlässt, die dich wirklich antreibt, und mit konstanter Energie anderen zeigst, was echte Ausdauer bedeutet.",
+      "Du führst stark, wenn du deine Energie auf Aufgaben richtest, die dich wirklich antreiben, statt dich an den Erwartungen anderer auszurichten. Deine Ausdauer und Schaffenskraft machen dich zu einer Führungspersönlichkeit, mit der Menschen langfristig arbeiten wollen.",
     higherSelf: "Befriedigung/Freude",
     notSelf: "Frustration",
   },
@@ -33,7 +33,7 @@ const HD_TYPE_MAPPING: Record<string, TypeMetadata> = {
     strategieBusinessText:
       "Du musst nicht alles selbst anstoßen. Deine stärksten Schritte entstehen, wenn etwas im Außen eine klare Reaktion in dir auslöst, und du dabei deinen eigenen, oft direkteren Weg findest.",
     typeBusinessText:
-      "Du bist stark, wenn du mehrere Themen verbinden, Dinge voranbringen und deinen eigenen effizienten Weg finden kannst.",
+      "Du führst wirkungsvoll, wenn du verschiedene Themen verbinden, schnell handeln und auf deine Art umsetzen kannst. Folge deiner Kreativität und genieße den Prozess, anstatt dich nur auf das Ergebnis zu konzentrieren. So begeisterst du andere und bringst sie in Bewegung.",
     higherSelf: "Befriedigung/Freude",
     notSelf: "Frustration",
   },
@@ -44,7 +44,7 @@ const HD_TYPE_MAPPING: Record<string, TypeMetadata> = {
     strategieBusinessText:
       "Deine Wirkung entfaltet sich, wenn andere deinen Blick aktiv anfragen. Dränge dich nicht auf, warte auf den Moment, in dem du erkannt und eingeladen wirst.",
     typeBusinessText:
-      "Du bist stark, wenn du erkannt und eingeladen wirst, deinen Blick auf Systeme und Menschen einzubringen. Deine Beobachtungsgabe ist dein schärfstes Werkzeug.",
+      "Du bist stark, wenn du deinen Blick auf Systeme und Menschen einbringen kannst. Du erkennst Fähigkeiten und Muster schnell. Deine Wirkung entsteht im Leiten, nicht im dauerhaften Leisten. Deine Beobachtungsgabe ist dein schärfstes Werkzeug.",
     higherSelf: "Erfolg",
     notSelf: "Bitterkeit",
   },
@@ -55,7 +55,7 @@ const HD_TYPE_MAPPING: Record<string, TypeMetadata> = {
     strategieBusinessText:
       "Du kannst Dinge in Bewegung setzen, bevor andere auch nur daran denken. Informiere dein Umfeld, bevor du handelst – das schafft Vertrauen statt Widerstand.",
     typeBusinessText:
-      "Du bist stark, wenn du Impulse frei initiieren und dein Umfeld frühzeitig in deine Pläne einbeziehen kannst.",
+      "Du führst stark, wenn du eigene Impulse initiierst und dein Umfeld frühzeitig über deine Pläne informierst. Du gehst neue Wege, stellst Bestehendes infrage und setzt kraftvolle Veränderungen in Gang. Deine Unabhängigkeit und dein Mut machen dich zum Leader.",
     higherSelf: "Innerer Frieden",
     notSelf: "Wut",
   },
@@ -66,7 +66,7 @@ const HD_TYPE_MAPPING: Record<string, TypeMetadata> = {
     strategieBusinessText:
       "Du brauchst Zeit und Abstand, um klare Impulse zu spüren. Warte möglichst einen Mondzyklus ab, bevor du große Entscheidungen triffst.",
     typeBusinessText:
-      "Du bist stark, wenn du Systeme, Teams und Situationen aus der Außenperspektive beobachtest und benennen kannst, was andere schlicht nicht sehen.",
+      "Du führst stark, wenn du Teams und Systeme aus der Außenperspektive beobachtest. Du erkennst, was andere übersehen, und spiegelst es präzise zurück. Deine Wahrnehmung macht Potenziale und notwendige Veränderungen sichtbar und das darfst du weitergeben, statt es festzuhalten.",
     higherSelf: "Überraschung",
     notSelf: "Enttäuschung",
   },
