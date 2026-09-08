@@ -352,7 +352,7 @@ export default function ChartForm({ onSuccess, onError, onRequest }: ChartFormPr
 
       {/* ── Datenschutz-Hinweis ── */}
       <p className="mt-4 text-center text-xs" style={{ color: "#C4BEB8" }}>
-        Deine Angaben werden ausschließlich zur Berechnung deiner persönlichen Human Design Business-Energie verwendet.
+        Deine Angaben werden ausschließlich zur Berechnung verwendet und nicht gespeichert. Lade dein Ergebnis als PDF herunter, um es zu behalten.
       </p>
 
       {/* ── Rechtlicher Hinweis ── */}
